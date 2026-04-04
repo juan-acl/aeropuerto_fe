@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "Aeropuerto La Aurora",
+    "slug": "aeropuerto_fe",
+    "version": "2.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "aeropuertofe",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": { "supportsTablet": true },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#003366",
+        "foregroundImage": "./assets/images/android-icon-foreground.png"
+      },
+      "edgeToEdgeEnabled": true
+    },
+    "web": { "output": "static", "favicon": "./assets/images/favicon.png" },
+    "plugins": ["expo-router", ["expo-splash-screen", {
+      "backgroundColor": "#003366",
+      "resizeMode": "contain"
+    }]],
+    "experiments": { "typedRoutes": true }
+  }
+}
