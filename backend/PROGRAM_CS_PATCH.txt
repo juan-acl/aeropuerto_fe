@@ -1,0 +1,32 @@
+// ═══════════════════════════════════════════════════════════════
+// PATCH para aeropuerto_be-develop/Program.cs
+// Agregar estos servicios DESPUÉS de AddScoped<IAeropuertoService>
+// ═══════════════════════════════════════════════════════════════
+
+// REEMPLAZAR la sección de servicios con esto:
+
+builder.Services.AddScoped<IAeropuertoService,      AeropuertoService>();
+builder.Services.AddScoped<IAerolineaService,        AerolineaService>();
+builder.Services.AddScoped<ITripulacionService,      TripulacionService>();
+builder.Services.AddScoped<ITemporadaVueloService,   TemporadaVueloService>();
+builder.Services.AddScoped<IModeloAvionService,      ModeloAvionService>();
+builder.Services.AddScoped<IFabricanteAvionService,  FabricanteAvionService>();
+builder.Services.AddScoped<IMotorAvionService,       MotorAvionService>();
+builder.Services.AddScoped<IUsuarioSistemaService,   UsuarioSistemaService>();
+builder.Services.AddScoped<IRolSistemaService,       RolSistemaService>();
+builder.Services.AddScoped<IUsuarioRolService,       UsuarioRolService>();
+
+// REEMPLAZAR la política CORS con esto (para que Expo funcione):
+builder.Services.AddCors(options => {
+    options.AddPolicy(name: MiAppReact,
+        policy => {
+            policy.WithOrigins(
+                "http://localhost:3000",    // React web
+                "http://localhost:8081",    // Expo web
+                "http://localhost:19006",   // Expo web alternativo
+                "http://localhost:19000"    // Expo Go tunnel
+            )
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+        });
+});

@@ -1,0 +1,16 @@
+-- =================================================================
+-- PASO 2: DESPLEGAR EL SCHEMA (240 TABLAS)
+-- Ejecutar como: aurora_user / aurora_pass2024
+-- Conexión: localhost:1521  SID: ORCL
+-- =================================================================
+-- En SQL Developer:
+--   Nueva conexión → aurora_user / aurora_pass2024 / SID: ORCL
+--   Abrir incrementos.sql → ejecutar (F5 o botón Run Script)
+--
+-- En SQL*Plus (línea de comandos):
+--   sqlplus aurora_user/aurora_pass2024@localhost:1521/ORCL
+--   @incrementos.sql
+--
+-- El script incrementos.sql ya viene en la raíz del proyecto.
+-- No modificar ese archivo.
+-- =================================================================
