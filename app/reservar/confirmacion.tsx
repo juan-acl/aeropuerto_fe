@@ -24,13 +24,13 @@ export default function Confirmacion() {
   const { usuario } = useSesion();
   const { codigo, vuelo: vueloId, asiento, puntos, total } =
     useLocalSearchParams<{ codigo: string; vuelo: string; asiento: string; puntos: string; total: string }>();
-  const { vuelo, programa, aerolinea } = useVueloDetalle(Number(vueloId));
+  const { vuelo, tarifas, loading, error } = useVueloDetalle(Number(vueloId));
 
   const puntosGanados  = Number(puntos ?? 0);
   const totalPagado    = Number(total ?? 0);
-  const salida  = vuelo?.hora_salida_programada?.split('T')[1]?.slice(0,5) ?? '--:--';
-  const llegada = vuelo?.hora_llegada_programada?.split('T')[1]?.slice(0,5) ?? '--:--';
-  const fecha   = vuelo?.fecha_vuelo?.split('T')[0] ?? '—';
+  const salida  = vuelo?.HoraSalidaProgramada?.split('T')[1]?.slice(0,5) ?? '--:--';
+  const llegada = vuelo?.HoraLlegadaProgramada?.split('T')[1]?.slice(0,5) ?? '--:--';
+  const fecha   = vuelo?.FechaVuelo?.split('T')[0] ?? '—';
 
   const lealtad = (PROGRAMAS_LEALTAD as any[]).find(l => l.id_pasajero === usuario?.id);
   const nivelActual    = lealtad?.nivel_membresia ?? 'BRONCE';
@@ -46,7 +46,7 @@ export default function Confirmacion() {
   const handleShare = async () => {
     try {
       await Share.share({
-        message: `✈️ Reserva confirmada: ${codigo}\nVuelo: ${vuelo?.numero_vuelo ?? vueloId}\nAsiento: ${asiento}\nFecha: ${fecha}\nSalida: ${salida}`,
+        message: `✈️ Reserva confirmada: ${codigo}\nVuelo: ${vuelo?.NumeroVuelo ?? vueloId}\nAsiento: ${asiento}\nFecha: ${fecha}\nSalida: ${salida}`,
         title: 'Mi pase de abordar — Aeropuerto La Aurora',
       });
     } catch {}
@@ -71,8 +71,8 @@ export default function Confirmacion() {
           {/* Header strip */}
           <View style={s.bpHeader}>
             <View style={s.bpOrb} />
-            <Text style={s.bpAerolinea}>{aerolinea?.nombre_aerolinea ?? 'Aerolínea'}</Text>
-            <Text style={s.bpNum}>{vuelo?.numero_vuelo ?? '—'}</Text>
+            <Text style={s.bpAerolinea}>{vuelo?.NombreAerolinea ?? 'Aerolínea'}</Text>
+            <Text style={s.bpNum}>{vuelo?.NumeroVuelo ?? '—'}</Text>
             <View style={[s.bpStatusChip]}>
               <Text style={s.bpStatusT}>CONFIRMADO</Text>
             </View>
@@ -81,7 +81,7 @@ export default function Confirmacion() {
           {/* Route */}
           <View style={s.bpRoute}>
             <View style={s.bpEndpoint}>
-              <Text style={s.bpCode}>{vuelo?.aeropuerto_origen ?? 'GUA'}</Text>
+              <Text style={s.bpCode}>{vuelo?.AeropuertoOrigen ?? 'GUA'}</Text>
               <Text style={s.bpTime}>{salida}</Text>
             </View>
             <View style={s.bpMiddle}>
@@ -89,7 +89,7 @@ export default function Confirmacion() {
               <Text style={s.bpFecha}>{fecha}</Text>
             </View>
             <View style={[s.bpEndpoint, { alignItems: 'flex-end' }]}>
-              <Text style={s.bpCode}>{vuelo?.aeropuerto_destino ?? '—'}</Text>
+              <Text style={s.bpCode}>{vuelo?.AeropuertoDestino ?? '—'}</Text>
               <Text style={s.bpTime}>{llegada}</Text>
             </View>
           </View>
@@ -107,7 +107,7 @@ export default function Confirmacion() {
               { label: 'PASAJERO', value: `${usuario?.nombre ?? '—'} ${usuario?.apellido ?? ''}` },
               { label: 'ASIENTO',  value: asiento ?? '—' },
               { label: 'CÓDIGO',   value: codigo ?? '—' },
-              { label: 'PUERTA',   value: `${vuelo?.id_puerta_salida ?? '—'}` },
+              { label: 'PUERTA',   value: `${vuelo?.IdPuertaSalida ?? '—'}` },
             ].map(item => (
               <View key={item.label} style={s.bpInfoItem}>
                 <Text style={s.bpInfoLabel}>{item.label}</Text>

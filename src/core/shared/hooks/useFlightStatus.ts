@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Hook for real-time flight status polling.
  * Polls retrasos_tiempo_real every 15 seconds.
  */
@@ -24,11 +24,13 @@ export function useFlightStatus(idVuelo: number): FlightStatusResult {
   const fetch = useCallback(async () => {
     setLoading(true);
     try {
-      // Try API first; fall back to mock
-      const found = VUELOS.find((v: any) => v.id_vuelo === idVuelo) ?? null;
-      const retraso = RETRASOS.find((r: any) => r.id_vuelo === idVuelo);
-      setVuelo(found as Vuelo | null);
-      setRetrasoMinutos(retraso?.minutos_retraso ?? 0);
+      // Obtener vuelo real desde el backend
+      const vuelos = await backendApi.vuelos.listar().catch(() => [] as any[]);
+      const found = vuelos.find((v: any) => v.IdVuelo === idVuelo || v.id_vuelo === idVuelo) ?? null;
+      const retrasos = await backendApi.retrasos.listar().catch(() => [] as any[]);
+      const retraso = retrasos.find((r: any) => r.IdVuelo === idVuelo || r.id_vuelo === idVuelo);
+      setVuelo(found as any);
+      setRetrasoMinutos(retraso?.MinutosRetraso ?? retraso?.minutos_retraso ?? 0);
       setLastUpdated(new Date());
     } finally {
       setLoading(false);

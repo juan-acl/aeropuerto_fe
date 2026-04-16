@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, ScrollView, SafeAreaView, Alert, TouchableOpacity } from 'react-native';
 import { backendApi } from '@/services/backendApi';
 import {Badge, DataCard, EmptyState, FF, FSelect, FToggle, FormModal, FormSection, InfoRow, ProgressBar, ScoreBar, ScreenHeader, SearchBar, StatCard, StatsRow, TabBar} from '@/components/shared';
@@ -12,12 +12,12 @@ export default function Screen() {
   const [ORDENES_COMPRA, set_ORDENES_COMPRA] = useState<any[]>([]);
   const [CUENTAS_BANCARIAS, set_CUENTAS_BANCARIAS] = useState<any[]>([]);
   useEffect(() => {
-      backendApi.finanzas.presupuestos.listar().then(d => set_PRESUPUESTOS_DATA(d)).catch(() => {});
-      backendApi.ingresos.listar().then(d => set_INGRESOS_DATA(d)).catch(() => {});
-      backendApi.gastos.listar().then(d => set_GASTOS_DATA(d)).catch(() => {});
-      backendApi.vuelos.listar().then(d => set_PROVEEDORES_DATA(d)).catch(() => {});
-      backendApi.vuelos.listar().then(d => set_ORDENES_COMPRA(d)).catch(() => {});
-      backendApi.cuentasBancarias.listar().then(d => set_CUENTAS_BANCARIAS(d)).catch(() => {});
+      backendApi.finanzas.presupuestos.listar().then((d: any) => set_PRESUPUESTOS_DATA(d)).catch(() => {});
+      backendApi.ingresos.listar().then((d: any) => set_INGRESOS_DATA(d)).catch(() => {});
+      backendApi.gastos.listar().then((d: any) => set_GASTOS_DATA(d)).catch(() => {});
+      backendApi.vuelos.listar().then((d: any) => set_PROVEEDORES_DATA(d)).catch(() => {});
+      backendApi.vuelos.listar().then((d: any) => set_ORDENES_COMPRA(d)).catch(() => {});
+      backendApi.cuentasBancarias.listar().then((d: any) => set_CUENTAS_BANCARIAS(d)).catch(() => {});
   }, []);
 
   const [q, setQ] = useState('');

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Dashboard Tab — Dinámico por rol
  */
 import React, { useState, useMemo, useEffect } from 'react';
@@ -62,14 +62,14 @@ function AlertRow({ text, level }: { text: string; level: 'info' | 'warn' | 'cri
 }
 
 // ─── CLIENTE ──────────────────────────────────────────────────────────────────
-function DashboardCliente() {
+function DashboardCliente({ PROGRAMAS_LEALTAD, HOTELES, VUELOS }: { PROGRAMAS_LEALTAD: any[]; HOTELES: any[]; VUELOS: any[] }) {
   const { usuario, misReservas } = useSesion();
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
 
-  const lealtad = PROGRAMAS_LEALTAD.find(p => p.id_pasajero === (usuario?.id ?? 100));
-  const puntos  = lealtad?.puntos_acumulados ?? 0;
-  const nivel   = (lealtad as any)?.nivel_membresia ?? 'BRONCE';
+  const lealtad = PROGRAMAS_LEALTAD.find((p: any) => p.IdPasajero === (usuario?.id ?? 100) || p.id_pasajero === (usuario?.id ?? 100));
+  const puntos  = lealtad?.PuntosAcumulados ?? lealtad?.puntos_acumulados ?? 0;
+  const nivel   = lealtad?.NivelMembresia ?? lealtad?.nivel_membresia ?? 'BRONCE';
 
   const NIVEL_CFG: Record<string, { color: string; icon: string; next: number }> = {
     BRONCE:  { color: '#B45309', icon: '🥉', next: 5000   },
@@ -84,7 +84,7 @@ function DashboardCliente() {
     .filter(r => r.estado_reserva === 'CONFIRMADA' || r.estado_reserva === 'CHECK_IN')
     .slice(0, 3);
 
-  const hotelesTop = HOTELES.filter((h: any) => h.activo).slice(0, 3);
+  const hotelesTop = HOTELES.filter((h: any) => h.Activo !== 0).slice(0, 3);
   const onRefresh  = () => { setRefreshing(true); setTimeout(() => setRefreshing(false), 800); };
   const hora = new Date().getHours();
   const saludo = hora < 12 ? 'Buenos días' : hora < 19 ? 'Buenas tardes' : 'Buenas noches';
@@ -146,19 +146,19 @@ function DashboardCliente() {
             <View style={s.emptyBtn}><Text style={s.emptyBtnT}>Reservar ahora →</Text></View>
           </TouchableOpacity>
         ) : proximos.map((r: any, i: number) => {
-          const vuelo = VUELOS.find(v => v.id_vuelo === r.id_vuelo);
+          const vuelo = VUELOS.find((v: any) => v.IdVuelo === r.id_vuelo || v.id_vuelo === r.id_vuelo);
           return (
             <View key={i} style={s.reservaCard}>
               <View style={[s.reservaAccent, { backgroundColor: C.electric }]} />
               <View style={s.reservaBody}>
                 <View style={s.reservaTop}>
-                  <Text style={s.reservaNum}>{vuelo?.numero_vuelo ?? r.numero_vuelo ?? '—'}</Text>
+                  <Text style={s.reservaNum}>{vuelo?.NumeroVuelo ?? vuelo?.numero_vuelo ?? r.numero_vuelo ?? '—'}</Text>
                   <View style={[s.chipGreen]}>
                     <Text style={s.chipGreenT}>{r.estado_reserva}</Text>
                   </View>
                 </View>
                 <Text style={s.reservaRuta}>
-                  {vuelo?.aeropuerto_origen ?? 'GUA'} → {vuelo?.aeropuerto_destino ?? '—'}
+                  {vuelo?.AeropuertoOrigen ?? vuelo?.aeropuerto_origen ?? 'GUA'} → {vuelo?.AeropuertoDestino ?? vuelo?.aeropuerto_destino ?? '—'}
                 </Text>
                 <View style={s.reservaMeta}>
                   <Text style={s.reservaMetaT}>💺 {r.numero_asiento ?? '—'}</Text>
@@ -196,19 +196,19 @@ function DashboardCliente() {
 }
 
 // ─── EMPLEADO ─────────────────────────────────────────────────────────────────
-function DashboardEmpleado() {
+function DashboardEmpleado({ VUELOS, ALERTAS_DATA }: { VUELOS: any[]; ALERTAS_DATA: any[] }) {
   const { usuario } = useSesion();
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
 
   const stats = useMemo(() => ({
-    enVuelo:     VUELOS.filter(v => v.estado_vuelo === 'EN_VUELO').length,
-    demorados:   VUELOS.filter(v => v.estado_vuelo === 'DEMORADO').length,
-    cancelados:  VUELOS.filter(v => v.estado_vuelo === 'CANCELADO').length,
-    programados: VUELOS.filter(v => v.estado_vuelo === 'PROGRAMADO').length,
-  }), []);
+    enVuelo:     VUELOS.filter((v: any) => (v.EstadoVuelo ?? v.estado_vuelo) === 'EN_VUELO').length,
+    demorados:   VUELOS.filter((v: any) => (v.EstadoVuelo ?? v.estado_vuelo) === 'DEMORADO').length,
+    cancelados:  VUELOS.filter((v: any) => (v.EstadoVuelo ?? v.estado_vuelo) === 'CANCELADO').length,
+    programados: VUELOS.filter((v: any) => (v.EstadoVuelo ?? v.estado_vuelo) === 'PROGRAMADO').length,
+  }), [VUELOS]);
 
-  const alertas = (ALERTAS_DATA as any[]).filter(a => !a.atendida).slice(0, 4);
+  const alertas = (ALERTAS_DATA as any[]).filter((a: any) => !a.Atendida && !a.atendida).slice(0, 4);
   const vuelosHoy = VUELOS.slice(0, 6);
   const permisos = PERMISOS_POR_ROL[usuario?.rol ?? 'OPERACIONES'];
 
@@ -282,8 +282,8 @@ function DashboardEmpleado() {
         <SectionHeader title="Vuelos de hoy" action="Ver todos"
           onAction={() => router.push('/(tabs)' as any)} />
         {vuelosHoy.map(v => {
-          const dep = v.hora_salida_programada?.split('T')[1]?.slice(0, 5) ?? '--:--';
-          const sc  = STATUS_COLOR[v.estado_vuelo] ?? C.gray;
+          const dep = (v.HoraSalidaProgramada ?? v.hora_salida_programada)?.split('T')[1]?.slice(0, 5) ?? '--:--';
+          const sc  = STATUS_COLOR[(v.EstadoVuelo ?? v.estado_vuelo)] ?? C.gray;
           return (
             <TouchableOpacity key={v.id_vuelo} style={s.vueloRow}
               onPress={() => router.push(('/modules/vuelo-detalle?id=' + v.id_vuelo) as any)}
@@ -291,12 +291,12 @@ function DashboardEmpleado() {
             >
               <View style={[s.vuDot, { backgroundColor: sc }]} />
               <View style={{ flex: 1 }}>
-                <Text style={s.vuNum}>{v.numero_vuelo ?? 'FL-' + v.id_vuelo}</Text>
-                <Text style={s.vuRuta}>{v.aeropuerto_origen} → {v.aeropuerto_destino}</Text>
+                <Text style={s.vuNum}>{v.NumeroVuelo ?? v.numero_vuelo ?? 'FL-' + v.id_vuelo}</Text>
+                <Text style={s.vuRuta}>{v.AeropuertoOrigen ?? v.aeropuerto_origen} → {v.AeropuertoDestino ?? v.aeropuerto_destino}</Text>
               </View>
               <Text style={s.vuHora}>{dep}</Text>
               <View style={[s.vuEstado, { backgroundColor: sc + '20', borderColor: sc + '40' }]}>
-                <Text style={[s.vuEstadoT, { color: sc }]}>{v.estado_vuelo}</Text>
+                <Text style={[s.vuEstadoT, { color: sc }]}>{v.EstadoVuelo ?? v.estado_vuelo}</Text>
               </View>
             </TouchableOpacity>
           );
@@ -325,23 +325,26 @@ function DashboardEmpleado() {
 }
 
 // ─── ADMIN ────────────────────────────────────────────────────────────────────
-function DashboardAdmin() {
+function DashboardAdmin({ VUELOS, ALERTAS_DATA, EMPLEADOS, INGRESOS_DATA, GASTOS_DATA, CANCELACIONES }: {
+  VUELOS: any[]; ALERTAS_DATA: any[]; EMPLEADOS: any[];
+  INGRESOS_DATA: any[]; GASTOS_DATA: any[]; CANCELACIONES: any[];
+}) {
   const { isOnline, temporadas, refresh } = useBackend();
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
 
-  const totalIngresos = (INGRESOS_DATA as any[]).reduce((s: number, i: any) => s + (i.monto ?? 0), 0);
-  const totalGastos   = (GASTOS_DATA   as any[]).reduce((s: number, g: any) => s + (g.monto ?? 0), 0);
+  const totalIngresos = (INGRESOS_DATA as any[]).reduce((s: number, i: any) => s + (i.Monto ?? i.monto ?? 0), 0);
+  const totalGastos   = (GASTOS_DATA   as any[]).reduce((s: number, g: any) => s + (g.Monto ?? g.monto ?? 0), 0);
   const balance = totalIngresos - totalGastos;
 
   const stats = {
     vuelos:       VUELOS.length,
-    enVuelo:      VUELOS.filter(v => v.estado_vuelo === 'EN_VUELO').length,
-    empleados:    EMPLEADOS.filter(e => e.activo).length,
-    alertas:      (ALERTAS_DATA as any[]).filter(a => !a.atendida).length,
+    enVuelo:      VUELOS.filter((v: any) => (v.EstadoVuelo ?? v.estado_vuelo) === 'EN_VUELO').length,
+    empleados:    EMPLEADOS.filter((e: any) => e.Activo !== 0).length,
+    alertas:      (ALERTAS_DATA as any[]).filter((a: any) => !a.Atendida && !a.atendida).length,
     cancelaciones:CANCELACIONES.length,
   };
-  const alertasCrit = (ALERTAS_DATA as any[]).filter(a => !a.atendida).slice(0, 3);
+  const alertasCrit = (ALERTAS_DATA as any[]).filter((a: any) => !a.Atendida && !a.atendida).slice(0, 3);
   const onRefresh   = () => { setRefreshing(true); setTimeout(() => setRefreshing(false), 800); };
 
   const ADMIN_LINKS = [
@@ -445,8 +448,8 @@ export default function DashboardTab() {
   }, []);
 
   const { esCliente, esAdmin } = useSesion();
-  if (esAdmin)    return <DashboardAdmin    />;
-  if (!esCliente) return <DashboardEmpleado />;
+  if (esAdmin)    return <DashboardAdmin    VUELOS={VUELOS} ALERTAS_DATA={ALERTAS_DATA} EMPLEADOS={EMPLEADOS} INGRESOS_DATA={INGRESOS_DATA} GASTOS_DATA={GASTOS_DATA} CANCELACIONES={CANCELACIONES} />;
+  if (!esCliente) return <DashboardEmpleado VUELOS={VUELOS} ALERTAS_DATA={ALERTAS_DATA} />;
   return <ClienteHome />;
 }
 

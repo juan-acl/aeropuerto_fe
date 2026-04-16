@@ -50,25 +50,6 @@ export interface PromoRec {
   vence:     string;
 }
 
-// ── Static data for recommendations when backend has no dedicated endpoints ──
-const DESTINOS_FIJOS: DestinoPop[] = [
-  { code: 'MIA', city: 'Miami',          emoji: '🌊', precio: 385, tagline: 'Sol y playa',       badge: '🔥 Popular' },
-  { code: 'BOG', city: 'Bogotá',         emoji: '🏙️', precio: 220, tagline: 'Mejor precio',      badge: '💰 Oferta' },
-  { code: 'MEX', city: 'CDMX',           emoji: '🌮', precio: 180, tagline: 'Gastronomía' },
-  { code: 'LAX', city: 'Los Ángeles',    emoji: '🎬', precio: 520, tagline: 'Entretenimiento' },
-  { code: 'MAD', city: 'Madrid',         emoji: '🏖️', precio: 780, tagline: 'Cultura europea',  badge: '✈️ Directo' },
-  { code: 'LIM', city: 'Lima',           emoji: '🦙', precio: 310, tagline: 'Gastronomía' },
-  { code: 'SCL', city: 'Santiago',       emoji: '🏔️', precio: 420, tagline: 'Aventura' },
-  { code: 'CUN', city: 'Cancún',         emoji: '🌴', precio: 290, tagline: 'Todo incluido',    badge: '🌟 Top' },
-];
-
-const PROMOS_BASE: PromoRec[] = [
-  { id: 'p1', titulo: 'Escapada caribeña',    descuento: 30, destino: 'CUN', precio: 203, color: C.teal,     emoji: '🌴', vence: '31 Dic' },
-  { id: 'p2', titulo: 'Vuelo a Bogotá',       descuento: 25, destino: 'BOG', precio: 165, color: C.electric, emoji: '🏙️', vence: '15 Ene' },
-  { id: 'p3', titulo: 'Semana en Miami',      descuento: 20, destino: 'MIA', precio: 308, color: C.purple,   emoji: '🌊', vence: '28 Feb' },
-  { id: 'p4', titulo: 'Vuelo + Hotel Madrid', descuento: 15, destino: 'MAD', precio: 663, color: C.amber,    emoji: '🏖️', vence: '10 Mar' },
-];
-
 const EMOJIS = ['🏨', '🌴', '🏙️', '⛪', '🌿', '🏰', '🌊', '🏔️'];
 
 export function useRecommendations() {
@@ -76,29 +57,18 @@ export function useRecommendations() {
   const backend = useBackend();
 
   // ── Destinos populares ────────────────────────────────────────────────────
-  // Si hay aeropuertos reales del backend, usarlos. Sino, usar lista fija.
   const destinosPopulares = useMemo((): DestinoPop[] => {
     const backendAirports = backend.aeropuertos.data;
 
-    if (backendAirports.length > 0) {
-      // Mezclar: aeropuertos reales de Oracle + destinos conocidos
-      const realCodes = new Set(backendAirports.map((a: any) => a.codigo_aeropuerto));
-      return DESTINOS_FIJOS.map(d => ({
-        ...d,
-        // Si el aeropuerto existe en Oracle, marcar como real
-        badge: realCodes.has(d.code) ? '🟢 En Oracle' :
-               features?.topDestinations.includes(d.code) ? '⭐ Tu favorito' : d.badge,
-      }));
-    }
-
-    if (!features) return DESTINOS_FIJOS;
-    return DESTINOS_FIJOS.map(d => ({
-      ...d,
-      badge: features.topDestinations.includes(d.code) ? '⭐ Tu favorito'
-           : features.searchedDestinations?.includes(d.code) ? '🔍 Buscado'
-           : d.badge,
+    return backendAirports.slice(0, 8).map((a: any, i: number) => ({
+      code: a.codigo_aeropuerto,
+      city: a.ciudad ?? a.nombre_aeropuerto,
+      emoji: EMOJIS[i % EMOJIS.length],
+      precio: 200 + (i * 20),
+      tagline: a.pais ?? 'Destino',
+      badge: '🟢 En Oracle'
     }));
-  }, [features, backend.aeropuertos.data]);
+  }, [backend.aeropuertos.data]);
 
   // ── Hoteles recomendados: datos reales del backend Oracle ─────────────────
   const hotelesRecomendados = useMemo((): HotelRec[] => {
@@ -140,19 +110,9 @@ export function useRecommendations() {
 
   // ── Promos ────────────────────────────────────────────────────────────────
   const promos = useMemo((): PromoRec[] => {
-    if (!features) return PROMOS_BASE;
-    if (features.clusterLabel === 'CHURNING') {
-      return [
-        {
-          id: 'ret', titulo: 'Te extrañamos — oferta exclusiva', descuento: 40,
-          destino: features.topDestinations[0] ?? 'BOG', precio: 132,
-          color: C.danger, emoji: '🎁', vence: '7 días',
-        },
-        ...PROMOS_BASE.slice(0, 3),
-      ];
-    }
-    return PROMOS_BASE;
-  }, [features]);
+    // Al no haber endpoint de promos, retornamos nada para no mostrar data quemada
+    return [];
+  }, []);
 
   const mensajePersonalizado =
     backend.hoteles.source === 'backend'

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Infrastructure Repository Implementations
  * These adapt the domain contracts to actual data sources (Oracle or Mock).
  * Switch between them by changing which is injected into use cases.
@@ -14,7 +14,7 @@ import type { Reserva } from '../../domain/entities';
 
 // ─── Mock Flight Repository ───────────────────────────────────────────────────
 export class MockFlightRepository implements IFlightRepository {
-  private vuelos = [...VUELOS] as any[];
+  private vuelos: any[] = [];
 
   async findAll(params?: FlightSearchParams) {
     return this.vuelos.filter(v => {
@@ -55,7 +55,7 @@ export class MockFlightRepository implements IFlightRepository {
 
 // ─── Mock Booking Repository ──────────────────────────────────────────────────
 export class MockBookingRepository implements IBookingRepository {
-  private reservas = [...RESERVAS] as any[];
+  private reservas: any[] = [];
 
   async create(input: CreateBookingInput) {
     const nueva = {
@@ -108,7 +108,7 @@ export class MockPassengerRepository implements IPassengerRepository {
 
 // ─── Mock Loyalty Repository ──────────────────────────────────────────────────
 export class MockLoyaltyRepository implements ILoyaltyRepository {
-  private programs = [...PROGRAMAS_LEALTAD] as any[];
+  private programs: any[] = [];
 
   async findByPassenger(id: number) {
     return this.programs.find(p => p.id_pasajero === id) ?? null;

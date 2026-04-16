@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, TextInput, StyleSheet, FlatList } from 'react-native';
 import { useRouter } from 'expo-router';
 import { C } from '@/constants/theme';
@@ -16,7 +16,7 @@ const FILTERS = [
   { k: 'ATERRIZADO', l: 'Aterrizado', icon: '⚫' },
 ];
 
-function VistaPasajero() {
+function VistaPasajero({ VUELOS }: { VUELOS: any[] }) {
   const { statuses: rtStatuses, lastUpdate } = useFlightStatusList();
   const getRtStatus = (id: number) => rtStatuses.find(s => s.id_vuelo === id);
   const router = useRouter();
@@ -26,16 +26,16 @@ function VistaPasajero() {
   const dateStr = now.toLocaleDateString('es-GT', { weekday: 'long', day: 'numeric', month: 'long' });
 
   const data = useMemo(() =>
-    VUELOS.filter(v => {
-      const match = !q || `${v.numero_vuelo} ${v.aeropuerto_origen} ${v.aeropuerto_destino}`.toLowerCase().includes(q.toLowerCase());
-      const visible = ['PROGRAMADO','EN_VUELO','DEMORADO','CANCELADO','ATERRIZADO'].includes(v.estado_vuelo);
-      const dir = filtro === 'SALIDAS' ? (v.aeropuerto_origen === 'GUA') : v.aeropuerto_destino === 'GUA';
+    VUELOS.filter((v: any) => {
+      const match = !q || `${v.NumeroVuelo ?? ''} ${v.AeropuertoOrigen ?? ''} ${v.AeropuertoDestino ?? ''}`.toLowerCase().includes(q.toLowerCase());
+      const visible = ['PROGRAMADO','EN_VUELO','DEMORADO','CANCELADO','ATERRIZADO'].includes(v.EstadoVuelo ?? '');
+      const dir = filtro === 'SALIDAS' ? (v.AeropuertoOrigen === 'GUA') : v.AeropuertoDestino === 'GUA';
       return match && visible && (q ? true : dir);
-    }), [q, filtro]);
+    }), [q, filtro, VUELOS]);
 
-  const enVuelo = VUELOS.filter(v => v.estado_vuelo === 'EN_VUELO').length;
-  const demorados = VUELOS.filter(v => v.estado_vuelo === 'DEMORADO').length;
-  const cancelados = VUELOS.filter(v => v.estado_vuelo === 'CANCELADO').length;
+  const enVuelo = VUELOS.filter((v: any) => v.EstadoVuelo === 'EN_VUELO').length;
+  const demorados = VUELOS.filter((v: any) => v.EstadoVuelo === 'DEMORADO').length;
+  const cancelados = VUELOS.filter((v: any) => v.EstadoVuelo === 'CANCELADO').length;
 
   return (
     <SafeAreaView style={s.container}>
@@ -101,7 +101,7 @@ function VistaPasajero() {
 
       <FlatList
         data={data}
-        keyExtractor={v => v.id_vuelo.toString()}
+        keyExtractor={(v: any) => (v.IdVuelo ?? v.id_vuelo ?? Math.random()).toString()}
         contentContainerStyle={{ padding: 16, paddingBottom: 30, flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => <FlightCard vuelo={item} modoPublico />}
@@ -117,25 +117,25 @@ function VistaPasajero() {
   );
 }
 
-function VistaPersonal() {
+function VistaPersonal({ VUELOS }: { VUELOS: any[] }) {
   const { usuario } = useSesion();
   const router = useRouter();
   const [q, setQ] = useState('');
   const [filtro, setFiltro] = useState('TODOS');
 
   const stats = useMemo(() => ({
-    enVuelo: VUELOS.filter(v => v.estado_vuelo === 'EN_VUELO').length,
-    programado: VUELOS.filter(v => v.estado_vuelo === 'PROGRAMADO').length,
-    demorado: VUELOS.filter(v => v.estado_vuelo === 'DEMORADO').length,
-    cancelado: VUELOS.filter(v => v.estado_vuelo === 'CANCELADO').length,
-  }), []);
+    enVuelo:    VUELOS.filter((v: any) => v.EstadoVuelo === 'EN_VUELO').length,
+    programado: VUELOS.filter((v: any) => v.EstadoVuelo === 'PROGRAMADO').length,
+    demorado:   VUELOS.filter((v: any) => v.EstadoVuelo === 'DEMORADO').length,
+    cancelado:  VUELOS.filter((v: any) => v.EstadoVuelo === 'CANCELADO').length,
+  }), [VUELOS]);
 
   const data = useMemo(() =>
-    VUELOS.filter(v => {
-      const m = !q || `${v.numero_vuelo} ${v.aeropuerto_origen} ${v.aeropuerto_destino} ${v.matricula_avion ?? ''}`.toLowerCase().includes(q.toLowerCase());
-      const f = filtro === 'TODOS' || v.estado_vuelo === filtro;
+    VUELOS.filter((v: any) => {
+      const m = !q || `${v.NumeroVuelo ?? ''} ${v.AeropuertoOrigen ?? ''} ${v.AeropuertoDestino ?? ''} ${v.MatriculaAvion ?? ''}`.toLowerCase().includes(q.toLowerCase());
+      const f = filtro === 'TODOS' || v.EstadoVuelo === filtro;
       return m && f;
-    }), [q, filtro]);
+    }), [q, filtro, VUELOS]);
 
   return (
     <SafeAreaView style={s.container}>
@@ -196,7 +196,7 @@ function VistaPersonal() {
 
       <FlatList
         data={data}
-        keyExtractor={v => v.id_vuelo.toString()}
+        keyExtractor={(v: any) => (v.IdVuelo ?? v.id_vuelo ?? Math.random()).toString()}
         contentContainerStyle={{ padding: 16, paddingBottom: 24, flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
@@ -221,7 +221,7 @@ export default function VuelosTab() {
   }, []);
 
   const { esCliente } = useSesion();
-  return esCliente ? <VistaPasajero /> : <VistaPersonal />;
+  return esCliente ? <VistaPasajero VUELOS={VUELOS} /> : <VistaPersonal VUELOS={VUELOS} />;
 }
 
 const s = StyleSheet.create({

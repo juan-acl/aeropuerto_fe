@@ -22,9 +22,11 @@
  */
 
 // ─── Base URLs ────────────────────────────────────────────────────────────────
-const BE_DEVELOP = process.env.EXPO_PUBLIC_BE_URL     ?? 'http://localhost:5087';
-const BE_GERSON  = process.env.EXPO_PUBLIC_BE_GERSON  ?? 'http://localhost:5088';
-const BE_MODULOS = process.env.EXPO_PUBLIC_BE_MODULOS ?? 'http://localhost:5089';
+// ✅ Todos los módulos están unificados en aeropuerto_be-develop (:5087)
+const BE_UNIFIED = process.env.EXPO_PUBLIC_BE_URL ?? 'http://localhost:5087';
+const BE_DEVELOP = BE_UNIFIED;
+const BE_GERSON  = BE_UNIFIED;   // Ya no es un backend separado
+const BE_MODULOS = BE_UNIFIED;   // Ya no es un backend separado
 
 const TIMEOUT_MS = 8000;
 
@@ -1425,6 +1427,7 @@ export const backendApi = {
       get<BE_ServicioAeropuerto[]>(BE_GERSON, `/api/serviciosaeropuerto/aeropuerto/${cod}`),
   },
   lealtad: {
+    listar:     ()                             => get<BE_ProgramaLealtad[]>(BE_GERSON, '/api/programalealtad'),
     registrar:  (m: Omit<BE_ProgramaLealtad, 'IdLealtad'>) =>
       post<{ IdGenerado: number }>(BE_GERSON, '/api/programalealtad', m),
     porPasajero:(id: number) => get<BE_ProgramaLealtad>(BE_GERSON, `/api/programalealtad/pasajero/${id}`),

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, TextInput, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { C } from '@/constants/theme';
@@ -7,25 +7,19 @@ import { useVuelos } from '@/hooks/useVuelos';
 import { backendApi } from '@/services/backendApi';
 import { fmt } from '@/utils/format';
 
-const AEROP_OPTS = AEROPUERTOS.map(a => ({
-  code: a.codigo_aeropuerto,
-  city: a.ciudad,
-  name: a.nombre,
-}));
-
-const DESTINOS_POPULARES = [
-  { code: 'MIA', name: 'Miami', emoji: '🌊', precio: 385 },
-  { code: 'BOG', name: 'Bogotá', emoji: '🏙️', precio: 220 },
-  { code: 'MEX', name: 'CDMX', emoji: '🌮', precio: 180 },
-  { code: 'LAX', name: 'Los Angeles', emoji: '🎬', precio: 520 },
-  { code: 'MAD', name: 'Madrid', emoji: '🏖️', precio: 780 },
-];
+const EMOJIS = ['🌊', '🏙️', '🌮', '🎬', '🏖️'];
 
 export default function BuscarVuelo() {
   const [AEROPUERTOS, set_AEROPUERTOS] = useState<any[]>([]);
   useEffect(() => {
       backendApi.aeropuertos.listar().then(d => set_AEROPUERTOS(d)).catch(() => {});
   }, []);
+
+  const AEROP_OPTS = AEROPUERTOS.map(a => ({
+    code: a.codigo_aeropuerto,
+    city: a.ciudad,
+    name: a.nombre,
+  }));
 
   const router = useRouter();
   const { usuario } = useSesion();
@@ -144,13 +138,13 @@ export default function BuscarVuelo() {
           <View style={{ paddingHorizontal: 16 }}>
             <Text style={s.sectionTitle}>Destinos populares</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }}>
-              {DESTINOS_POPULARES.map(d => (
-                <TouchableOpacity key={d.code} style={s.destCard}
-                  onPress={() => { setDestino(d.code); setBuscado(false); }} activeOpacity={0.8}>
-                  <Text style={{ fontSize: 28 }}>{d.emoji}</Text>
-                  <Text style={s.destCardCity}>{d.name}</Text>
-                  <Text style={s.destCardCode}>{d.code}</Text>
-                  <Text style={s.destCardPrice}>desde {fmt.moneda(d.precio)}</Text>
+              {AEROPUERTOS.slice(0, 5).map((d: any, i: number) => (
+                <TouchableOpacity key={d.codigo_aeropuerto} style={s.destCard}
+                  onPress={() => { setDestino(d.codigo_aeropuerto); setBuscado(false); }} activeOpacity={0.8}>
+                  <Text style={{ fontSize: 28 }}>{EMOJIS[i % EMOJIS.length]}</Text>
+                  <Text style={s.destCardCity}>{d.nombre_aeropuerto ?? d.ciudad}</Text>
+                  <Text style={s.destCardCode}>{d.codigo_aeropuerto}</Text>
+                  <Text style={s.destCardPrice}>desde {fmt.moneda(200 + i * 30)}</Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -189,9 +183,9 @@ export default function BuscarVuelo() {
               </View>
             ) : vuelos.map(v => {
               const precio = getPrice(v.aeropuerto_destino ?? '');
-              const dep = v.hora_salida_programada?.split('T')[1]?.slice(0,5) ?? '--:--';
-              const arr = v.hora_llegada_programada?.split('T')[1]?.slice(0,5) ?? '--:--';
-              const avail = (v.plazas_vacias ?? 30) > 0;
+              const dep = v.hora_salida ?? '--:--';
+              const arr = v.hora_llegada ?? '--:--';
+              const avail = (v.plazas_disponibles ?? 30) > 0;
               return (
                 <TouchableOpacity key={v.id_vuelo} style={[s.vCard, !avail && { opacity: 0.5 }]}
                   onPress={() => avail && router.push({ pathname: '/reservar/asiento', params: { id: v.id_vuelo, clase, precio: String(Math.round(precio)) } })}
@@ -220,7 +214,7 @@ export default function BuscarVuelo() {
                       <Text style={[s.vCardTime, { textAlign: 'right' }]}>{arr}</Text>
                     </View>
                     <View style={s.vCardFooter}>
-                      <Text style={{ fontSize: 11, color: C.muted }}>💺 {v.plazas_vacias ?? '—'} disponibles</Text>
+                      <Text style={{ fontSize: 11, color: C.muted }}>💺 {v.plazas_disponibles ?? '—'} disponibles</Text>
                       {avail ? (
                         <View style={s.vCardCta}>
                           <Text style={s.vCardCtaT}>Seleccionar →</Text>

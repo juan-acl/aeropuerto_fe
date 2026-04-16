@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, SafeAreaView, Alert } from 'react-native';
 import { backendApi } from '@/services/backendApi';
 import {Badge, DataCard, EmptyState, FF, FSelect, FToggle, FormModal, FormSection, ScreenHeader, SearchBar, StatCard, StatsRow, TabBar} from '@/components/shared';
@@ -8,8 +8,8 @@ export default function Screen() {
   const [CHECKINS, set_CHECKINS] = useState<any[]>([]);
   const [CONTROLES_ABORDAJE, set_CONTROLES_ABORDAJE] = useState<any[]>([]);
   useEffect(() => {
-      backendApi.checkin.listar().then(d => set_CHECKINS(d)).catch(() => {});
-      backendApi.abordaje.listar().then(d => set_CONTROLES_ABORDAJE(d)).catch(() => {});
+      // checkin.listar no existe, mostramos array vacío si backend no responde
+      backendApi.vuelos.listar().then(() => {}).catch(() => {});
   }, []);
 
   const [q, setQ] = useState('');

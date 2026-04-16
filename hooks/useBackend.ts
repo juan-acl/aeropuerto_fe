@@ -46,17 +46,17 @@ export function useBackend() {
 
   // ── Health checks ───────────────────────────────────────────────────
   const checkHealth = useCallback(async () => {
-    const checks = await Promise.allSettled([
-      backendApi.health(),
-      fetch(`${process.env.EXPO_PUBLIC_BE_GERSON  ?? 'http://localhost:5088'}/api/test`).catch(() => null),
-      fetch(`${process.env.EXPO_PUBLIC_BE_MODULOS ?? 'http://localhost:5089'}/api/test`).catch(() => null)
-    ]);
-    if (!mounted.current) return;
-    setHealth({
-      develop: checks[0].status === 'fulfilled' ? 'online' : 'offline',
-      gerson:  checks[1].status === 'fulfilled' ? 'online' : 'offline',
-      modulos: checks[2].status === 'fulfilled' ? 'online' : 'offline',
-    });
+    // ✅ Backend unificado en :5087 — un solo health check
+    const beUrl = process.env.EXPO_PUBLIC_BE_URL ?? 'http://localhost:5087';
+    try {
+      const res = await fetch(`${beUrl}/api/test`);
+      if (!mounted.current) return;
+      const status: BackendStatus = res.ok ? 'online' : 'offline';
+      setHealth({ develop: status, gerson: status, modulos: status });
+    } catch {
+      if (!mounted.current) return;
+      setHealth({ develop: 'offline', gerson: 'offline', modulos: 'offline' });
+    }
   }, []);
 
   useEffect(() => {

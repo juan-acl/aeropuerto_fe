@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   View, Text, SafeAreaView, ScrollView, TextInput,
   TouchableOpacity, StyleSheet, Alert, FlatList, Modal,
@@ -143,13 +143,13 @@ export default function AdminTab() {
   const [ALERTAS_DATA, set_ALERTAS_DATA] = useState<any[]>([]);
   const [INCIDENTES_SEG, set_INCIDENTES_SEG] = useState<any[]>([]);
   useEffect(() => {
-      backendApi.empleados.listar().then(d => set_EMPLEADOS(d)).catch(() => {});
-      backendApi.cuentasBancarias.listar().then(d => set_CUENTAS_BANCARIAS(d)).catch(() => {});
-      backendApi.finanzas.presupuestos.listar().then(d => set_PRESUPUESTOS_DATA(d)).catch(() => {});
-      backendApi.vuelos.listar().then(d => set_ORDENES_COMPRA(d)).catch(() => {});
-      backendApi.vuelos.listar().then(d => set_PROHIBICIONES(d)).catch(() => {});
-      backendApi.mantenimiento.alertasTecnicas.listar().then(d => set_ALERTAS_DATA(d)).catch(() => {});
-      backendApi.vuelos.listar().then(d => set_INCIDENTES_SEG(d)).catch(() => {});
+      backendApi.empleados.listar().then((d: any) => set_EMPLEADOS(d)).catch(() => {});
+      backendApi.cuentasBancarias.listar().then((d: any) => set_CUENTAS_BANCARIAS(d)).catch(() => {});
+      backendApi.finanzas.presupuestos.listar().then((d: any) => set_PRESUPUESTOS_DATA(d)).catch(() => {});
+      backendApi.vuelos.listar().then((d: any) => set_ORDENES_COMPRA(d)).catch(() => {});
+      backendApi.vuelos.listar().then((d: any) => set_PROHIBICIONES(d)).catch(() => {});
+      backendApi.mantenimiento.alertasTecnicas.listar().then((d: any) => set_ALERTAS_DATA(d)).catch(() => {});
+      backendApi.vuelos.listar().then((d: any) => set_INCIDENTES_SEG(d)).catch(() => {});
   }, []);
 
   const { logout: globalLogout } = useSesion();

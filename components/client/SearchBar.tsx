@@ -38,19 +38,8 @@ interface Props {
   airportsLoading?: boolean;
 }
 
-// Fallback estático mínimo (GUA + destinos comunes) cuando Oracle no responde
-const FALLBACK_AIRPORTS: AirportOption[] = [
-  { code: 'GUA', city: 'Ciudad de Guatemala', name: 'La Aurora Int\'l', pais: 'Guatemala' },
-  { code: 'MIA', city: 'Miami',               name: 'Miami International',     pais: 'EEUU' },
-  { code: 'BOG', city: 'Bogotá',              name: 'El Dorado',               pais: 'Colombia' },
-  { code: 'MEX', city: 'Ciudad de México',    name: 'Benito Juárez',           pais: 'México' },
-  { code: 'LAX', city: 'Los Ángeles',         name: 'Los Angeles International',pais: 'EEUU' },
-  { code: 'MAD', city: 'Madrid',              name: 'Adolfo Suárez Barajas',   pais: 'España' },
-  { code: 'LIM', city: 'Lima',                name: 'Jorge Chávez',            pais: 'Perú' },
-  { code: 'SCL', city: 'Santiago',            name: 'Arturo Merino Benítez',   pais: 'Chile' },
-  { code: 'CUN', city: 'Cancún',              name: 'Internacional de Cancún', pais: 'México' },
-  { code: 'JFK', city: 'Nueva York',          name: 'John F. Kennedy',         pais: 'EEUU' },
-];
+// Lista de aeropuertos gestionada exclusivamente desde Oracle
+const FALLBACK_AIRPORTS: AirportOption[] = [];
 
 // ─── Airport Picker Modal ─────────────────────────────────────────────────────
 function AirportPicker({ visible, onSelect, onClose, title, airports, loading }: {
@@ -128,12 +117,12 @@ function AirportPicker({ visible, onSelect, onClose, title, airports, loading }:
                 </View>
               ))
             )}
-            {filtered.length === 0 && !loading && (
+            {filtered.length === 0 && !loading ? (
               <View style={pk.emptyWrap}>
                 <Text style={pk.emptyT}>No se encontraron aeropuertos</Text>
                 <Text style={pk.emptySub}>Prueba con otra ciudad o código IATA</Text>
               </View>
-            )}
+            ) : null}
           </ScrollView>
         </View>
       </View>
@@ -160,7 +149,7 @@ function AirportRow({ a, onSelect }: { a: AirportOption; onSelect: () => void })
 export function SearchBar({
   onSearch, loading = false, initialParams, airports, airportsLoading = false,
 }: Props) {
-  const airportList = (airports && airports.length > 0) ? airports : FALLBACK_AIRPORTS;
+  const airportList = airports || [];
 
   const [modo,      setModo]     = useState<SearchMode>(initialParams?.modo ?? 'vuelos');
   const [origen,    setOrigen]   = useState(initialParams?.origen  ?? 'GUA');
@@ -256,7 +245,7 @@ export function SearchBar({
             <Text style={[s.fieldValue, !destino && { color: C.placeholder }]}>
               {destino ? getCity(destino) : 'Elige destino'}
             </Text>
-            {destino && <Text style={s.fieldCode}>{destino}</Text>}
+            {destino ? <Text style={s.fieldCode}>{destino}</Text> : null}
           </TouchableOpacity>
         </View>
       )}

@@ -132,8 +132,8 @@ export default function PagoScreen() {
     return d.length > 2 ? `${d.slice(0,2)}/${d.slice(2)}` : d;
   };
 
-  const handlePromo = () => {
-    const ok = mgr.validarPromo(promo);
+  const handlePromo = async () => {
+    const ok = await Promise.resolve(mgr.validarPromo(promo));
     setPromoMsg(ok ? '✅ Código aplicado' : '❌ Código inválido');
   };
 
@@ -154,11 +154,12 @@ export default function PagoScreen() {
     if (pasajeroData) mgr.guardarPasajero(pasajeroData);
 
     const resultado = await mgr.confirmarPago(metodo, cardNum.slice(-4) || 'N/A');
-    if (resultado) {
+    const resData = await Promise.resolve(resultado);
+    if (resData) {
       router.replace({
         pathname: '/reservar/confirmacion',
         params: {
-          codigo:       resultado.codigo_reserva,
+          codigo:       (resData as any).CodigoReserva,
           vuelo:        params.id,
           asiento:      params.asiento,
           puntos:       String(mgr.puntosGanados),
@@ -184,7 +185,7 @@ export default function PagoScreen() {
         </TouchableOpacity>
         <View>
           <Text style={s.headerTitle}>Confirmar y pagar</Text>
-          <Text style={s.headerSub}>{vuelo?.numero_vuelo ?? 'Vuelo'} · Asiento {params.asiento}</Text>
+          <Text style={s.headerSub}>{vuelo?.NumeroVuelo ?? 'Vuelo'} · Asiento {params.asiento}</Text>
         </View>
         <View style={{ width: 36 }} />
       </View>

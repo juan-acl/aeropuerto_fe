@@ -147,7 +147,7 @@ export default function SeleccionarAsiento() {
         <View style={s.headerMid}>
           <Text style={s.headerTitle}>Elige tu asiento</Text>
           <Text style={s.headerSub}>
-            {vuelo?.numero_vuelo ?? `Vuelo #${id}`} · {claseLabel}
+            {vuelo?.NumeroVuelo ?? `Vuelo #${id}`} · {claseLabel}
           </Text>
         </View>
         <View style={[s.availBadge]}>
