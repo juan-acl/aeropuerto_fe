@@ -34,10 +34,10 @@ export const NotificationFactory = {
   vueloRetrasado(vuelo: { numero_vuelo: string; minutos: number; nueva_hora: string }): Partial<Notification> {
     return {
       type: 'VUELO_RETRASADO',
-      title: `⏱️ Retraso — ${vuelo.numero_vuelo}`,
+      title: ` Retraso — ${vuelo.numero_vuelo}`,
       body: `Tu vuelo tiene un retraso de ${vuelo.minutos} minutos. Nueva salida: ${vuelo.nueva_hora}`,
       priority: 'HIGH',
-      icon: '⏱️',
+      icon: '',
       color: '#D97706',
       actionRoute: '/historial',
     };
@@ -58,10 +58,10 @@ export const NotificationFactory = {
   reservaConfirmada(codigo: string, destino: string): Partial<Notification> {
     return {
       type: 'RESERVA_CONFIRMADA',
-      title: '✅ ¡Reserva confirmada!',
+      title: ' ¡Reserva confirmada!',
       body: `Tu reserva ${codigo} a ${destino} está confirmada. ¡Buen viaje!`,
       priority: 'HIGH',
-      icon: '✅',
+      icon: '',
       color: '#059669',
       actionRoute: '/historial',
     };
@@ -96,10 +96,10 @@ export const NotificationFactory = {
   promoExclusiva(titulo: string, descuento: number, vence: string): Partial<Notification> {
     return {
       type: 'PROMO_EXCLUSIVA',
-      title: `🎁 Oferta exclusiva — ${descuento}% OFF`,
+      title: ` Oferta exclusiva — ${descuento}% OFF`,
       body: `${titulo}. Válida hasta el ${vence}. ¡No te la pierdas!`,
       priority: 'NORMAL',
-      icon: '🎁',
+      icon: '',
       color: '#7C3AED',
       actionRoute: '/reservar',
     };

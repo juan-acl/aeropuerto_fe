@@ -6,7 +6,7 @@ import { ScreenHeader, SearchBar, DataCard, Badge, StatCard, FormModal, FF, FSel
 import { C } from '@/constants/theme';
 
 type Tab = 'pasajeros' | 'perfiles';
-const TABS = [{ k: 'pasajeros', l: '🧍 Pasajeros' }, { k: 'perfiles', l: '⭐ Perfiles Viajero' }];
+const TABS = [{ k: 'pasajeros', l: ' Pasajeros' }, { k: 'perfiles', l: ' Perfiles Viajero' }];
 const TIPOS_DOC = [{ label: 'DPI (Documento Personal de Identificación)', value: 'DPI' }, { label: 'Pasaporte', value: 'PASAPORTE' }, { label: 'Cédula extranjera', value: 'CEDULA' }, { label: 'Otro documento', value: 'OTRO' }];
 const GENEROS = [{ label: 'Masculino', value: 'M' }, { label: 'Femenino', value: 'F' }, { label: 'Prefiero no indicar', value: 'O' }];
 const TIPOS_PERFIL = [{ label: 'Viajero frecuente', value: 'FRECUENTE' }, { label: 'Viajero ocasional', value: 'OCASIONAL' }, { label: 'VIP / Primera clase', value: 'VIP' }, { label: 'Corporativo / Empresarial', value: 'CORPORATIVO' }];
@@ -50,7 +50,7 @@ export default function Pasajeros() {
       else setPerfiles(d => [...d, entry]);
     }
     setModal(false); setForm({});
-    Alert.alert('✅ Guardado', editItem ? 'Pasajero actualizado.' : 'Pasajero registrado.');
+    Alert.alert(' Guardado', editItem ? 'Pasajero actualizado.' : 'Pasajero registrado.');
   };
 
   const pasajeroOptions = pasajeros.map(p => ({ label: `${p.nombres} ${p.apellidos} — ${p.numero_documento}`, value: String(p.id_pasajero) }));
@@ -59,7 +59,7 @@ export default function Pasajeros() {
     if (tab === 'pasajeros') {
       const data = pasajeros.filter(p => `${p.nombres} ${p.apellidos} ${p.numero_documento} ${p.email ?? ''} ${p.nacionalidad ?? ''}`.toLowerCase().includes(q.toLowerCase()));
       return <FlatList data={data} keyExtractor={p => String(p.id_pasajero)} contentContainerStyle={{ padding: 14, paddingBottom: 24, flexGrow: 1 }}
-        ListEmptyComponent={<EmptyState icon="🧍" text="Sin pasajeros registrados" sub="Registra el primer pasajero con + Nuevo" />}
+        ListEmptyComponent={<EmptyState icon="" text="Sin pasajeros registrados" sub="Registra el primer pasajero con + Nuevo" />}
         renderItem={({ item: p }) => (
           <DataCard title={`${p.nombres} ${p.apellidos}`} subtitle={`${p.tipo_documento}: ${p.numero_documento}`}
             badge={<Badge value={p.genero === 'M' ? 'MASCULINO' : p.genero === 'F' ? 'FEMENINO' : 'OTRO'} />}
@@ -68,7 +68,7 @@ export default function Pasajeros() {
             <View style={{ gap: 3 }}>
               {p.email ? <Text style={{ fontSize: 11, color: C.muted }}>✉️ {p.email}</Text> : null}
               {p.telefono ? <Text style={{ fontSize: 11, color: C.muted }}>📞 {p.telefono}</Text> : null}
-              {(p.ciudad_residencia || p.pais_residencia) ? <Text style={{ fontSize: 11, color: C.muted }}>📍 {[p.ciudad_residencia, p.pais_residencia].filter(Boolean).join(', ')}</Text> : null}
+              {(p.ciudad_residencia || p.pais_residencia) ? <Text style={{ fontSize: 11, color: C.muted }}> {[p.ciudad_residencia, p.pais_residencia].filter(Boolean).join(', ')}</Text> : null}
               {p.fecha_nacimiento ? <Text style={{ fontSize: 11, color: C.muted }}>🎂 {p.fecha_nacimiento}</Text> : null}
             </View>
           </DataCard>
@@ -77,7 +77,7 @@ export default function Pasajeros() {
     const data = perfiles.filter(p => JSON.stringify(p).toLowerCase().includes(q.toLowerCase()));
     const paxMap = Object.fromEntries(pasajeros.map(p => [p.id_pasajero, `${p.nombres} ${p.apellidos}`]));
     return <FlatList data={data} keyExtractor={p => String(p.id_perfil)} contentContainerStyle={{ padding: 14, paddingBottom: 24, flexGrow: 1 }}
-      ListEmptyComponent={<EmptyState icon="⭐" text="Sin perfiles de viajero" />}
+      ListEmptyComponent={<EmptyState icon="" text="Sin perfiles de viajero" />}
       renderItem={({ item: p }) => (
         <DataCard title={paxMap[p.id_pasajero] ?? `Pasajero #${p.id_pasajero}`}
           subtitle={`Prog: ${p.numero_programa ?? '—'}`}
@@ -95,9 +95,9 @@ export default function Pasajeros() {
       <ScreenHeader title="Gestión de Pasajeros" subtitle="Pasajeros y perfiles de viajero" onAdd={openNew} />
       <TabBar tabs={TABS} active={tab} onPress={k => { setTab(k as Tab); setQ(''); }} />
       <StatsRow>
-        <StatCard label="Pasajeros" value={pasajeros.length} color={C.info} bg={C.infoBg} icon="🧍" />
-        <StatCard label="Frecuentes" value={perfiles.filter(p => p.tipo_perfil === 'FRECUENTE').length} color={C.purple} bg={C.purpleBg} icon="⭐" />
-        <StatCard label="VIP" value={perfiles.filter(p => p.tipo_perfil === 'VIP').length} color={C.warning} bg={C.warningBg} icon="💎" />
+        <StatCard label="Pasajeros" value={pasajeros.length} color={C.info} bg={C.infoBg} icon="" />
+        <StatCard label="Frecuentes" value={perfiles.filter(p => p.tipo_perfil === 'FRECUENTE').length} color={C.purple} bg={C.purpleBg} icon="" />
+        <StatCard label="VIP" value={perfiles.filter(p => p.tipo_perfil === 'VIP').length} color={C.warning} bg={C.warningBg} icon="" />
         <StatCard label="Perfiles" value={perfiles.length} color={C.orange} bg={C.orangeBg} icon="🎖️" />
       </StatsRow>
       <SearchBar value={q} onChangeText={setQ} placeholder="Buscar por nombre, documento, email..." />
@@ -107,7 +107,7 @@ export default function Pasajeros() {
         onClose={() => setModal(false)} onSave={handleSave} saveLabel={editItem ? 'Actualizar' : 'Guardar'}>
 
         {tab === 'pasajeros' && <>
-          <FormSection title="Datos personales" icon="👤" />
+          <FormSection title="Datos personales" icon="" />
           <FF label="Nombres" required value={form.nombres ?? ''} onChangeText={set('nombres')} placeholder="Ej: María José" />
           <FF label="Apellidos" value={form.apellidos ?? ''} onChangeText={set('apellidos')} placeholder="Ej: García López" />
           <FSelect label="Género" value={form.genero ?? 'M'} onChange={set('genero')} options={GENEROS} />
@@ -124,9 +124,9 @@ export default function Pasajeros() {
         </>}
 
         {tab === 'perfiles' && <>
-          <FormSection title="Pasajero" icon="🧍" />
+          <FormSection title="Pasajero" icon="" />
           <FSelect label="Pasajero" required value={String(form.id_pasajero ?? '')} onChange={set('id_pasajero')} options={pasajeroOptions} hint="Selecciona el pasajero para este perfil" />
-          <FormSection title="Programa de fidelización" icon="⭐" />
+          <FormSection title="Programa de fidelización" icon="" />
           <FSelect label="Tipo de perfil" required value={form.tipo_perfil ?? ''} onChange={set('tipo_perfil')} options={TIPOS_PERFIL} />
           <FSelect label="Categoría" value={form.categoria ?? 'BRONCE'} onChange={set('categoria')} options={CATEGORIAS} />
           <FF label="Número de programa" value={form.numero_programa ?? ''} onChangeText={set('numero_programa')} placeholder="Ej: PRG-001234" hint="Se genera automáticamente si se deja vacío" autoCapitalize="characters" />

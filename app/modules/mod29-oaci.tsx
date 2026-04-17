@@ -26,10 +26,10 @@ export default function Screen() {
       <ScrollView style={{flex:1}} contentContainerStyle={{padding:14, paddingBottom:24, flexGrow:1}}>
         
         <View style={{flexDirection:'row',gap:8,marginBottom:12}}>
-          <StatCard label="Reportes" value={REPORTES_OACI.length} color={C.gray} bg={C.grayBg} icon="📊" />
-          <StatCard label="Certificaciones" value={CERTIFICACIONES_INT.filter((c:any)=>c.activa).length} color={C.teal} bg={C.tealBg} icon="🏅" />
+          <StatCard label="Reportes" value={REPORTES_OACI.length} color={C.gray} bg={C.grayBg} icon="" />
+          <StatCard label="Certificaciones" value={CERTIFICACIONES_INT.filter((c:any)=>c.activa).length} color={C.teal} bg={C.tealBg} icon="" />
         </View>
-        <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginBottom:8}}>📊 Reportes OACI</Text>
+        <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginBottom:8}}> Reportes OACI</Text>
         {REPORTES_OACI.filter((r:any)=>JSON.stringify(r).toLowerCase().includes(q.toLowerCase())).map((r:any)=>(
           <DataCard key={r.id_reporte_oaci} title={`Reporte ${r.tipo_reporte} – ${r.periodo}`}
             subtitle={`${r.fecha_inicio_periodo} → ${r.fecha_fin_periodo}`}
@@ -38,7 +38,7 @@ export default function Screen() {
             <></>
           </DataCard>
         ))}
-        <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginTop:16,marginBottom:8}}>🏅 Certificaciones Internacionales</Text>
+        <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginTop:16,marginBottom:8}}> Certificaciones Internacionales</Text>
         {CERTIFICACIONES_INT.filter((c:any)=>JSON.stringify(c).toLowerCase().includes(q.toLowerCase())).map((c:any)=>(
           <DataCard key={c.id_certificacion_internacional} title={c.nombre_certificacion}
             subtitle={`${c.numero_certificado} · ${c.organismo_certificador}`}

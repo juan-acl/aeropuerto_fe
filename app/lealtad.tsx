@@ -9,15 +9,15 @@ const NIVELES = [
   { key: 'BRONCE',  icon: '🥉', color: '#B45309', min: 0,     max: 5000,  desc: 'Nivel inicial' },
   { key: 'PLATA',   icon: '🥈', color: '#6B7280', min: 5001,  max: 15000, desc: '+1.5x puntos por vuelo' },
   { key: 'ORO',     icon: '🥇', color: '#D97706', min: 15001, max: 40000, desc: '+2x puntos · Salón VIP gratis' },
-  { key: 'PLATINO', icon: '💎', color: '#7C3AED', min: 40001, max: 99999, desc: '+3x puntos · Upgrades · Fast-track' },
+  { key: 'PLATINO', icon: '', color: '#7C3AED', min: 40001, max: 99999, desc: '+3x puntos · Upgrades · Fast-track' },
 ];
 
 const CANJES = [
   { pts: 2000,  icon: '🎫', desc: 'Descuento Q50 en próxima reserva',  tipo: 'DESCUENTO' },
   { pts: 5000,  icon: '🛄', desc: 'Equipaje extra 10kg gratis',         tipo: 'EQUIPAJE'  },
-  { pts: 8000,  icon: '🍸', desc: 'Acceso salón VIP 1 visita',          tipo: 'VIP'       },
+  { pts: 8000,  icon: '', desc: 'Acceso salón VIP 1 visita',          tipo: 'VIP'       },
   { pts: 15000, icon: '⬆️', desc: 'Upgrade a clase Ejecutiva',           tipo: 'UPGRADE'   },
-  { pts: 25000, icon: '✈️', desc: 'Vuelo nacional gratis',               tipo: 'VUELO'     },
+  { pts: 25000, icon: '', desc: 'Vuelo nacional gratis',               tipo: 'VUELO'     },
 ];
 
 export default function LealtadScreen() {
@@ -97,7 +97,7 @@ export default function LealtadScreen() {
             <TouchableOpacity key={t} style={[s.tabBtn, tab === t && s.tabBtnActive]}
               onPress={() => setTab(t)}>
               <Text style={[s.tabBtnT, tab === t && { color: nc.color }]}>
-                {t === 'puntos' ? '🏆 Niveles' : t === 'canjes' ? '🎁 Canjear' : '📋 Historial'}
+                {t === 'puntos' ? '🏆 Niveles' : t === 'canjes' ? ' Canjear' : '📋 Historial'}
               </Text>
             </TouchableOpacity>
           ))}
@@ -169,7 +169,7 @@ export default function LealtadScreen() {
             ) : misReservas.map((r, i) => (
               <View key={i} style={s.histRow}>
                 <View style={[s.histIcon, { backgroundColor: C.infoBg }]}>
-                  <Text style={{ fontSize: 18 }}>✈️</Text>
+                  <Text style={{ fontSize: 18 }}></Text>
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={s.histNum}>{r.numero_vuelo ?? 'Vuelo #' + r.id_vuelo}</Text>

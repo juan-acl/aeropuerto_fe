@@ -65,7 +65,7 @@ export function FlightCard({ vuelo, onPress, modoPublico = false, retraso_min }:
                 width: vuelo.estado_vuelo === 'EN_VUELO' ? '55%'
                   : vuelo.estado_vuelo === 'ATERRIZADO' ? '100%' : '0%' }]} />
             </View>
-            <Text style={[s.planeTxt, { color: cfg.dot }]}>✈</Text>
+            <Text style={[s.planeTxt, { color: cfg.dot }]}></Text>
             <View style={[s.routeTrack, { backgroundColor: cfg.dot + '30' }]}>
               <View style={[s.routeProgress, { backgroundColor: cfg.dot,
                 width: vuelo.estado_vuelo === 'ATERRIZADO' ? '100%' : '0%' }]} />
@@ -82,7 +82,7 @@ export function FlightCard({ vuelo, onPress, modoPublico = false, retraso_min }:
         {/* RT delay badge */}
       {retraso_min != null && retraso_min > 0 && (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: C.warningBg, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3, marginHorizontal: 16, borderWidth: 1, borderColor: C.warningL }}>
-          <Text style={{ fontSize: 11 }}>⏱️</Text>
+          <Text style={{ fontSize: 11 }}></Text>
           <Text style={{ fontSize: 11, fontWeight: '700', color: C.warning }}>
             Retraso de {retraso_min} min
           </Text>

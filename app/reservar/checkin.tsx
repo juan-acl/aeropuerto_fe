@@ -64,7 +64,7 @@ function BoardingPassCard({ pase }: { pase: PaseAbordaje }) {
     <View style={bp.card}>
       <View style={bp.header}>
         <View style={bp.headerOrb} />
-        <Text style={bp.headerAirline}>✈️ Aeropuerto La Aurora</Text>
+        <Text style={bp.headerAirline}> Aeropuerto La Aurora</Text>
         <Text style={bp.headerNum}>{pase.numero_vuelo}</Text>
       </View>
 
@@ -74,7 +74,7 @@ function BoardingPassCard({ pase }: { pase: PaseAbordaje }) {
           <Text style={bp.time}>{pase.salida}</Text>
         </View>
         <View style={bp.middle}>
-          <Text style={bp.arrow}>── ✈ ──</Text>
+          <Text style={bp.arrow}>──  ──</Text>
           <Text style={bp.fecha}>{pase.fecha}</Text>
         </View>
         <View style={[bp.endpoint, { alignItems: 'flex-end' }]}>
@@ -264,7 +264,7 @@ export default function CheckinScreen() {
             />
             {step === 'ERROR' && (
               <View style={s.errorBox}>
-                <Text style={s.errorT}>⚠️ {mensaje}</Text>
+                <Text style={s.errorT}> {mensaje}</Text>
               </View>
             )}
             <TouchableOpacity style={s.checkinBtn} onPress={procesarCheckin} activeOpacity={0.88}>

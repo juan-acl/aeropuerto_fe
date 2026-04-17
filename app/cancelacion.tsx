@@ -79,7 +79,7 @@ export default function CancelacionScreen() {
       setLoading(false);
       setAccion('done');
       Alert.alert(
-        '✅ Procesado',
+        ' Procesado',
         tipo === 'REEMBOLSO'
           ? `Reembolso de USD ${reembolso.toFixed(2)} solicitado. Se procesará en 3-5 días hábiles.`
           : tipo === 'VUELO_ALT'
@@ -131,7 +131,7 @@ export default function CancelacionScreen() {
         <TouchableOpacity style={[s.optionCard, accion === 'vuelo_alt' && s.optionCardActive]}
           onPress={() => setAccion(accion === 'vuelo_alt' ? 'opciones' : 'vuelo_alt')} activeOpacity={0.85}>
           <View style={[s.optionIcon, { backgroundColor: C.infoBg }]}>
-            <Text style={{ fontSize: 24 }}>✈️</Text>
+            <Text style={{ fontSize: 24 }}></Text>
           </View>
           <View style={{ flex: 1 }}>
             <Text style={s.optionTitle}>Vuelo alternativo</Text>
@@ -169,7 +169,7 @@ export default function CancelacionScreen() {
         <TouchableOpacity style={[s.optionCard, accion === 'hotel' && s.optionCardActive]}
           onPress={() => setAccion(accion === 'hotel' ? 'opciones' : 'hotel')} activeOpacity={0.85}>
           <View style={[s.optionIcon, { backgroundColor: C.tealBg }]}>
-            <Text style={{ fontSize: 24 }}>🏨</Text>
+            <Text style={{ fontSize: 24 }}></Text>
           </View>
           <View style={{ flex: 1 }}>
             <Text style={s.optionTitle}>Reservar hotel</Text>
@@ -204,7 +204,7 @@ export default function CancelacionScreen() {
         <TouchableOpacity style={[s.optionCard, accion === 'reembolso' && s.optionCardActive]}
           onPress={() => setAccion(accion === 'reembolso' ? 'opciones' : 'reembolso')} activeOpacity={0.85}>
           <View style={[s.optionIcon, { backgroundColor: C.warningBg }]}>
-            <Text style={{ fontSize: 24 }}>💰</Text>
+            <Text style={{ fontSize: 24 }}></Text>
           </View>
           <View style={{ flex: 1 }}>
             <Text style={s.optionTitle}>Solicitar reembolso</Text>

@@ -23,17 +23,17 @@ export default function Mod08() {
   const [reservas, setReservas] = useState(RESERVAS);
   const [facturas, setFacturas] = useState(FACTURAS_DATA);
   const [promociones, setPromociones] = useState(PROMOCIONES_DATA);
-  const TABS = [{k:'reservas',l:'🎟️ Reservas'},{k:'facturas',l:'🧾 Facturas'},{k:'promociones',l:'🏷️ Promociones'}];
+  const TABS = [{k:'reservas',l:' Reservas'},{k:'facturas',l:'🧾 Facturas'},{k:'promociones',l:'🏷️ Promociones'}];
   const renderContent = () => {
     if (tab==='reservas') {
       const data = reservas.filter(r=>`${r.codigo_reserva} ${r.pasajero_nombre??''} ${r.numero_vuelo??''}`.toLowerCase().includes(q.toLowerCase()));
       return <FlatList data={data} keyExtractor={r=>String(r.id_reserva)} contentContainerStyle={{padding:14, paddingBottom:24, flexGrow:1}}
-        ListEmptyComponent={<EmptyState icon="🎟️" />}
+        ListEmptyComponent={<EmptyState icon="" />}
         renderItem={({item:r})=>(
           <DataCard title={r.codigo_reserva} subtitle={`${r.pasajero_nombre??'Pasajero '+r.id_pasajero} · Vuelo ${r.numero_vuelo??r.id_vuelo}`}
             badge={<Badge value={r.estado_reserva} />} meta={`${r.moneda??'USD'} ${r.precio_pagado??0}`} accentColor={C.purple}
             onDelete={()=>setReservas(d=>d.filter(x=>x.id_reserva!==r.id_reserva))}>
-            <Text style={{fontSize:11,color:C.muted}}>Asiento: {r.numero_asiento??'—'} · Clase: {r.clase_servicio??'—'} · Check-in: {r.checkin_realizado?'✅':'❌'}</Text>
+            <Text style={{fontSize:11,color:C.muted}}>Asiento: {r.numero_asiento??'—'} · Clase: {r.clase_servicio??'—'} · Check-in: {r.checkin_realizado?'':'❌'}</Text>
           </DataCard>
         )} />;
     }
@@ -70,8 +70,8 @@ export default function Mod08() {
         </View>)}
       </View>
       <StatsRow>
-        <StatCard label="Reservas" value={reservas.length} color={C.purple} bg={C.purpleBg} icon="🎟️" />
-        <StatCard label="Confirmadas" value={reservas.filter(r=>r.estado_reserva==='CONFIRMADA'||r.estado_reserva==='ABORDADO').length} color={C.success} bg={C.successBg} icon="✅" />
+        <StatCard label="Reservas" value={reservas.length} color={C.purple} bg={C.purpleBg} icon="" />
+        <StatCard label="Confirmadas" value={reservas.filter(r=>r.estado_reserva==='CONFIRMADA'||r.estado_reserva==='ABORDADO').length} color={C.success} bg={C.successBg} icon="" />
         <StatCard label="Facturas" value={facturas.length} color={C.green} bg={C.greenBg} icon="🧾" />
         <StatCard label="Promociones" value={promociones.filter(p=>p.activa).length} color={C.orange} bg={C.orangeBg} icon="🏷️" />
       </StatsRow>

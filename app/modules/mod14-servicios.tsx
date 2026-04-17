@@ -21,12 +21,12 @@ export default function Mod14() {
   const [hoteles, setHoteles] = useState(HOTELES);
   const [quejas, setQuejas] = useState(QUEJAS);
   const [lealtad, setLealtad] = useState(PROGRAMAS_LEALTAD);
-  const TABS = [{k:'hoteles',l:'🏨 Hoteles'},{k:'quejas',l:'📬 Quejas'},{k:'lealtad',l:'⭐ Lealtad'}];
+  const TABS = [{k:'hoteles',l:' Hoteles'},{k:'quejas',l:'📬 Quejas'},{k:'lealtad',l:' Lealtad'}];
   const renderContent = () => {
     if (tab==='hoteles') {
       const data = hoteles.filter(h=>`${h.nombre_hotel} ${h.categoria??''}`.toLowerCase().includes(q.toLowerCase()));
       return <FlatList data={data} keyExtractor={h=>String(h.id_hotel)} contentContainerStyle={{padding:14, paddingBottom:24, flexGrow:1}}
-        ListEmptyComponent={<EmptyState icon="🏨" />}
+        ListEmptyComponent={<EmptyState icon="" />}
         renderItem={({item:h})=>(<DataCard title={h.nombre_hotel} subtitle={`${h.categoria??'—'} · ${h.distancia_km??'—'} km del aeropuerto`}
             badge={<Badge value={h.activo?'ACTIVO':'INACTIVO'} />} meta={`Desde Q ${h.tarifa_noche_desde??'—'}/noche`} accentColor={C.teal}
             onDelete={()=>setHoteles(d=>d.filter(x=>x.id_hotel!==h.id_hotel))}>
@@ -45,7 +45,7 @@ export default function Mod14() {
     }
     const data = lealtad.filter(l=>JSON.stringify(l).toLowerCase().includes(q.toLowerCase()));
     return <FlatList data={data} keyExtractor={l=>String(l.id_lealtad)} contentContainerStyle={{padding:14, paddingBottom:24, flexGrow:1}}
-      ListEmptyComponent={<EmptyState icon="⭐" />}
+      ListEmptyComponent={<EmptyState icon="" />}
       renderItem={({item:l})=>(<DataCard title={`Lealtad #${l.id_lealtad} – Pasajero ${l.id_pasajero}`} subtitle={`Nivel: ${l.nivel_membresia??'—'}`}
           badge={<Badge value={l.activo?'ACTIVO':'INACTIVO'} />} meta={`${l.puntos_acumulados?.toLocaleString()} pts`} accentColor={C.orange}
           onDelete={()=>setLealtad(d=>d.filter(x=>x.id_lealtad!==l.id_lealtad))}>
@@ -61,9 +61,9 @@ export default function Mod14() {
         </View>)}
       </View>
       <StatsRow>
-        <StatCard label="Hoteles" value={hoteles.length} color={C.teal} bg={C.tealBg} icon="🏨" />
+        <StatCard label="Hoteles" value={hoteles.length} color={C.teal} bg={C.tealBg} icon="" />
         <StatCard label="Quejas" value={quejas.filter(q2=>q2.tipo_contacto==='QUEJA'||q2.tipo_contacto==='RECLAMO').length} color={C.danger} bg={C.dangerBg} icon="📬" />
-        <StatCard label="Programa Lealtad" value={lealtad.length} color={C.orange} bg={C.orangeBg} icon="⭐" />
+        <StatCard label="Programa Lealtad" value={lealtad.length} color={C.orange} bg={C.orangeBg} icon="" />
       </StatsRow>
       <SearchBar value={q} onChangeText={setQ} placeholder="Buscar servicios..." />
       {renderContent()}

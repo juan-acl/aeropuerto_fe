@@ -102,7 +102,7 @@ const METODOS = [
   { key: 'TARJETA',       label: 'Tarjeta',     icon: '💳', sub: 'Crédito o débito' },
   { key: 'TRANSFERENCIA', label: 'Transferencia',icon: '🏦', sub: 'Bancaria' },
   { key: 'EFECTIVO',      label: 'Efectivo',     icon: '💵', sub: 'En agencia' },
-  { key: 'PUNTOS',        label: 'Puntos',       icon: '💎', sub: 'Programa lealtad' },
+  { key: 'PUNTOS',        label: 'Puntos',       icon: '', sub: 'Programa lealtad' },
 ];
 
 export default function PagoScreen() {
@@ -134,7 +134,7 @@ export default function PagoScreen() {
 
   const handlePromo = async () => {
     const ok = await Promise.resolve(mgr.validarPromo(promo));
-    setPromoMsg(ok ? '✅ Código aplicado' : '❌ Código inválido');
+    setPromoMsg(ok ? ' Código aplicado' : '❌ Código inválido');
   };
 
   const procesar = async () => {
@@ -197,7 +197,7 @@ export default function PagoScreen() {
 
         {/* ── Desglose de precio ── */}
         <View style={s.card}>
-          <Text style={s.cardTitle}>💰 Resumen de precio</Text>
+          <Text style={s.cardTitle}> Resumen de precio</Text>
           <PriceRow label={`Tarifa base (${params.clase ?? 'ECONOMICA'})`} value={`USD ${precioBase}`} />
           {descTotal > 0 && (
             <PriceRow label="Descuentos aplicados" value={`- USD ${Math.round(descTotal)}`} color={C.success} />
@@ -221,7 +221,7 @@ export default function PagoScreen() {
         </View>
 
         {/* ── Servicios extra ── */}
-        <Text style={s.sectionTitle}>🎁 Servicios adicionales</Text>
+        <Text style={s.sectionTitle}> Servicios adicionales</Text>
         {mgr.extras.map(extra => (
           <ExtraCard key={extra.id} extra={extra} onToggle={() => mgr.toggleExtra(extra.id)} />
         ))}
@@ -242,7 +242,7 @@ export default function PagoScreen() {
               <Text style={s.promoBtnT}>Aplicar</Text>
             </TouchableOpacity>
           </View>
-          {promoMsg ? <Text style={[s.promoMsg, promoMsg.startsWith('✅') && { color: C.success }]}>{promoMsg}</Text> : null}
+          {promoMsg ? <Text style={[s.promoMsg, promoMsg.startsWith('') && { color: C.success }]}>{promoMsg}</Text> : null}
           <Text style={s.promoHint}>Códigos válidos: AURORA20 · LAUNCH15 · VIP25 · FIDELIDAD</Text>
         </View>
 
@@ -283,7 +283,7 @@ export default function PagoScreen() {
 
         {metodo === 'PUNTOS' && (
           <View style={[s.card, { backgroundColor: C.purpleBg + '40', borderColor: C.purple + '40' }]}>
-            <Text style={{ fontSize: 18 }}>💎</Text>
+            <Text style={{ fontSize: 18 }}></Text>
             <Text style={{ fontSize: 13, color: C.textSub, marginTop: 4 }}>
               Se descontarán {(total * 100).toLocaleString('es-GT')} puntos de tu saldo de lealtad.
             </Text>
@@ -293,7 +293,7 @@ export default function PagoScreen() {
         {/* Error */}
         {mgr.error && (
           <View style={s.errorBox}>
-            <Text style={s.errorT}>⚠️ {mgr.error}</Text>
+            <Text style={s.errorT}> {mgr.error}</Text>
           </View>
         )}
 

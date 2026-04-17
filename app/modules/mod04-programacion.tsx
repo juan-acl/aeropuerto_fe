@@ -26,7 +26,7 @@ export default function Mod04() {
   const [temporadas, setTemporadas] = useState(TEMPORADAS);
   const [restricciones, setRestricciones] = useState(RESTRICCIONES_VUELO);
 
-  const TABS = [{ k: 'programas', l: '📋 Programas' }, { k: 'temporadas', l: '📅 Temporadas' }, { k: 'restricciones', l: '⛔ Restricciones' }];
+  const TABS = [{ k: 'programas', l: '📋 Programas' }, { k: 'temporadas', l: ' Temporadas' }, { k: 'restricciones', l: '⛔ Restricciones' }];
 
   const getAerolinea = (id: number) => AEROLINEAS.find(a => a.id_aerolinea === id)?.nombre_aerolinea ?? `Aerolínea ${id}`;
 
@@ -68,7 +68,7 @@ export default function Mod04() {
       const data = temporadas.filter(t => (t.nombre_temporada ?? '').toLowerCase().includes(q.toLowerCase()));
       return (
         <FlatList data={data} keyExtractor={t => String(t.id_temporada)} contentContainerStyle={{ padding: 14 }}
-          ListEmptyComponent={<EmptyState icon="📅" />}
+          ListEmptyComponent={<EmptyState icon="" />}
           renderItem={({ item: t }) => (
             <DataCard title={t.nombre_temporada ?? '—'} subtitle={`${t.fecha_inicio ?? '—'} → ${t.fecha_fin ?? '—'}`}
               badge={<Badge value={t.activa ? 'ACTIVO' : 'INACTIVO'} />}
@@ -102,7 +102,7 @@ export default function Mod04() {
       </View>
       <View style={{ flexDirection: 'row', gap: 10, padding: 12, backgroundColor:C.bgCard }}>
         <StatCard label="Programas" value={programas.length} color={C.purple} bg={C.purpleBg} icon="📋" />
-        <StatCard label="Temporadas" value={temporadas.length} color={C.orange} bg={C.orangeBg} icon="📅" />
+        <StatCard label="Temporadas" value={temporadas.length} color={C.orange} bg={C.orangeBg} icon="" />
         <StatCard label="Restricciones" value={restricciones.filter(r => r.activa).length} color={C.danger} bg={C.dangerBg} icon="⛔" />
       </View>
       <SearchBar value={q} onChangeText={setQ} placeholder="Buscar..." />

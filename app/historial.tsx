@@ -78,8 +78,8 @@ export default function HistorialScreen() {
               <View style={s.cardMeta}>
                 <Text style={s.cardMetaT}>🎫 {r.codigo_reserva}</Text>
                 <Text style={s.cardMetaT}>💺 {r.numero_asiento ?? '—'}</Text>
-                <Text style={s.cardMetaT}>💰 USD {r.precio_pagado ?? '—'}</Text>
-                <Text style={s.cardMetaT}>📅 {r.fecha_reserva?.split('T')[0] ?? '—'}</Text>
+                <Text style={s.cardMetaT}> USD {r.precio_pagado ?? '—'}</Text>
+                <Text style={s.cardMetaT}> {r.fecha_reserva?.split('T')[0] ?? '—'}</Text>
               </View>
               {isCancelled && (
                 <TouchableOpacity style={s.reembolsoBtn}

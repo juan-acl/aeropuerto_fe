@@ -1,15 +1,16 @@
 /**
  * /buscar — Motor de búsqueda Skyscanner-style
- * ✅ Airports reales de Oracle
- * ✅ Shimmer skeleton, error con retry
- * ✅ SourceBadge 🟢 Oracle / 🟡 Demo
- * ✅ Cross-sell automático
+ *  Airports reales de Oracle
+ *  Shimmer skeleton, error con retry
+ *  SourceBadge  Oracle /  Demo
+ *  Cross-sell automático
  */
 import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import {
   View, Text, SafeAreaView, FlatList, TouchableOpacity,
   StyleSheet, ActivityIndicator, ScrollView, Animated,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { C } from '@/constants/theme';
 import { SearchBar, SearchParams, SearchMode } from '@/components/client/SearchBar';
@@ -24,16 +25,16 @@ import { BackendStatus } from '@/components/shared/BackendStatus';
 
 // ─── Sort options ─────────────────────────────────────────────────────────────
 const FLIGHT_SORTS = [
-  { key: 'precio'   as const, label: '💰 Precio'    },
-  { key: 'duracion' as const, label: '⏱️ Duración'  },
-  { key: 'salida'   as const, label: '🌅 Salida'    },
-  { key: 'llegada'  as const, label: '🌇 Llegada'   },
+  { key: 'precio'   as const, label: 'Precio'    },
+  { key: 'duracion' as const, label: 'Duración'  },
+  { key: 'salida'   as const, label: 'Salida'    },
+  { key: 'llegada'  as const, label: 'Llegada'   },
 ];
 const HOTEL_SORTS = [
-  { key: 'precio'    as const, label: '💰 Precio'    },
-  { key: 'rating'    as const, label: '⭐ Rating'    },
-  { key: 'distancia' as const, label: '📍 Distancia' },
-  { key: 'estrellas' as const, label: '🌟 Estrellas' },
+  { key: 'precio'    as const, label: 'Precio'    },
+  { key: 'rating'    as const, label: 'Rating'    },
+  { key: 'distancia' as const, label: 'Distancia' },
+  { key: 'estrellas' as const, label: 'Estrellas' },
 ];
 
 // ─── Shimmer skeleton ─────────────────────────────────────────────────────────
@@ -69,7 +70,7 @@ function EmptyState({ icon, title, sub, action, onAction }: {
 }) {
   return (
     <View style={es.wrap}>
-      <Text style={es.icon}>{icon}</Text>
+      <Ionicons name={icon as any} size={48} color={C.muted} style={es.icon} />
       <Text style={es.title}>{title}</Text>
       <Text style={es.sub}>{sub}</Text>
       {action && onAction && (
@@ -82,7 +83,7 @@ function EmptyState({ icon, title, sub, action, onAction }: {
 }
 const es = StyleSheet.create({
   wrap:  { alignItems: 'center', paddingVertical: 50, paddingHorizontal: 30 },
-  icon:  { fontSize: 56, marginBottom: 16 },
+  icon:  { marginBottom: 16 },
   title: { fontSize: 18, fontWeight: '800', color: C.textSub, textAlign: 'center' },
   sub:   { fontSize: 12, color: C.muted, marginTop: 8, textAlign: 'center', lineHeight: 19 },
   btn:   { marginTop: 20, backgroundColor: C.electric, paddingHorizontal: 24, paddingVertical: 11, borderRadius: 14 },
@@ -93,18 +94,17 @@ const es = StyleSheet.create({
 function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
     <View style={er.wrap}>
-      <Text style={er.icon}>⚠️</Text>
+      <Ionicons name="warning-outline" size={44} color={C.danger} style={{ marginBottom: 12 }} />
       <Text style={er.title}>Error al conectar</Text>
       <Text style={er.sub}>{message}</Text>
       <TouchableOpacity style={er.btn} onPress={onRetry}>
-        <Text style={er.btnT}>🔄 Reintentar</Text>
+        <Text style={er.btnT}>Reintentar</Text>
       </TouchableOpacity>
     </View>
   );
 }
 const er = StyleSheet.create({
   wrap:  { alignItems: 'center', paddingVertical: 50, paddingHorizontal: 30 },
-  icon:  { fontSize: 44, marginBottom: 12 },
   title: { fontSize: 17, fontWeight: '800', color: C.danger },
   sub:   { fontSize: 12, color: C.muted, marginTop: 6, textAlign: 'center', lineHeight: 18 },
   btn:   { marginTop: 18, backgroundColor: C.electric, paddingHorizontal: 24, paddingVertical: 10, borderRadius: 14 },
@@ -117,7 +117,7 @@ function SourceBadge({ source }: { source: string }) {
   return (
     <View style={[sb.chip, { backgroundColor: isReal ? C.successBg : C.warningBg }]}>
       <Text style={[sb.t, { color: isReal ? C.success : C.warning }]}>
-        {isReal ? '🟢 Oracle' : '🟡 Demo'}
+        {isReal ? ' Oracle' : ' Demo'}
       </Text>
     </View>
   );
@@ -132,7 +132,7 @@ function CrossSellBanner({ destino, onPress }: { destino: string; onPress: () =>
   return (
     <TouchableOpacity style={cs.banner} onPress={onPress} activeOpacity={0.88}>
       <View style={cs.left}>
-        <Text style={cs.icon}>🏨</Text>
+        <Ionicons name="business" size={24} color={C.teal} />
         <View>
           <Text style={cs.title}>¿Hotel en {destino}?</Text>
           <Text style={cs.sub}>Hoteles disponibles cerca del aeropuerto desde Oracle</Text>
@@ -145,7 +145,6 @@ function CrossSellBanner({ destino, onPress }: { destino: string; onPress: () =>
 const cs = StyleSheet.create({
   banner: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: C.tealBg, paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.tealL },
   left:   { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
-  icon:   { fontSize: 22 },
   title:  { fontSize: 13, fontWeight: '700', color: C.teal },
   sub:    { fontSize: 11, color: C.muted, marginTop: 1 },
   btn:    { backgroundColor: C.teal, paddingHorizontal: 12, paddingVertical: 5, borderRadius: 99 },
@@ -323,7 +322,7 @@ export default function BuscarScreen() {
             <ErrorState message={flights.error} onRetry={handleRetryFlights} />
           ) : flights.searched && flights.results.length === 0 ? (
             <EmptyState
-              icon="✈️"
+              icon="airplane-outline"
               title="Sin vuelos en Oracle aún"
               sub={`El endpoint /api/vuelos aún no está implementado en el backend.\nConecta el backend de vuelos para ver resultados reales.`}
               action="Ver hoteles disponibles"
@@ -342,7 +341,7 @@ export default function BuscarScreen() {
                 ) : null
               }
               ListEmptyComponent={
-                <EmptyState icon="✈️" title="Sin vuelos disponibles"
+                <EmptyState icon="search-outline" title="Sin vuelos disponibles"
                   sub="Prueba con otro destino, fecha o clase de cabina" />
               }
               ListFooterComponent={
@@ -356,7 +355,7 @@ export default function BuscarScreen() {
               )}
             />
           ) : (
-            <EmptyState icon="🔍" title="Busca tu vuelo"
+            <EmptyState icon="search-outline" title="Busca tu vuelo"
               sub={"Elige origen, destino y fecha para ver vuelos disponibles en Oracle"} />
           )}
         </View>
@@ -387,7 +386,7 @@ export default function BuscarScreen() {
               contentContainerStyle={s.listPad}
               showsVerticalScrollIndicator={false}
               ListEmptyComponent={
-                <EmptyState icon="🏨" title="Sin hoteles en Oracle"
+                <EmptyState icon="business-outline" title="Sin hoteles en Oracle"
                   sub="No se encontraron hoteles registrados en la base de datos.\nVerifica el backend o agrega hoteles al sistema." />
               }
               renderItem={({ item }) => (
@@ -395,7 +394,7 @@ export default function BuscarScreen() {
               )}
             />
           ) : (
-            <EmptyState icon="🏨" title="Busca un hotel"
+            <EmptyState icon="search-outline" title="Busca un hotel"
               sub="Ingresa el destino para ver hoteles registrados en Oracle" />
           )}
         </View>

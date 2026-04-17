@@ -25,7 +25,7 @@ export default function Screen() {
   // BODEGAS available from imports
 
   const handleSave = () => {
-    Alert.alert('✅ Guardado', 'Registro creado exitosamente.');
+    Alert.alert(' Guardado', 'Registro creado exitosamente.');
     setModal(false);
     setForm({});
   };
@@ -80,7 +80,7 @@ export default function Screen() {
           <FF label="Aeropuerto de destino" value={form.destino??''} onChangeText={set('destino')} autoCapitalize="characters" placeholder="Ej: MIA" />
           <FF label="Remitente" value={form.remitente??''} onChangeText={set('remitente')} />
           <FF label="Consignatario / Destinatario" value={form.consignatario??''} onChangeText={set('consignatario')} />
-          <FormSection title="Estado y vuelo" icon="✅" />
+          <FormSection title="Estado y vuelo" icon="" />
           <FSelect label="Estado del envío" value={form.estado??'RECIBIDO'} onChange={set('estado')}
           options={[{label:'Recibido en bodega',value:'RECIBIDO'},{label:'En bodega',value:'EN_BODEGA'},{label:'Cargado en aeronave',value:'CARGADO'},{label:'En vuelo',value:'EN_VUELO_C'},{label:'Descargado',value:'DESCARGADO'},{label:'En aduana',value:'ADUANA'},{label:'Entregado',value:'ENTREGADO'}]} />
           <FF label="Número de vuelo" value={form.numero_vuelo??''} onChangeText={set('numero_vuelo')} autoCapitalize="characters" />

@@ -27,7 +27,7 @@ export default function Screen() {
         
         <View style={{flexDirection:'row',gap:8,marginBottom:12}}>
           <StatCard label="Residuos" value={RESIDUOS.length} color={C.green} bg={C.greenBg} icon="♻️" />
-          <StatCard label="Huellas CO₂" value={HUELLAS_CARBONO.length} color={C.teal} bg={C.tealBg} icon="🌿" />
+          <StatCard label="Huellas CO₂" value={HUELLAS_CARBONO.length} color={C.teal} bg={C.tealBg} icon="" />
         </View>
         <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginBottom:8}}>♻️ Gestión de Residuos</Text>
         {RESIDUOS.filter((r:any)=>JSON.stringify(r).toLowerCase().includes(q.toLowerCase())).map((r:any)=>(
@@ -38,7 +38,7 @@ export default function Screen() {
             <Text style={{fontSize:11,color:C.muted}}>Costo tratamiento: Q {r.costo_tratamiento??0}</Text>
           </DataCard>
         ))}
-        <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginTop:16,marginBottom:8}}>🌿 Huella de Carbono por Vuelo</Text>
+        <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginTop:16,marginBottom:8}}> Huella de Carbono por Vuelo</Text>
         {HUELLAS_CARBONO.filter((h:any)=>JSON.stringify(h).toLowerCase().includes(q.toLowerCase())).map((h:any)=>(
           <DataCard key={h.id_huella_carbono} title={`Vuelo ID: ${h.id_vuelo}`}
             subtitle={`${h.categoria_vuelo??'—'} · ${h.distancia_vuelo_km?.toLocaleString()} km`}

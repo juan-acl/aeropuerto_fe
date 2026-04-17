@@ -50,7 +50,8 @@ export interface PromoRec {
   vence:     string;
 }
 
-const EMOJIS = ['🏨', '🌴', '🏙️', '⛪', '🌿', '🏰', '🌊', '🏔️'];
+// Emojis removidos por estilo premium
+const EMOJIS = [''];
 
 export function useRecommendations() {
   const { recommendations, features, loading } = useAnalytics();

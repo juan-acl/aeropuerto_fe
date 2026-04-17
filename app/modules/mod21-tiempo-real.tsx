@@ -26,11 +26,11 @@ export default function Screen() {
       <ScrollView style={{flex:1}} contentContainerStyle={{padding:14, paddingBottom:24, flexGrow:1}}>
         
         <View style={{flexDirection:'row',gap:8,marginBottom:12}}>
-          <StatCard label="Slots Hoy" value={SLOTS.length} color={C.info} bg={C.infoBg} icon="📅" />
-          <StatCard label="Disponibles" value={SLOTS.filter((s:any)=>s.estado_slot==='DISPONIBLE').length} color={C.success} bg={C.successBg} icon="✅" />
+          <StatCard label="Slots Hoy" value={SLOTS.length} color={C.info} bg={C.infoBg} icon="" />
+          <StatCard label="Disponibles" value={SLOTS.filter((s:any)=>s.estado_slot==='DISPONIBLE').length} color={C.success} bg={C.successBg} icon="" />
           <StatCard label="Retrasos TR" value={RETRASOS_TR.length} color={C.warning} bg={C.warningBg} icon="⏱" />
         </View>
-        <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginBottom:8}}>📅 Slots de Aeropuerto</Text>
+        <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginBottom:8}}> Slots de Aeropuerto</Text>
         {SLOTS.filter((s:any)=>JSON.stringify(s).toLowerCase().includes(q.toLowerCase())).map((s:any)=>(
           <DataCard key={s.id_slot} title={`Slot #${s.id_slot} · ${s.tipo_operacion}`}
             subtitle={`Aerolínea ID: ${s.id_aerolinea} · ${s.fecha_slot}`}

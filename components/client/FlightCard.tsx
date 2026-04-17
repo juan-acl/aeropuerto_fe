@@ -1,9 +1,10 @@
 /**
  * FlightCard — Premium visual con datos reales del backend
- * ✅ Badge IATA, barra de duración, urgencia de plazas, animación al seleccionar
+ *  Badge IATA, barra de duración, urgencia de plazas, animación al seleccionar
  */
 import React, { useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { C } from '@/constants/theme';
 import type { FlightResult, ClaseVuelo } from '@/hooks/useFlights';
 
@@ -106,7 +107,7 @@ export function FlightCard({ vuelo: v, clase, onSelect, selected = false }: Prop
             <Text style={s.durationT}>{formatDur(v.duracion_min)}</Text>
             <View style={s.line}>
               <View style={s.lineDot} />
-              <Text style={s.planeIcon}>✈</Text>
+              <Ionicons name="airplane" size={14} color={C.electric} style={{ marginHorizontal: 4 }} />
               <View style={s.lineDot} />
             </View>
             <Text style={v.escalas === 0 ? s.escalasD : s.escalasC}>
@@ -142,7 +143,7 @@ export function FlightCard({ vuelo: v, clase, onSelect, selected = false }: Prop
 }
 
 const s = StyleSheet.create({
-  card:         { borderRadius: 20, padding: 16, marginBottom: 10, borderWidth: 1.5, gap: 10 },
+  card:         { borderRadius: 8, padding: 12, marginBottom: 8, borderWidth: 1, gap: 8 },
   headerRow:    { flexDirection: 'row', alignItems: 'center', gap: 8 },
   iataBadge:    { borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4, borderWidth: 1 },
   iataText:     { fontSize: 12, fontWeight: '900', letterSpacing: 0.5 },
@@ -153,18 +154,17 @@ const s = StyleSheet.create({
   selectedT:    { fontSize: 9, color: C.success, fontWeight: '800' },
   routeRow:     { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   endpoint:     { alignItems: 'flex-start', minWidth: 60 },
-  time:         { fontSize: 26, fontWeight: '900', color: C.text, letterSpacing: -0.5 },
-  code:         { fontSize: 13, fontWeight: '700', color: C.muted, marginTop: 2 },
-  durationWrap: { flex: 1, alignItems: 'center', gap: 4, paddingHorizontal: 8 },
+  time:         { fontSize: 20, fontWeight: '900', color: C.text, letterSpacing: -0.5 },
+  code:         { fontSize: 11, fontWeight: '700', color: C.muted, marginTop: 1 },
+  durationWrap: { flex: 1, alignItems: 'center', gap: 2, paddingHorizontal: 8 },
   durationT:    { fontSize: 11, color: C.muted, fontWeight: '600' },
-  line:         { flexDirection: 'row', alignItems: 'center', gap: 4, width: '100%' },
-  lineDot:      { flex: 1, height: 1, backgroundColor: C.border },
-  planeIcon:    { fontSize: 14, color: C.electric },
+  line:         { flexDirection: 'row', alignItems: 'center', width: '100%' },
+  lineDot:      { flex: 1, height: 1.5, backgroundColor: C.border },
   escalasD:   { fontSize: 10, color: C.success, fontWeight: '500' as const },
   escalasC:   { fontSize: 10, color: C.warning, fontWeight: '500' as const },
   footer:     { flexDirection: 'row' as const, alignItems: 'center' as const, justifyContent: 'space-between' as const, paddingTop: 4, borderTopWidth: 1, borderTopColor: C.borderL },
   flightNum:  { fontSize: 12, color: C.muted, fontWeight: '600' as const },
-  priceWrap:  { alignItems: 'flex-end' as const, gap: 2 },
-  claseTag:   { fontSize: 9, color: C.amber, fontWeight: '800' as const, textTransform: 'uppercase' as const },
-  price:      { fontSize: 22, fontWeight: '900' as const, color: C.electric },
+  priceWrap:  { alignItems: 'flex-end' as const, gap: 0 },
+  claseTag:   { fontSize: 8, color: C.amber, fontWeight: '800' as const, textTransform: 'uppercase' as const },
+  price:      { fontSize: 18, fontWeight: '900' as const, color: C.electric },
 });

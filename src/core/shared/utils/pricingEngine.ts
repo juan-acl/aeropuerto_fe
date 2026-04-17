@@ -117,8 +117,8 @@ export function calcularPrecio(input: PricingInput): PricingResult {
   if (ocupacion >= 0.85)       badge = '⚡ Últimas plazas';
   else if (descAnticip >= 0.15) badge = '🐦 Early bird';
   else if (factorTemp >= 1.5)   badge = '🔥 Temporada alta';
-  else if (factorTemp <= 0.7)   badge = '💰 Temporada baja';
-  else if (descLealtad > 0)     badge = `⭐ Precio ${nivelLealtad}`;
+  else if (factorTemp <= 0.7)   badge = ' Temporada baja';
+  else if (descLealtad > 0)     badge = ` Precio ${nivelLealtad}`;
 
   return {
     precioBase, multiplicadorClase: multClase, factorOcupacion: factorOcup,

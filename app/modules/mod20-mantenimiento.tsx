@@ -33,12 +33,12 @@ export default function Screen() {
         
         <View style={{flexDirection:'row',gap:8,marginBottom:12}}>
           <StatCard label="Sensores" value={SENSORES_DATA.filter((s:any)=>s.activo).length} color={C.red} bg={C.redBg} icon="📡" />
-          <StatCard label="Alertas" value={ALERTAS_DATA.filter((a:any)=>!a.atendida).length} color={C.danger} bg={C.dangerBg} icon="⚠️" />
-          <StatCard label="Órdenes" value={ORDENES_DATA.filter((o:any)=>o.estado!=='COMPLETADO').length} color={C.warning} bg={C.warningBg} icon="🔧" />
+          <StatCard label="Alertas" value={ALERTAS_DATA.filter((a:any)=>!a.atendida).length} color={C.danger} bg={C.dangerBg} icon="" />
+          <StatCard label="Órdenes" value={ORDENES_DATA.filter((o:any)=>o.estado!=='COMPLETADO').length} color={C.warning} bg={C.warningBg} icon="" />
         </View>
-        <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginBottom:8}}>⚠️ Alertas Técnicas Activas</Text>
+        <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginBottom:8}}> Alertas Técnicas Activas</Text>
         {ALERTAS_DATA.filter((a:any)=>JSON.stringify(a).toLowerCase().includes(q.toLowerCase())).map((a:any)=>(
-          <DataCard key={a.id} title={`${a.nivel==='CRITICO'?'🚨':a.nivel==='PREVENTIVO'?'⚠️':'ℹ️'} ${a.tipo}`}
+          <DataCard key={a.id} title={`${a.nivel==='CRITICO'?'🚨':a.nivel==='PREVENTIVO'?'':'ℹ️'} ${a.tipo}`}
             subtitle={`Sensor: ${a.sensor} · ${a.fecha}`}
             badge={<Badge value={a.nivel} />} accentColor={a.nivel==='CRITICO'?C.danger:a.nivel==='PREVENTIVO'?C.warning:C.info}>
             <Text style={{fontSize:12,color:C.muted,marginBottom:6}}>{a.descripcion}</Text>

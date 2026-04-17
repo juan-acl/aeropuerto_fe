@@ -5,7 +5,7 @@ import { C, MOD_COLORS } from '@/constants/theme';
 import { ModuleHubCard } from '@/components/shared';
 import { useSesion, PERMISOS_POR_ROL } from '@/context/session';
 
-const GRUPOS = [{"grupo": "Infraestructura y Flota", "emoji": "🏢", "items": [{"mod": 1, "title": "Infraestructura Aeroportuaria", "desc": "Aeropuertos, pistas y puertas", "route": "/modules/mod01-infraestructura"}, {"mod": 2, "title": "Flota Aérea", "desc": "Aeronaves, modelos y mantenimientos", "route": "/modules/mod02-flota"}, {"mod": 3, "title": "Aerolíneas y Operaciones", "desc": "Aerolíneas, alianzas y certificaciones", "route": "/modules/mod03-aerolineas"}, {"mod": 4, "title": "Programación de Vuelos", "desc": "Programas, temporadas y restricciones", "route": "/modules/mod04-programacion"}]}, {"grupo": "Vuelo y Tripulación", "emoji": "✈️", "items": [{"mod": 5, "title": "Operaciones de Vuelo", "desc": "Vuelos, incidentes, retrasos y combustible", "route": "/modules/mod05-operaciones"}, {"mod": 6, "title": "Gestión de Tripulación", "desc": "Tripulantes, certificaciones y disponibilidad", "route": "/modules/mod06-tripulacion"}]}, {"grupo": "Pasajeros y Reservas", "emoji": "🧍", "items": [{"mod": 7, "title": "Gestión de Pasajeros", "desc": "Datos, documentos y perfiles", "route": "/modules/mod07-pasajeros"}, {"mod": 8, "title": "Reservas y Boletería", "desc": "Reservas, pagos y facturas", "route": "/modules/mod08-reservas"}, {"mod": 9, "title": "Check-in y Abordaje", "desc": "Check-in digital y pases de abordaje", "route": "/modules/mod09-checkin"}]}];
+const GRUPOS = [{"grupo": "Infraestructura y Flota", "emoji": "", "items": [{"mod": 1, "title": "Infraestructura Aeroportuaria", "desc": "Aeropuertos, pistas y puertas", "route": "/modules/mod01-infraestructura"}, {"mod": 2, "title": "Flota Aérea", "desc": "Aeronaves, modelos y mantenimientos", "route": "/modules/mod02-flota"}, {"mod": 3, "title": "Aerolíneas y Operaciones", "desc": "Aerolíneas, alianzas y certificaciones", "route": "/modules/mod03-aerolineas"}, {"mod": 4, "title": "Programación de Vuelos", "desc": "Programas, temporadas y restricciones", "route": "/modules/mod04-programacion"}]}, {"grupo": "Vuelo y Tripulación", "emoji": "", "items": [{"mod": 5, "title": "Operaciones de Vuelo", "desc": "Vuelos, incidentes, retrasos y combustible", "route": "/modules/mod05-operaciones"}, {"mod": 6, "title": "Gestión de Tripulación", "desc": "Tripulantes, certificaciones y disponibilidad", "route": "/modules/mod06-tripulacion"}]}, {"grupo": "Pasajeros y Reservas", "emoji": "", "items": [{"mod": 7, "title": "Gestión de Pasajeros", "desc": "Datos, documentos y perfiles", "route": "/modules/mod07-pasajeros"}, {"mod": 8, "title": "Reservas y Boletería", "desc": "Reservas, pagos y facturas", "route": "/modules/mod08-reservas"}, {"mod": 9, "title": "Check-in y Abordaje", "desc": "Check-in digital y pases de abordaje", "route": "/modules/mod09-checkin"}]}];
 
 export default function OperacionesTab() {
   const router = useRouter();
@@ -29,7 +29,7 @@ export default function OperacionesTab() {
       </View>
       <View style={s.searchWrap}>
         <View style={s.searchBox}>
-          <Text style={s.searchIcon}>🔍</Text>
+          <Text style={s.searchIcon}></Text>
           <TextInput style={s.searchInput} placeholder="Buscar sección..." placeholderTextColor={C.placeholder}
             value={q} onChangeText={setQ} clearButtonMode="while-editing" />
         </View>
@@ -54,7 +54,7 @@ export default function OperacionesTab() {
         ))}
         {filtrados.length === 0 && (
           <View style={{ alignItems: 'center', paddingVertical: 50 }}>
-            <Text style={{ fontSize: 40, marginBottom: 10 }}>{q ? '🔍' : '🔒'}</Text>
+            <Text style={{ fontSize: 40, marginBottom: 10 }}>{q ? '' : '🔒'}</Text>
             <Text style={{ fontSize: 15, fontWeight: '700', color: C.textSub }}>{q ? `Sin resultados` : 'Sin secciones asignadas'}</Text>
             {!q && <Text style={{ fontSize: 12, color: C.muted, marginTop: 6, textAlign: 'center' }}>Tu rol no tiene acceso a secciones en esta área.</Text>}
           </View>

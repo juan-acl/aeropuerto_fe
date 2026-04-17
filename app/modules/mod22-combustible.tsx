@@ -22,7 +22,7 @@ export default function Screen() {
   // PEDIDOS_COMB available from imports
 
   const handleSave = () => {
-    Alert.alert('✅ Guardado', 'Registro creado exitosamente.');
+    Alert.alert(' Guardado', 'Registro creado exitosamente.');
     setModal(false);
     setForm({});
   };
@@ -64,11 +64,11 @@ export default function Screen() {
           options={[{label:'Carga de combustible a aeronave',value:'CARGA'},{label:'Recepción en tanque',value:'RECEPCION'},{label:'Pedido a proveedor',value:'PEDIDO'},{label:'Control de calidad',value:'CALIDAD'}]} />
           <FSelect label="Tipo de combustible" required value={form.tipo_combustible??''} onChange={set('tipo_combustible')}
           options={[{label:'JET-A1 (turborreactor comercial)',value:'JET_A1'},{label:'JET-A (turborreactor doméstico)',value:'JET_A'},{label:'JET-B (clima frío)',value:'JET_B'},{label:'AVGAS 100LL (pistón)',value:'AVGAS'}]} />
-          <FormSection title="Cantidades y costos" icon="📊" />
+          <FormSection title="Cantidades y costos" icon="" />
           <FF label="Cantidad (litros)" required value={String(form.cantidad_litros??'')} onChangeText={set('cantidad_litros')} keyboardType="decimal-pad" placeholder="Ej: 18500" />
           <FF label="Precio por litro (Q)" value={String(form.precio_litro??'')} onChangeText={set('precio_litro')} keyboardType="decimal-pad" />
           <FF label="Costo total (Q)" value={String(form.costo_total??'')} onChangeText={set('costo_total')} keyboardType="decimal-pad" />
-          <FormSection title="Proveedor y aeronave" icon="✈️" />
+          <FormSection title="Proveedor y aeronave" icon="" />
           <FF label="Proveedor de combustible" value={form.proveedor??''} onChangeText={set('proveedor')} placeholder="Ej: ESSO Aviation, Shell Avgas" />
           <FF label="Matrícula de aeronave (si aplica)" value={form.matricula??''} onChangeText={set('matricula')} autoCapitalize="characters" />
           <FF label="Número de vuelo (si aplica)" value={form.numero_vuelo??''} onChangeText={set('numero_vuelo')} autoCapitalize="characters" />

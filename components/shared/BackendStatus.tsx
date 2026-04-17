@@ -9,7 +9,7 @@ import type { BackendStatus as BS } from '@/hooks/useBackend';
 interface SingleProps { label: string; status: BS; }
 function Dot({ label, status }: SingleProps) {
   const color = status === 'online' ? C.success : status === 'checking' ? C.warning : C.danger;
-  const icon  = status === 'online' ? '🟢' : status === 'checking' ? '⏳' : '🔴';
+  const icon  = status === 'online' ? '' : status === 'checking' ? '' : '🔴';
   return (
     <View style={s.dot}>
       <Text style={{ fontSize: 8 }}>{icon}</Text>
@@ -28,7 +28,7 @@ interface Props {
 export function BackendStatus({ isOnline, health, compact = false, onPress }: Props) {
   if (compact || !health) {
     const color = isOnline === null ? C.warning : isOnline ? C.success : C.danger;
-    const icon  = isOnline === null ? '⏳' : isOnline ? '🟢' : '🔴';
+    const icon  = isOnline === null ? '' : isOnline ? '' : '🔴';
     const label = isOnline === null ? 'Conectando...' : isOnline ? 'Oracle Online' : 'Sin conexión';
     return (
       <TouchableOpacity style={[s.pill, { borderColor: color + '40', backgroundColor: color + '14' }]}

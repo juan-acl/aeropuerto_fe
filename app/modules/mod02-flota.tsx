@@ -5,7 +5,7 @@ import { ScreenHeader, SearchBar, DataCard, Badge, StatCard, FormModal, FF, FSel
 import { C } from '@/constants/theme';
 
 type Tab = 'modelos' | 'mantenimientos';
-const TABS = [{ k: 'modelos', l: '✈️ Modelos' }, { k: 'mantenimientos', l: '🔧 Mantenimientos' }];
+const TABS = [{ k: 'modelos', l: ' Modelos' }, { k: 'mantenimientos', l: ' Mantenimientos' }];
 const FABRICANTES = [
   { label: 'Boeing', value: 'Boeing' }, { label: 'Airbus', value: 'Airbus' },
   { label: 'Embraer', value: 'Embraer' }, { label: 'Bombardier', value: 'Bombardier' },
@@ -54,7 +54,7 @@ export default function FlotaAerea() {
       else setMantenimientos(d => [...d, entry]);
     }
     setModal(false); setForm({});
-    Alert.alert('✅ Guardado', editItem ? 'Registro actualizado.' : 'Registro creado.');
+    Alert.alert(' Guardado', editItem ? 'Registro actualizado.' : 'Registro creado.');
   };
 
   const proxMant = mantenimientos.filter(m => m.fecha_proximo && m.fecha_proximo <= new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0]).length;
@@ -63,7 +63,7 @@ export default function FlotaAerea() {
     if (tab === 'modelos') {
       const data = modelos.filter(m => `${m.nombre_modelo} ${m.fabricante} ${m.codigo_iata ?? ''}`.toLowerCase().includes(q.toLowerCase()));
       return <FlatList data={data} keyExtractor={m => String(m.id_modelo)} contentContainerStyle={{ padding: 14, paddingBottom: 24, flexGrow: 1 }}
-        ListEmptyComponent={<EmptyState icon="✈️" text="Sin modelos registrados" />}
+        ListEmptyComponent={<EmptyState icon="" text="Sin modelos registrados" />}
         renderItem={({ item: m }) => (
           <DataCard title={m.nombre_modelo} subtitle={`${m.fabricante} · ${m.codigo_iata ?? '—'}`}
             badge={<Badge value={m.activo ? 'ACTIVO' : 'INACTIVO'} />}
@@ -72,15 +72,15 @@ export default function FlotaAerea() {
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
               {m.autonomia_km ? <Text style={{ fontSize: 11, color: C.muted }}>🛣️ {m.autonomia_km?.toLocaleString()} km</Text> : null}
               {m.velocidad_crucero_kmh ? <Text style={{ fontSize: 11, color: C.muted }}>💨 {m.velocidad_crucero_kmh} km/h</Text> : null}
-              {m.tripulacion_minima ? <Text style={{ fontSize: 11, color: C.muted }}>👨‍✈️ Trip. mín: {m.tripulacion_minima}</Text> : null}
-              {m.tipo_motor ? <Text style={{ fontSize: 11, color: C.muted }}>⚙️ {m.tipo_motor}</Text> : null}
+              {m.tripulacion_minima ? <Text style={{ fontSize: 11, color: C.muted }}> Trip. mín: {m.tripulacion_minima}</Text> : null}
+              {m.tipo_motor ? <Text style={{ fontSize: 11, color: C.muted }}> {m.tipo_motor}</Text> : null}
             </View>
           </DataCard>
         )} />;
     }
     const data = mantenimientos.filter(m => `${m.matricula_avion} ${m.tipo_mantenimiento} ${m.taller ?? ''}`.toLowerCase().includes(q.toLowerCase()));
     return <FlatList data={data} keyExtractor={m => String(m.id_mantenimiento)} contentContainerStyle={{ padding: 14, paddingBottom: 24, flexGrow: 1 }}
-      ListEmptyComponent={<EmptyState icon="🔧" text="Sin registros de mantenimiento" />}
+      ListEmptyComponent={<EmptyState icon="" text="Sin registros de mantenimiento" />}
       renderItem={({ item: m }) => (
         <DataCard title={`${m.matricula_avion} · ${m.tipo_mantenimiento}`} subtitle={`Taller: ${m.taller ?? '—'} · ${m.fecha_mantenimiento ?? '—'}`}
           badge={<Badge value={m.tipo_mantenimiento} />}
@@ -88,8 +88,8 @@ export default function FlotaAerea() {
           onEdit={() => openEdit(m)} onDelete={() => setMantenimientos(d => d.filter(x => x.id_mantenimiento !== m.id_mantenimiento))}>
           <View style={{ gap: 3 }}>
             {m.tecnico_responsable ? <Text style={{ fontSize: 11, color: C.muted }}>👷 {m.tecnico_responsable}</Text> : null}
-            {m.horas_trabajo ? <Text style={{ fontSize: 11, color: C.muted }}>⏱️ {m.horas_trabajo} horas de trabajo</Text> : null}
-            {m.fecha_proximo ? <Text style={{ fontSize: 11, color: C.info }}>📅 Próximo: {m.fecha_proximo}</Text> : null}
+            {m.horas_trabajo ? <Text style={{ fontSize: 11, color: C.muted }}> {m.horas_trabajo} horas de trabajo</Text> : null}
+            {m.fecha_proximo ? <Text style={{ fontSize: 11, color: C.info }}> Próximo: {m.fecha_proximo}</Text> : null}
             {m.observaciones ? <Text style={{ fontSize: 11, color: C.muted }}>📝 {m.observaciones}</Text> : null}
           </View>
         </DataCard>
@@ -102,10 +102,10 @@ export default function FlotaAerea() {
       <TabBar tabs={TABS} active={tab} onPress={k => { setTab(k as Tab); setQ(''); }} />
       {proxMant > 0 && <View style={{ paddingTop: 10 }}><AlertBanner type="warning" message={`${proxMant} mantenimiento${proxMant > 1 ? 's' : ''} programado${proxMant > 1 ? 's' : ''} en los próximos 7 días.`} /></View>}
       <StatsRow>
-        <StatCard label="Modelos" value={modelos.length} color={C.teal} bg={C.tealBg} icon="✈️" />
-        <StatCard label="Activos" value={modelos.filter(m => m.activo).length} color={C.success} bg={C.successBg} icon="✅" />
-        <StatCard label="Mantenimientos" value={mantenimientos.length} color={C.warning} bg={C.warningBg} icon="🔧" />
-        <StatCard label="Próximos" value={proxMant} color={proxMant > 0 ? C.danger : C.success} bg={proxMant > 0 ? C.dangerBg : C.successBg} icon="📅" />
+        <StatCard label="Modelos" value={modelos.length} color={C.teal} bg={C.tealBg} icon="" />
+        <StatCard label="Activos" value={modelos.filter(m => m.activo).length} color={C.success} bg={C.successBg} icon="" />
+        <StatCard label="Mantenimientos" value={mantenimientos.length} color={C.warning} bg={C.warningBg} icon="" />
+        <StatCard label="Próximos" value={proxMant} color={proxMant > 0 ? C.danger : C.success} bg={proxMant > 0 ? C.dangerBg : C.successBg} icon="" />
       </StatsRow>
       <SearchBar value={q} onChangeText={setQ} placeholder={tab === 'modelos' ? 'Buscar por modelo, fabricante...' : 'Buscar por matrícula, taller...'} />
       {renderContent()}
@@ -114,7 +114,7 @@ export default function FlotaAerea() {
         onClose={() => setModal(false)} onSave={handleSave} saveLabel={editItem ? 'Actualizar' : 'Guardar'}>
 
         {tab === 'modelos' && <>
-          <FormSection title="Identificación del modelo" icon="✈️" />
+          <FormSection title="Identificación del modelo" icon="" />
           <FF label="Nombre del modelo" required value={form.nombre_modelo ?? ''} onChangeText={set('nombre_modelo')} placeholder="Ej: Boeing 737-800, Airbus A320" />
           <FSelect label="Fabricante" required value={form.fabricante ?? ''} onChange={set('fabricante')} options={FABRICANTES} />
           <FF label="Código IATA del modelo" value={form.codigo_iata ?? ''} onChangeText={set('codigo_iata')} placeholder="Ej: 738, 320" autoCapitalize="characters" hint="Código de 3 caracteres para planificación" />
@@ -131,13 +131,13 @@ export default function FlotaAerea() {
         </>}
 
         {tab === 'mantenimientos' && <>
-          <FormSection title="Aeronave" icon="✈️" />
+          <FormSection title="Aeronave" icon="" />
           <FF label="Matrícula de la aeronave" required value={form.matricula_avion ?? ''} onChangeText={set('matricula_avion')} autoCapitalize="characters" placeholder="Ej: TG-ANA, N737BA" hint="Matrícula oficial de la aeronave" />
-          <FormSection title="Tipo y fechas" icon="📅" />
+          <FormSection title="Tipo y fechas" icon="" />
           <FSelect label="Tipo de mantenimiento" required value={form.tipo_mantenimiento ?? ''} onChange={set('tipo_mantenimiento')} options={TIPOS_MANT} />
           <FF label="Fecha de realización" value={form.fecha_mantenimiento ?? ''} onChangeText={set('fecha_mantenimiento')} placeholder="YYYY-MM-DD" />
           <FF label="Fecha de próximo mantenimiento" value={form.fecha_proximo ?? ''} onChangeText={set('fecha_proximo')} placeholder="YYYY-MM-DD" hint="Fecha estimada del siguiente mantenimiento" />
-          <FormSection title="Ejecución" icon="🔧" />
+          <FormSection title="Ejecución" icon="" />
           <FF label="Taller / Centro de mantenimiento" value={form.taller ?? ''} onChangeText={set('taller')} placeholder="Ej: Hangar Central Aurora, MRO GTM" />
           <FF label="Técnico responsable" value={form.tecnico_responsable ?? ''} onChangeText={set('tecnico_responsable')} placeholder="Nombre del técnico a cargo" />
           <FF label="Horas de trabajo" value={String(form.horas_trabajo ?? '')} onChangeText={set('horas_trabajo')} keyboardType="numeric" placeholder="Ej: 12" />

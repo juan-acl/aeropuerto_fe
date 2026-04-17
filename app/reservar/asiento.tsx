@@ -160,7 +160,7 @@ export default function SeleccionarAsiento() {
         {/* Aircraft nose */}
         <View style={s.nose}>
           <View style={s.noseShape}>
-            <Text style={{ fontSize: 28 }}>✈️</Text>
+            <Text style={{ fontSize: 28 }}></Text>
           </View>
           <Text style={s.noseLabel}>FRENTE DE LA CABINA</Text>
         </View>

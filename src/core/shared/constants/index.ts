@@ -15,11 +15,11 @@ export const ESTADO_VUELO = {
 
 export const ESTADO_VUELO_CONFIG: Record<string, { label: string; color: string; bg: string; icon: string }> = {
   PROGRAMADO:  { label: 'A tiempo',    color: '#2563EB', bg: '#EFF6FF', icon: '🔵' },
-  EN_VUELO:    { label: 'En vuelo',    color: '#059669', bg: '#ECFDF5', icon: '🟢' },
+  EN_VUELO:    { label: 'En vuelo',    color: '#059669', bg: '#ECFDF5', icon: '' },
   ATERRIZADO:  { label: 'Aterrizado',  color: '#6B7280', bg: '#F9FAFB', icon: '⚫' },
   CANCELADO:   { label: 'Cancelado',   color: '#DC2626', bg: '#FEF2F2', icon: '🔴' },
   REPROGRAMADO:{ label: 'Reprogramado',color: '#7C3AED', bg: '#F5F3FF', icon: '🟣' },
-  DEMORADO:    { label: 'Demorado',    color: '#D97706', bg: '#FFFBEB', icon: '🟡' },
+  DEMORADO:    { label: 'Demorado',    color: '#D97706', bg: '#FFFBEB', icon: '' },
   DESVIADO:    { label: 'Desviado',    color: '#EA580C', bg: '#FFF7ED', icon: '🟠' },
 };
 
@@ -51,7 +51,7 @@ export const NIVEL_LEALTAD = {
   BRONCE:  { label: 'Bronce',  icon: '🥉', color: '#B45309', minPuntos: 0,     maxPuntos: 5000,  descuento: 0,    multiplier: 1.0 },
   PLATA:   { label: 'Plata',   icon: '🥈', color: '#6B7280', minPuntos: 5001,  maxPuntos: 15000, descuento: 3,    multiplier: 1.5 },
   ORO:     { label: 'Oro',     icon: '🥇', color: '#D97706', minPuntos: 15001, maxPuntos: 40000, descuento: 5,    multiplier: 2.0 },
-  PLATINO: { label: 'Platino', icon: '💎', color: '#7C3AED', minPuntos: 40001, maxPuntos: Infinity, descuento: 8, multiplier: 3.0 },
+  PLATINO: { label: 'Platino', icon: '', color: '#7C3AED', minPuntos: 40001, maxPuntos: Infinity, descuento: 8, multiplier: 3.0 },
 };
 
 // ─── Roles ────────────────────────────────────────────────────────────────────
@@ -69,15 +69,15 @@ export const ROL_NIVEL: Record<RolUsuario, number> = {
 export const ROL_META: Record<RolUsuario, { label: string; color: string; bg: string; icon: string; dept: string }> = {
   CLIENTE:          { label: 'Pasajero / Cliente',     color: '#2563EB', bg: '#EFF6FF', icon: '🧳', dept: 'Público' },
   RECEPCIONISTA:    { label: 'Recepcionista',          color: '#0D9488', bg: '#F0FDFA', icon: '🎫', dept: 'Recepción' },
-  CHECKIN:          { label: 'Agente Check-in',        color: '#7C3AED', bg: '#F5F3FF', icon: '✅', dept: 'Check-in' },
-  OPERACIONES:      { label: 'Agente de Operaciones',  color: '#0D9488', bg: '#F0FDFA', icon: '🛬', dept: 'Operaciones' },
+  CHECKIN:          { label: 'Agente Check-in',        color: '#7C3AED', bg: '#F5F3FF', icon: '', dept: 'Check-in' },
+  OPERACIONES:      { label: 'Agente de Operaciones',  color: '#0D9488', bg: '#F0FDFA', icon: '', dept: 'Operaciones' },
   SEGURIDAD:        { label: 'Oficial de Seguridad',   color: '#DC2626', bg: '#FEF2F2', icon: '🛡️', dept: 'Seguridad' },
-  SUPERVISOR:       { label: 'Supervisor',             color: '#7C3AED', bg: '#F5F3FF', icon: '⭐', dept: 'Supervisión' },
-  JEFE_OPERACIONES: { label: 'Jefe de Operaciones',    color: '#0A1628', bg: '#EFF6FF', icon: '✈️', dept: 'Control Aéreo' },
-  FINANZAS:         { label: 'Analista Financiero',    color: '#16A34A', bg: '#F0FDF4', icon: '💰', dept: 'Finanzas' },
+  SUPERVISOR:       { label: 'Supervisor',             color: '#7C3AED', bg: '#F5F3FF', icon: '', dept: 'Supervisión' },
+  JEFE_OPERACIONES: { label: 'Jefe de Operaciones',    color: '#0A1628', bg: '#EFF6FF', icon: '', dept: 'Control Aéreo' },
+  FINANZAS:         { label: 'Analista Financiero',    color: '#16A34A', bg: '#F0FDF4', icon: '', dept: 'Finanzas' },
   RRHH:             { label: 'Recursos Humanos',       color: '#D97706', bg: '#FFFBEB', icon: '👥', dept: 'RRHH' },
-  MANTENIMIENTO:    { label: 'Técnico de Mantenimiento',color: '#EA580C', bg: '#FFF7ED', icon: '🔧', dept: 'Mantenimiento' },
-  ADMIN:            { label: 'Administrador del Sistema', color: '#B91C1C', bg: '#FEF2F2', icon: '⚙️', dept: 'TI' },
+  MANTENIMIENTO:    { label: 'Técnico de Mantenimiento',color: '#EA580C', bg: '#FFF7ED', icon: '', dept: 'Mantenimiento' },
+  ADMIN:            { label: 'Administrador del Sistema', color: '#B91C1C', bg: '#FEF2F2', icon: '', dept: 'TI' },
 };
 
 // ─── Permission matrix ────────────────────────────────────────────────────────

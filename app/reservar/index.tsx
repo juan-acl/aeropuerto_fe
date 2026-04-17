@@ -7,7 +7,7 @@ import { useVuelos } from '@/hooks/useVuelos';
 import { backendApi } from '@/services/backendApi';
 import { fmt } from '@/utils/format';
 
-const EMOJIS = ['🌊', '🏙️', '🌮', '🎬', '🏖️'];
+const EMOJIS = ['', '', '🌮', '🎬', '🏖️'];
 
 export default function BuscarVuelo() {
   const [AEROPUERTOS, set_AEROPUERTOS] = useState<any[]>([]);
@@ -41,7 +41,7 @@ export default function BuscarVuelo() {
           <View style={{ width: 36 }} />
         </View>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 30 }}>
-          <View style={s.lockWrap}><Text style={{ fontSize: 44 }}>🔐</Text></View>
+          <View style={s.lockWrap}><Text style={{ fontSize: 44 }}></Text></View>
           <Text style={s.lockTitle}>Inicia sesión para reservar</Text>
           <Text style={s.lockSub}>Necesitas una cuenta para gestionar reservas y check-in.</Text>
           <TouchableOpacity style={s.lockBtn} onPress={() => router.push('/(tabs)/perfil' as any)}>
@@ -97,7 +97,7 @@ export default function BuscarVuelo() {
 
           {/* Destino */}
           <TouchableOpacity style={[s.fieldBtn, !destino && s.fieldBtnEmpty]} onPress={() => setShowPicker('destino')}>
-            <View style={[s.fieldBtnIcon, { backgroundColor: destino ? C.cyan + '20' : C.bgElevated }]}><Text style={{ fontSize: 18 }}>🛬</Text></View>
+            <View style={[s.fieldBtnIcon, { backgroundColor: destino ? C.cyan + '20' : C.bgElevated }]}><Text style={{ fontSize: 18 }}></Text></View>
             <View style={{ flex: 1 }}>
               <Text style={s.fieldBtnLabel}>HASTA</Text>
               <Text style={[s.fieldBtnVal, !destino && { color: C.placeholder }]}>
@@ -109,7 +109,7 @@ export default function BuscarVuelo() {
 
           {/* Fecha */}
           <View style={[s.fieldBtn, { marginBottom: 0 }]}>
-            <View style={[s.fieldBtnIcon, { backgroundColor: C.amber + '20' }]}><Text style={{ fontSize: 18 }}>📅</Text></View>
+            <View style={[s.fieldBtnIcon, { backgroundColor: C.amber + '20' }]}><Text style={{ fontSize: 18 }}></Text></View>
             <View style={{ flex: 1 }}>
               <Text style={s.fieldBtnLabel}>FECHA DE SALIDA</Text>
               <TextInput style={[s.fieldBtnVal, { color: C.text }]} value={fecha} onChangeText={setFecha}
@@ -129,7 +129,7 @@ export default function BuscarVuelo() {
           </View>
 
           <TouchableOpacity style={[s.searchBtn, loading && { opacity: 0.7 }]} onPress={handleBuscar} disabled={loading} activeOpacity={0.85}>
-            {loading ? <ActivityIndicator color={C.white} /> : <Text style={s.searchBtnT}>🔍  Buscar vuelos</Text>}
+            {loading ? <ActivityIndicator color={C.white} /> : <Text style={s.searchBtnT}>  Buscar vuelos</Text>}
           </TouchableOpacity>
         </View>
 
@@ -154,7 +154,7 @@ export default function BuscarVuelo() {
         {/* Airport picker */}
         {showPicker && (
           <View style={s.pickerCard}>
-            <Text style={s.pickerTitle}>{showPicker === 'origen' ? '🛫 Selecciona origen' : '🛬 Selecciona destino'}</Text>
+            <Text style={s.pickerTitle}>{showPicker === 'origen' ? '🛫 Selecciona origen' : ' Selecciona destino'}</Text>
             {AEROP_OPTS.map(a => (
               <TouchableOpacity key={a.code} style={s.pickerItem}
                 onPress={() => { showPicker === 'origen' ? setOrigen(a.code) : setDestino(a.code); setShowPicker(null); }}>
@@ -207,7 +207,7 @@ export default function BuscarVuelo() {
                       <View style={s.vCardLine}>
                         <View style={s.vCardLineDot} />
                         <View style={[s.vCardLineBar, { backgroundColor: avail ? C.electric + '40' : C.border }]} />
-                        <Text style={{ color: avail ? C.electric : C.muted, fontSize: 14 }}>✈</Text>
+                        <Text style={{ color: avail ? C.electric : C.muted, fontSize: 14 }}></Text>
                         <View style={[s.vCardLineBar, { backgroundColor: avail ? C.electric + '40' : C.border }]} />
                         <View style={s.vCardLineDot} />
                       </View>

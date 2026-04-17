@@ -262,7 +262,7 @@ export function contentBasedFilter(
       if (features.searchedDestinations.includes(dest)) {
         score += 25;
         razon = 'Estuviste buscando este destino';
-        badge = '🔍 Buscado recientemente';
+        badge = ' Buscado recientemente';
       }
 
       // Class preference alignment

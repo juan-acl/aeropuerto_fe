@@ -122,7 +122,7 @@ export default function PreferenciasScreen() {
     // In production: PATCH /api/usuarios/{id}/preferencias
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
-    Alert.alert('✅ Guardado', 'Tus preferencias han sido actualizadas.');
+    Alert.alert(' Guardado', 'Tus preferencias han sido actualizadas.');
   };
 
   return (
@@ -140,7 +140,7 @@ export default function PreferenciasScreen() {
       <ScrollView contentContainerStyle={s.body} showsVerticalScrollIndicator={false}>
 
         {/* Personal info */}
-        <Section title="Datos personales" emoji="👤">
+        <Section title="Datos personales" emoji="">
           <View style={or.row}>
             <View style={{ flex: 1 }}>
               <Text style={or.label}>Nombre</Text>
@@ -159,14 +159,14 @@ export default function PreferenciasScreen() {
         </Section>
 
         {/* Travel preferences */}
-        <Section title="Preferencias de viaje" emoji="✈️">
+        <Section title="Preferencias de viaje" emoji="">
           <ChipRow label="Clase preferida"
             selected={prefs.clase}
             onSelect={k => set('clase', k)}
             options={[
               { key: 'ECONOMICA',     label: 'Económica', icon: '💺' },
               { key: 'EJECUTIVA',     label: 'Ejecutiva', icon: '🎩' },
-              { key: 'PRIMERA_CLASE', label: 'Primera',   icon: '💎' },
+              { key: 'PRIMERA_CLASE', label: 'Primera',   icon: '' },
             ]}
           />
           <ChipRow label="Asiento preferido"
@@ -197,7 +197,7 @@ export default function PreferenciasScreen() {
         </Section>
 
         {/* Notifications */}
-        <Section title="Notificaciones" emoji="🔔">
+        <Section title="Notificaciones" emoji="">
           <OptionRow label="Actualizaciones de vuelo" sub="Retrasos, cancelaciones, puertas"
             value={prefs.notif_vuelo} onToggle={v => set('notif_vuelo', v)} />
           <OptionRow label="Recordatorio de check-in" sub="2 horas antes del vuelo"
@@ -223,7 +223,7 @@ export default function PreferenciasScreen() {
         </Section>
 
         {/* Danger zone */}
-        <Section title="Cuenta" emoji="⚙️">
+        <Section title="Cuenta" emoji="">
           <TouchableOpacity style={or.row} onPress={() =>
             Alert.alert('Cambiar contraseña', 'Se enviará un enlace a tu email para cambiar la contraseña.')}>
             <View style={{ flex: 1 }}>

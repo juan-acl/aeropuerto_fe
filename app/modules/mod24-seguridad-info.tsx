@@ -29,11 +29,11 @@ export default function Screen() {
       <ScrollView style={{flex:1}} contentContainerStyle={{padding:14, paddingBottom:24, flexGrow:1}}>
         
         <View style={{flexDirection:'row',gap:8,marginBottom:12}}>
-          <StatCard label="Usuarios" value={USUARIOS.filter((u:any)=>u.activo).length} color={C.red} bg={C.redBg} icon="👤" />
+          <StatCard label="Usuarios" value={USUARIOS.filter((u:any)=>u.activo).length} color={C.red} bg={C.redBg} icon="" />
           <StatCard label="Roles" value={ROLES.length} color={C.purple} bg={C.purpleBg} icon="🔑" />
           <StatCard label="Incidentes" value={INCIDENTES_SEG.length} color={C.danger} bg={C.dangerBg} icon="🚨" />
         </View>
-        <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginBottom:8}}>👤 Usuarios del Sistema</Text>
+        <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginBottom:8}}> Usuarios del Sistema</Text>
         {USUARIOS.filter((u:any)=>JSON.stringify(u).toLowerCase().includes(q.toLowerCase())).map((u:any)=>(
           <DataCard key={u.id_usuario_sistema} title={u.nombre_usuario}
             subtitle={`${u.email_institucional??'—'} · Creado: ${u.fecha_creacion??'—'}`}

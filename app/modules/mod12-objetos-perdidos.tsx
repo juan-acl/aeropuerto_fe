@@ -23,12 +23,12 @@ export default function Screen() {
     <SafeAreaView style={{flex:1,backgroundColor:C.bg}}>
       <ScreenHeader title="Objetos Perdidos" subtitle="Registro y seguimiento de objetos perdidos" onAdd={()=>{setForm({});setModal(true);}} />
       <StatsRow>
-        <StatCard label="Total" value={data.length} color={C.orange} bg={C.orangeBg} icon="🔍" />
-        <StatCard label="Encontrados" value={data.filter((o:any)=>o.estado==='ENCONTRADO').length} color={C.warning} bg={C.warningBg} icon="📦" /><StatCard label="Entregados" value={data.filter((o:any)=>o.estado==='ENTREGADO').length} color={C.success} bg={C.successBg} icon="✅" />
+        <StatCard label="Total" value={data.length} color={C.orange} bg={C.orangeBg} icon="" />
+        <StatCard label="Encontrados" value={data.filter((o:any)=>o.estado==='ENCONTRADO').length} color={C.warning} bg={C.warningBg} icon="📦" /><StatCard label="Entregados" value={data.filter((o:any)=>o.estado==='ENTREGADO').length} color={C.success} bg={C.successBg} icon="" />
       </StatsRow>
       <SearchBar value={q} onChangeText={setQ} placeholder="Buscar..." />
       <FlatList data={filtered} keyExtractor={(m:any)=>String(m.id_objeto)} contentContainerStyle={{padding:14, paddingBottom:24, flexGrow:1}}
-        ListEmptyComponent={<EmptyState icon="🔍" />}
+        ListEmptyComponent={<EmptyState icon="" />}
         renderItem={({item:m})=>(
           <DataCard title={m.descripcion} subtitle={`${m.lugar_encontrado??'—'} · ${m.fecha_reporte}`}
             badge={<Badge value={m.estado} />} meta={`Q ${m.valor_estimado??0}`}

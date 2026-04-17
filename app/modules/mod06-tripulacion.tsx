@@ -6,7 +6,7 @@ import { useBackend } from '@/hooks/useBackend';
 import { C } from '@/constants/theme';
 
 type Tab = 'tripulantes' | 'certificaciones' | 'disponibilidad';
-const TABS = [{ k: 'tripulantes', l: '👨‍✈️ Tripulantes' }, { k: 'certificaciones', l: '🏅 Certificaciones' }, { k: 'disponibilidad', l: '📅 Disponibilidad' }];
+const TABS = [{ k: 'tripulantes', l: ' Tripulantes' }, { k: 'certificaciones', l: ' Certificaciones' }, { k: 'disponibilidad', l: ' Disponibilidad' }];
 const TIPOS_TRIPULANTE = [
   { label: 'Piloto al mando (Capitán)', value: 'PILOTO' },
   { label: 'Copiloto (Primer Oficial)', value: 'COPILOTO' },
@@ -71,7 +71,7 @@ export default function Tripulacion() {
       else setDisps(d => [...d, entry]);
     }
     setModal(false); setForm({});
-    Alert.alert('✅ Guardado', editItem ? 'Registro actualizado.' : 'Registro creado.');
+    Alert.alert(' Guardado', editItem ? 'Registro actualizado.' : 'Registro creado.');
   };
 
   const tripOptions = tripulantes.map(t => ({ label: `${t.nombres} ${t.apellidos} (${t.tipo_tripulante})`, value: String(t.id_tripulante) }));
@@ -81,7 +81,7 @@ export default function Tripulacion() {
     if (tab === 'tripulantes') {
       const data = tripulantes.filter(t => `${t.nombres} ${t.apellidos} ${t.tipo_tripulante} ${t.licencia ?? ''}`.toLowerCase().includes(q.toLowerCase()));
       return <FlatList data={data} keyExtractor={t => String(t.id_tripulante)} contentContainerStyle={{ padding: 14, paddingBottom: 24, flexGrow: 1 }}
-        ListEmptyComponent={<EmptyState icon="👨‍✈️" text="Sin tripulantes" sub="Agrega el primer tripulante con + Nuevo" />}
+        ListEmptyComponent={<EmptyState icon="" text="Sin tripulantes" sub="Agrega el primer tripulante con + Nuevo" />}
         renderItem={({ item: t }) => (
           <DataCard title={`${t.nombres} ${t.apellidos}`} subtitle={`Lic: ${t.licencia ?? '—'} · ${t.nacionalidad ?? '—'}`}
             badge={<Badge value={t.tipo_tripulante} />} meta={t.horas_vuelo_acumuladas ? `${t.horas_vuelo_acumuladas?.toLocaleString()} h` : undefined}
@@ -90,7 +90,7 @@ export default function Tripulacion() {
             <View style={{ flexDirection: 'row', gap: 12, flexWrap: 'wrap' }}>
               {t.email && <Text style={{ fontSize: 11, color: C.muted }}>✉️ {t.email}</Text>}
               {t.telefono && <Text style={{ fontSize: 11, color: C.muted }}>📞 {t.telefono}</Text>}
-              {t.fecha_vencimiento_licencia && <Text style={{ fontSize: 11, color: t.fecha_vencimiento_licencia < new Date().toISOString().split('T')[0] ? C.danger : C.muted }}>⏳ Licencia vence: {t.fecha_vencimiento_licencia}</Text>}
+              {t.fecha_vencimiento_licencia && <Text style={{ fontSize: 11, color: t.fecha_vencimiento_licencia < new Date().toISOString().split('T')[0] ? C.danger : C.muted }}> Licencia vence: {t.fecha_vencimiento_licencia}</Text>}
             </View>
           </DataCard>
         )} />;
@@ -99,7 +99,7 @@ export default function Tripulacion() {
       const data = certs.filter(c => `${c.tipo_certificacion} ${c.entidad_certificadora}`.toLowerCase().includes(q.toLowerCase()));
       const tripMap = Object.fromEntries(tripulantes.map(t => [t.id_tripulante, `${t.nombres} ${t.apellidos}`]));
       return <FlatList data={data} keyExtractor={c => String(c.id_certificacion)} contentContainerStyle={{ padding: 14, paddingBottom: 24, flexGrow: 1 }}
-        ListEmptyComponent={<EmptyState icon="🏅" text="Sin certificaciones" />}
+        ListEmptyComponent={<EmptyState icon="" text="Sin certificaciones" />}
         renderItem={({ item: c }) => {
           const vencida = c.fecha_vencimiento && c.fecha_vencimiento < new Date().toISOString().split('T')[0];
           return <DataCard title={c.tipo_certificacion ?? '—'} subtitle={tripMap[c.id_tripulante] ?? `Tripulante #${c.id_tripulante}`}
@@ -114,7 +114,7 @@ export default function Tripulacion() {
     const data = disps.filter(d => `${d.fecha_inicio} ${d.fecha_fin} ${d.observaciones ?? ''}`.toLowerCase().includes(q.toLowerCase()));
     const tripMap = Object.fromEntries(tripulantes.map(t => [t.id_tripulante, `${t.nombres} ${t.apellidos}`]));
     return <FlatList data={data} keyExtractor={d => String(d.id_disponibilidad)} contentContainerStyle={{ padding: 14, paddingBottom: 24, flexGrow: 1 }}
-      ListEmptyComponent={<EmptyState icon="📅" text="Sin registros de disponibilidad" />}
+      ListEmptyComponent={<EmptyState icon="" text="Sin registros de disponibilidad" />}
       renderItem={({ item: d }) => (
         <DataCard title={tripMap[d.id_tripulante] ?? `Tripulante #${d.id_tripulante}`}
           subtitle={`${d.fecha_inicio} → ${d.fecha_fin}`}
@@ -133,10 +133,10 @@ export default function Tripulacion() {
       <TabBar tabs={TABS} active={tab} onPress={k => { setTab(k as Tab); setQ(''); }} />
       {hoyVencidos > 0 && <View style={{ paddingTop: 10 }}><AlertBanner type="error" message={`${hoyVencidos} certificación${hoyVencidos > 1 ? 'es' : ''} vencida${hoyVencidos > 1 ? 's' : ''}. Requieren renovación inmediata.`} /></View>}
       <StatsRow>
-        <StatCard label="Total" value={tripulantes.length} color={C.navy} bg={C.infoBg} icon="👨‍✈️" />
-        <StatCard label="Activos" value={tripulantes.filter(t => t.activo).length} color={C.success} bg={C.successBg} icon="✅" />
+        <StatCard label="Total" value={tripulantes.length} color={C.navy} bg={C.infoBg} icon="" />
+        <StatCard label="Activos" value={tripulantes.filter(t => t.activo).length} color={C.success} bg={C.successBg} icon="" />
         <StatCard label="Pilotos" value={tripulantes.filter(t => t.tipo_tripulante === 'PILOTO').length} color={C.teal} bg={C.tealBg} icon="🎖️" />
-        <StatCard label="Certs." value={certs.length} color={C.purple} bg={C.purpleBg} icon="🏅" />
+        <StatCard label="Certs." value={certs.length} color={C.purple} bg={C.purpleBg} icon="" />
       </StatsRow>
       <SearchBar value={q} onChangeText={setQ} placeholder="Buscar tripulación..." />
       {renderContent()}
@@ -145,13 +145,13 @@ export default function Tripulacion() {
         onClose={() => setModal(false)} onSave={handleSave} saveLabel={editItem ? 'Actualizar' : 'Guardar'}>
 
         {tab === 'tripulantes' && <>
-          <FormSection title="Datos personales" icon="👤" />
+          <FormSection title="Datos personales" icon="" />
           <FF label="Nombres" required value={form.nombres ?? ''} onChangeText={set('nombres')} placeholder="Ej: Carlos Andrés" />
           <FF label="Apellidos" required value={form.apellidos ?? ''} onChangeText={set('apellidos')} placeholder="Ej: López Mendoza" />
           <FF label="Nacionalidad" value={form.nacionalidad ?? ''} onChangeText={set('nacionalidad')} placeholder="Ej: Guatemalteca" />
           <FF label="Email institucional" value={form.email ?? ''} onChangeText={set('email')} keyboardType="email-address" autoCapitalize="none" placeholder="Ej: c.lopez@aurora.aero" />
           <FF label="Teléfono" value={form.telefono ?? ''} onChangeText={set('telefono')} keyboardType="phone-pad" />
-          <FormSection title="Información de vuelo" icon="✈️" />
+          <FormSection title="Información de vuelo" icon="" />
           <FSelect label="Tipo de tripulante" required value={form.tipo_tripulante ?? ''} onChange={set('tipo_tripulante')} options={TIPOS_TRIPULANTE} />
           <FF label="Número de licencia" value={form.licencia ?? ''} onChangeText={set('licencia')} placeholder="Ej: DGAC-GT-00123" autoCapitalize="characters" />
           <FF label="Vencimiento de licencia" value={form.fecha_vencimiento_licencia ?? ''} onChangeText={set('fecha_vencimiento_licencia')} placeholder="YYYY-MM-DD" hint="Formato: año-mes-día" />
@@ -160,22 +160,22 @@ export default function Tripulacion() {
         </>}
 
         {tab === 'certificaciones' && <>
-          <FormSection title="Tripulante" icon="👨‍✈️" />
+          <FormSection title="Tripulante" icon="" />
           <FSelect label="Tripulante" required value={String(form.id_tripulante ?? '')} onChange={set('id_tripulante')} options={tripOptions} hint="Selecciona a quién se asigna esta certificación" />
-          <FormSection title="Certificación" icon="🏅" />
+          <FormSection title="Certificación" icon="" />
           <FSelect label="Tipo de certificación" required value={form.tipo_certificacion ?? ''} onChange={set('tipo_certificacion')} options={TIPOS_CERT} />
           <FF label="Entidad certificadora" value={form.entidad_certificadora ?? ''} onChangeText={set('entidad_certificadora')} placeholder="Ej: DGAC Guatemala, FAA, EASA" />
           <FF label="Número de certificado" value={form.numero_certificado ?? ''} onChangeText={set('numero_certificado')} autoCapitalize="characters" />
-          <FormSection title="Vigencia" icon="📅" />
+          <FormSection title="Vigencia" icon="" />
           <FF label="Fecha de obtención" value={form.fecha_obtencion ?? ''} onChangeText={set('fecha_obtencion')} placeholder="YYYY-MM-DD" />
           <FF label="Fecha de vencimiento" value={form.fecha_vencimiento ?? ''} onChangeText={set('fecha_vencimiento')} placeholder="YYYY-MM-DD" />
           <FToggle label="Certificación activa/vigente" value={form.activa !== false && form.activa !== 0} onChange={v => set('activa')(v)} />
         </>}
 
         {tab === 'disponibilidad' && <>
-          <FormSection title="Tripulante" icon="👨‍✈️" />
+          <FormSection title="Tripulante" icon="" />
           <FSelect label="Tripulante" required value={String(form.id_tripulante ?? '')} onChange={set('id_tripulante')} options={tripOptions} />
-          <FormSection title="Período de disponibilidad" icon="📅" />
+          <FormSection title="Período de disponibilidad" icon="" />
           <FF label="Fecha inicio" required value={form.fecha_inicio ?? ''} onChangeText={set('fecha_inicio')} placeholder="YYYY-MM-DD" hint="Primer día disponible" />
           <FF label="Fecha fin" required value={form.fecha_fin ?? ''} onChangeText={set('fecha_fin')} placeholder="YYYY-MM-DD" hint="Último día disponible" />
           <FF label="Horas máximas por día" value={String(form.horas_maximas_diarias ?? '8')} onChangeText={set('horas_maximas_diarias')} keyboardType="numeric" hint="Límite reglamentario diario" />

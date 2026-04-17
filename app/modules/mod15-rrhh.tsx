@@ -31,7 +31,7 @@ export default function Screen() {
   // CAPACITACIONES_DATA available from imports
 
   const handleSave = () => {
-    Alert.alert('✅ Guardado', 'Registro creado exitosamente.');
+    Alert.alert(' Guardado', 'Registro creado exitosamente.');
     setModal(false);
     setForm({});
   };
@@ -44,7 +44,7 @@ export default function Screen() {
         
         <View style={{flexDirection:'row',gap:8,marginBottom:12}}>
           <StatCard label="Empleados" value={EMPLEADOS.filter((e:any)=>e.activo).length} color={C.navy} bg={C.infoBg} icon="👥" />
-          <StatCard label="Departamentos" value={DEPARTAMENTOS.length} color={C.purple} bg={C.purpleBg} icon="🏢" />
+          <StatCard label="Departamentos" value={DEPARTAMENTOS.length} color={C.purple} bg={C.purpleBg} icon="" />
         </View>
         <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginBottom:8}}>👥 Empleados</Text>
         {EMPLEADOS.filter((e:any)=>JSON.stringify(e).toLowerCase().includes(q.toLowerCase())).map((e:any)=>(
@@ -56,7 +56,7 @@ export default function Screen() {
             <Text style={{fontSize:11,color:C.muted}}>📧 {e.email} · 📞 {e.telefono}</Text>
           </DataCard>
         ))}
-        <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginTop:16,marginBottom:8}}>📊 Evaluaciones Recientes</Text>
+        <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginTop:16,marginBottom:8}}> Evaluaciones Recientes</Text>
         {EVALUACIONES_DATA.filter((e:any)=>JSON.stringify(e).toLowerCase().includes(q.toLowerCase())).map((e:any)=>(
           <DataCard key={e.id} title={e.empleado} subtitle={`${e.evaluador} · ${e.periodo}`}
             badge={<Badge value={e.puntuacion_total>=4?'COMPLETADO':e.puntuacion_total>=3?'PENDIENTE':'RECHAZADO'} />}
@@ -66,7 +66,7 @@ export default function Screen() {
             <ScoreBar label="Asistencia" value={e.asistencia} />
           </DataCard>
         ))}
-        <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginTop:16,marginBottom:8}}>📅 Vacaciones y Permisos</Text>
+        <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginTop:16,marginBottom:8}}> Vacaciones y Permisos</Text>
         {VACACIONES_DATA.filter((v:any)=>JSON.stringify(v).toLowerCase().includes(q.toLowerCase())).map((v:any)=>(
           <DataCard key={v.id} title={v.empleado} subtitle={`${v.fecha_inicio} → ${v.fecha_fin} · ${v.dias} días`}
             badge={<Badge value={v.estado} />} meta={v.motivo??'—'}
@@ -77,12 +77,12 @@ export default function Screen() {
       </ScrollView>
       <FormModal visible={modal} title="Nuevo Registro" onClose={()=>setModal(false)} onSave={handleSave}>
         <>
-          <FormSection title="Datos personales" icon="👤" />
+          <FormSection title="Datos personales" icon="" />
           <FF label="Nombres" required value={form.nombres??''} onChangeText={set('nombres')} />
           <FF label="Apellidos" required value={form.apellidos??''} onChangeText={set('apellidos')} />
           <FF label="DPI / Identificación" value={form.dpi??''} onChangeText={set('dpi')} keyboardType="numeric" />
           <FF label="Fecha de nacimiento" value={form.fecha_nacimiento??''} onChangeText={set('fecha_nacimiento')} placeholder="YYYY-MM-DD" />
-          <FormSection title="Información laboral" icon="💼" />
+          <FormSection title="Información laboral" icon="" />
           <FF label="Código de empleado" value={form.codigo_empleado??''} onChangeText={set('codigo_empleado')} autoCapitalize="characters" hint="Se asigna automáticamente si se deja vacío" />
           <FF label="Puesto / Cargo" required value={form.puesto??''} onChangeText={set('puesto')} placeholder="Ej: Agente de servicios al pasajero" />
           <FF label="Departamento" value={form.departamento??''} onChangeText={set('departamento')} placeholder="Ej: Operaciones, RR.HH., Finanzas" />

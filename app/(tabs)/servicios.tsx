@@ -5,7 +5,7 @@ import { C, MOD_COLORS } from '@/constants/theme';
 import { ModuleHubCard } from '@/components/shared';
 import { useSesion, PERMISOS_POR_ROL } from '@/context/session';
 
-const GRUPOS = [{"grupo": "Seguridad y Control", "emoji": "🛡️", "items": [{"mod": 10, "title": "Seguridad Operacional", "desc": "Incidentes, prohibiciones y emergencias", "route": "/modules/mod10-seguridad"}, {"mod": 11, "title": "Seguridad Aeroportuaria", "desc": "Controles, objetos y visitas", "route": "/modules/mod11-seg-aeroportuaria"}, {"mod": 12, "title": "Objetos Perdidos", "desc": "Registro, seguimiento y entrega", "route": "/modules/mod12-objetos-perdidos"}]}, {"grupo": "Comercial y Pasajero", "emoji": "🛍️", "items": [{"mod": 13, "title": "Área Comercial", "desc": "Concesiones, ventas, VIP y estacionamiento", "route": "/modules/mod13-comercial"}, {"mod": 14, "title": "Servicios al Pasajero", "desc": "Hoteles, transporte y lealtad", "route": "/modules/mod14-servicios"}, {"mod": 18, "title": "Pasajeros Especiales", "desc": "Menores no acompañados y mascotas", "route": "/modules/mod18-especiales"}]}, {"grupo": "Recursos y Finanzas", "emoji": "💼", "items": [{"mod": 15, "title": "Recursos Humanos", "desc": "Empleados, evaluaciones y capacitaciones", "route": "/modules/mod15-rrhh"}, {"mod": 16, "title": "Finanzas y Contabilidad", "desc": "Presupuestos, ingresos y gastos", "route": "/modules/mod16-finanzas"}, {"mod": 19, "title": "Gestión de Carga", "desc": "Envíos, manifiestos y aduanas", "route": "/modules/mod19-carga"}, {"mod": 20, "title": "Mantenimiento Predictivo", "desc": "Sensores, alertas y órdenes", "route": "/modules/mod20-mantenimiento"}, {"mod": 27, "title": "Transporte Terrestre", "desc": "Rutas, vehículos y choferes", "route": "/modules/mod27-transporte"}]}];
+const GRUPOS = [{"grupo": "Seguridad y Control", "emoji": "🛡️", "items": [{"mod": 10, "title": "Seguridad Operacional", "desc": "Incidentes, prohibiciones y emergencias", "route": "/modules/mod10-seguridad"}, {"mod": 11, "title": "Seguridad Aeroportuaria", "desc": "Controles, objetos y visitas", "route": "/modules/mod11-seg-aeroportuaria"}, {"mod": 12, "title": "Objetos Perdidos", "desc": "Registro, seguimiento y entrega", "route": "/modules/mod12-objetos-perdidos"}]}, {"grupo": "Comercial y Pasajero", "emoji": "", "items": [{"mod": 13, "title": "Área Comercial", "desc": "Concesiones, ventas, VIP y estacionamiento", "route": "/modules/mod13-comercial"}, {"mod": 14, "title": "Servicios al Pasajero", "desc": "Hoteles, transporte y lealtad", "route": "/modules/mod14-servicios"}, {"mod": 18, "title": "Pasajeros Especiales", "desc": "Menores no acompañados y mascotas", "route": "/modules/mod18-especiales"}]}, {"grupo": "Recursos y Finanzas", "emoji": "", "items": [{"mod": 15, "title": "Recursos Humanos", "desc": "Empleados, evaluaciones y capacitaciones", "route": "/modules/mod15-rrhh"}, {"mod": 16, "title": "Finanzas y Contabilidad", "desc": "Presupuestos, ingresos y gastos", "route": "/modules/mod16-finanzas"}, {"mod": 19, "title": "Gestión de Carga", "desc": "Envíos, manifiestos y aduanas", "route": "/modules/mod19-carga"}, {"mod": 20, "title": "Mantenimiento Predictivo", "desc": "Sensores, alertas y órdenes", "route": "/modules/mod20-mantenimiento"}, {"mod": 27, "title": "Transporte Terrestre", "desc": "Rutas, vehículos y choferes", "route": "/modules/mod27-transporte"}]}];
 
 export default function ServiciosTab() {
   const router = useRouter();
@@ -29,7 +29,7 @@ export default function ServiciosTab() {
       </View>
       <View style={s.searchWrap}>
         <View style={s.searchBox}>
-          <Text style={s.searchIcon}>🔍</Text>
+          <Text style={s.searchIcon}></Text>
           <TextInput style={s.searchInput} placeholder="Buscar sección..." placeholderTextColor={C.placeholder}
             value={q} onChangeText={setQ} clearButtonMode="while-editing" />
         </View>
@@ -54,7 +54,7 @@ export default function ServiciosTab() {
         ))}
         {filtrados.length === 0 && (
           <View style={{ alignItems: 'center', paddingVertical: 50 }}>
-            <Text style={{ fontSize: 40, marginBottom: 10 }}>{q ? '🔍' : '🔒'}</Text>
+            <Text style={{ fontSize: 40, marginBottom: 10 }}>{q ? '' : '🔒'}</Text>
             <Text style={{ fontSize: 15, fontWeight: '700', color: C.textSub }}>{q ? `Sin resultados` : 'Sin secciones asignadas'}</Text>
             {!q && <Text style={{ fontSize: 12, color: C.muted, marginTop: 6, textAlign: 'center' }}>Tu rol no tiene acceso a secciones en esta área.</Text>}
           </View>

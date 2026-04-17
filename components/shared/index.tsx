@@ -137,7 +137,7 @@ export function StatCard({label,value,color=C.navy,bg=C.infoBg,icon}:{label:stri
   return (
     <View style={[sc.card,{borderTopColor:color}]}>
       <View style={[sc.iconWrap,{backgroundColor:bg}]}>
-        <Text style={{fontSize:18}}>{icon??'📊'}</Text>
+        <Text style={{fontSize:18}}>{icon??''}</Text>
       </View>
       <Text style={[sc.val,{color}]}>{value}</Text>
       <Text style={sc.lbl} numberOfLines={1}>{label}</Text>
@@ -355,7 +355,7 @@ export function SearchBar({value,onChangeText,placeholder='Buscar...'}:{value:st
   return (
     <View style={{paddingHorizontal:14,paddingVertical:10,backgroundColor:C.bgCard,borderBottomWidth:1,borderBottomColor:C.borderL}}>
       <View style={{backgroundColor:C.bg,borderRadius:12,flexDirection:'row',alignItems:'center',paddingHorizontal:12,borderWidth:1.5,borderColor:C.borderL}}>
-        <Text style={{fontSize:16,marginRight:8,color:C.light}}>🔍</Text>
+        <Text style={{fontSize:16,marginRight:8,color:C.light}}></Text>
         <TextInput style={{flex:1,paddingVertical:10,fontSize:15,color:C.text}} value={value} onChangeText={onChangeText} placeholder={placeholder} placeholderTextColor={C.placeholder} clearButtonMode="while-editing"/>
         {value.length>0&&Platform.OS==='android'&&(
           <TouchableOpacity onPress={()=>onChangeText('')} style={{padding:4}}>
@@ -525,8 +525,8 @@ export function SectionHeader({title,count}:{title:string;count?:number}) {
 export function AlertBanner({type,message}:{type:'info'|'success'|'warning'|'error';message:string}) {
   const map={
     info:{bg:C.infoBg,border:C.infoL,text:C.info,icon:'ℹ️'},
-    success:{bg:C.successBg,border:C.successL,text:C.success,icon:'✅'},
-    warning:{bg:C.warningBg,border:C.warningL,text:C.warning,icon:'⚠️'},
+    success:{bg:C.successBg,border:C.successL,text:C.success,icon:''},
+    warning:{bg:C.warningBg,border:C.warningL,text:C.warning,icon:''},
     error:{bg:C.dangerBg,border:C.dangerL,text:C.danger,icon:'🚫'},
   };
   const cfg=map[type];

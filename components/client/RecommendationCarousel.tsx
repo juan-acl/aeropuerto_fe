@@ -7,6 +7,7 @@ import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet,
   ActivityIndicator,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { C } from '@/constants/theme';
 import type { DestinoPop, VueloRec, HotelRec, PromoRec } from '@/hooks/useRecommendations';
@@ -16,7 +17,7 @@ function DestCard({ d, onPress }: { d: DestinoPop; onPress: () => void }) {
   return (
     <TouchableOpacity style={dc.card} onPress={onPress} activeOpacity={0.85}>
       <View style={dc.imgWrap}>
-        <Text style={dc.emoji}>{d.emoji}</Text>
+        <Ionicons name="location-outline" size={36} color={C.electric} />
         {d.badge && <View style={dc.badge}><Text style={dc.badgeT}>{d.badge}</Text></View>}
       </View>
       <Text style={dc.city}>{d.city}</Text>
@@ -28,7 +29,6 @@ function DestCard({ d, onPress }: { d: DestinoPop; onPress: () => void }) {
 const dc = StyleSheet.create({
   card: { width: 130, backgroundColor: C.bgCard, borderRadius: 18, overflow: 'hidden', borderWidth: 1, borderColor: C.border },
   imgWrap: { height: 90, backgroundColor: C.bgElevated, alignItems: 'center', justifyContent: 'center', position: 'relative' },
-  emoji: { fontSize: 36 },
   badge: { position: 'absolute', top: 6, right: 6, backgroundColor: C.electric, borderRadius: 99, paddingHorizontal: 6, paddingVertical: 2 },
   badgeT: { fontSize: 8, fontWeight: '800', color: C.white },
   city: { fontSize: 13, fontWeight: '800', color: C.text, paddingHorizontal: 10, paddingTop: 8 },
@@ -68,14 +68,26 @@ function HotelRecCard({ h, onPress }: { h: HotelRec; onPress: () => void }) {
   return (
     <TouchableOpacity style={hrc.card} onPress={onPress} activeOpacity={0.85}>
       <View style={hrc.imgWrap}>
-        <Text style={{ fontSize: 32 }}>🏨</Text>
+        <Ionicons name="business" size={32} color={C.navyG} />
         {h.badge && <View style={hrc.badge}><Text style={hrc.badgeT}>{h.badge}</Text></View>}
       </View>
       <View style={hrc.body}>
         <Text style={hrc.name} numberOfLines={2}>{h.nombre}</Text>
-        <Text style={hrc.stars}>{'★'.repeat(h.estrellas)}</Text>
-        <Text style={hrc.dist}>📍 {h.distancia} km</Text>
-        {h.shuttle && <Text style={hrc.shuttle}>🚌 Shuttle gratis</Text>}
+        <View style={{ flexDirection: 'row', marginTop: 2, gap: 2 }}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Ionicons key={i} name={i < h.estrellas ? 'star' : 'star-outline'} size={10} color={i < h.estrellas ? C.amber : C.muted} />
+          ))}
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 }}>
+          <Ionicons name="location-outline" size={10} color={C.muted} />
+          <Text style={hrc.dist}>{h.distancia} km</Text>
+        </View>
+        {h.shuttle && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 2 }}>
+            <Ionicons name="bus-outline" size={10} color={C.teal} />
+            <Text style={hrc.shuttle}>Shuttle gratis</Text>
+          </View>
+        )}
         <Text style={hrc.price}>USD {h.precio}/noche</Text>
       </View>
     </TouchableOpacity>
@@ -88,7 +100,6 @@ const hrc = StyleSheet.create({
   badgeT: { fontSize: 8, fontWeight: '800', color: C.navy },
   body: { padding: 10, gap: 2 },
   name: { fontSize: 12, fontWeight: '800', color: C.text, lineHeight: 16 },
-  stars: { fontSize: 10, color: C.amber, marginTop: 2 },
   dist: { fontSize: 10, color: C.muted },
   shuttle: { fontSize: 10, color: C.teal, fontWeight: '600' },
   price: { fontSize: 13, fontWeight: '800', color: C.electric, marginTop: 4 },
@@ -99,7 +110,7 @@ function PromoCard({ p, onPress }: { p: PromoRec; onPress: () => void }) {
   return (
     <TouchableOpacity style={[prc.card, { borderColor: p.color + '40' }]} onPress={onPress} activeOpacity={0.85}>
       <View style={[prc.header, { backgroundColor: p.color + '15' }]}>
-        <Text style={{ fontSize: 28 }}>{p.emoji}</Text>
+        <Ionicons name="pricetag" size={28} color={p.color} />
         <View style={[prc.discountBadge, { backgroundColor: p.color }]}>
           <Text style={prc.discountT}>-{p.descuento}%</Text>
         </View>
@@ -188,7 +199,7 @@ export function RecommendationCarousel({
       {/* AI message */}
       {mensajePersonalizado && (
         <View style={main.aiMsg}>
-          <Text style={{ fontSize: 16 }}>🤖</Text>
+          <Ionicons name="sparkles" size={16} color={C.electric} />
           <Text style={main.aiMsgT}>{mensajePersonalizado}</Text>
         </View>
       )}
@@ -208,7 +219,7 @@ export function RecommendationCarousel({
 
       {/* Vuelos recomendados */}
       {vuelosRec.length > 0 && (
-        <SectionWrap title="✈️ Vuelos para ti" action="Ver todos"
+        <SectionWrap title="Vuelos para ti" action="Ver todos"
           onAction={() => router.push('/reservar' as any)}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 20, gap: 10 }}>
@@ -222,7 +233,7 @@ export function RecommendationCarousel({
 
       {/* Hoteles */}
       {hotelesRec.length > 0 && (
-        <SectionWrap title="🏨 Hoteles destacados" action="Ver todos"
+        <SectionWrap title="Hoteles destacados" action="Ver todos"
           onAction={() => {}}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 20, gap: 10 }}>
@@ -236,7 +247,7 @@ export function RecommendationCarousel({
 
       {/* Promos */}
       {promos.length > 0 && (
-        <SectionWrap title="🎁 Ofertas exclusivas">
+        <SectionWrap title="Ofertas exclusivas">
           <ScrollView horizontal showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 20, gap: 10 }}>
             {promos.map(p => (

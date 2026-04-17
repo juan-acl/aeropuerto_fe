@@ -112,7 +112,7 @@ export function FilterPanel(props: Props) {
   return (
     <>
       <TouchableOpacity style={fp.trigger} onPress={() => { setLocalF(props.filters); setVisible(true); }}>
-        <Text style={{ fontSize: 16 }}>⚙️</Text>
+        <Text style={{ fontSize: 16 }}></Text>
         <Text style={fp.triggerT}>Filtros</Text>
       </TouchableOpacity>
 

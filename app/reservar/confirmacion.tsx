@@ -46,7 +46,7 @@ export default function Confirmacion() {
   const handleShare = async () => {
     try {
       await Share.share({
-        message: `✈️ Reserva confirmada: ${codigo}\nVuelo: ${vuelo?.NumeroVuelo ?? vueloId}\nAsiento: ${asiento}\nFecha: ${fecha}\nSalida: ${salida}`,
+        message: ` Reserva confirmada: ${codigo}\nVuelo: ${vuelo?.NumeroVuelo ?? vueloId}\nAsiento: ${asiento}\nFecha: ${fecha}\nSalida: ${salida}`,
         title: 'Mi pase de abordar — Aeropuerto La Aurora',
       });
     } catch {}
@@ -58,7 +58,7 @@ export default function Confirmacion() {
 
         {/* ── Success header ── */}
         <View style={s.successHeader}>
-          <View style={s.checkCircle}><Text style={{ fontSize: 42 }}>✅</Text></View>
+          <View style={s.checkCircle}><Text style={{ fontSize: 42 }}></Text></View>
           <Text style={s.successTitle}>¡Reserva confirmada!</Text>
           <Text style={s.successSub}>
             Se ha enviado la confirmación a{' '}
@@ -85,7 +85,7 @@ export default function Confirmacion() {
               <Text style={s.bpTime}>{salida}</Text>
             </View>
             <View style={s.bpMiddle}>
-              <Text style={s.bpArrow}>─────── ✈ ───────</Text>
+              <Text style={s.bpArrow}>───────  ───────</Text>
               <Text style={s.bpFecha}>{fecha}</Text>
             </View>
             <View style={[s.bpEndpoint, { alignItems: 'flex-end' }]}>
@@ -169,7 +169,7 @@ export default function Confirmacion() {
               pathname: '/reservar/checkin',
               params: { codigo },
             } as any)}>
-            <Text style={{ fontSize: 24 }}>✅</Text>
+            <Text style={{ fontSize: 24 }}></Text>
             <Text style={s.actionBtnT}>Hacer{'\n'}Check-in</Text>
           </TouchableOpacity>
           <TouchableOpacity style={s.actionBtn} onPress={handleShare}>
@@ -178,7 +178,7 @@ export default function Confirmacion() {
           </TouchableOpacity>
           <TouchableOpacity style={s.actionBtn}
             onPress={() => router.push('/historial' as any)}>
-            <Text style={{ fontSize: 24 }}>🎟️</Text>
+            <Text style={{ fontSize: 24 }}></Text>
             <Text style={s.actionBtnT}>Mis{'\n'}Viajes</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[s.actionBtn, { borderColor: C.danger + '40' }]}

@@ -250,8 +250,8 @@ export default function AnalyticsDashboard() {
           {[
             { label: 'Ingresos',     val: `Q ${(kpis.ingresosTotales/1000).toFixed(0)}K`, color: C.success, icon: '📈' },
             { label: 'Gastos',       val: `Q ${(kpis.gastosTotales/1000).toFixed(0)}K`,  color: C.danger,  icon: '📉' },
-            { label: 'Utilidad',     val: `Q ${(kpis.utilidadNeta/1000).toFixed(0)}K`,   color: C.electric,icon: '💰' },
-            { label: 'Margen',       val: `${kpis.margenPct.toFixed(1)}%`,               color: C.teal,    icon: '📊' },
+            { label: 'Utilidad',     val: `Q ${(kpis.utilidadNeta/1000).toFixed(0)}K`,   color: C.electric,icon: '' },
+            { label: 'Margen',       val: `${kpis.margenPct.toFixed(1)}%`,               color: C.teal,    icon: '' },
           ].map(k => (
             <View key={k.label} style={[s.kpiCard, { borderTopColor: k.color }]}>
               <Text style={{ fontSize: 20 }}>{k.icon}</Text>
@@ -264,8 +264,8 @@ export default function AnalyticsDashboard() {
         {/* KPI Row 2 */}
         <View style={s.kpiGrid}>
           {[
-            { label: 'Reservas',       val: kpis.totalReservas,          color: C.purple, icon: '🎟️' },
-            { label: 'Confirmadas',    val: kpis.reservasConfirm,        color: C.success,icon: '✅' },
+            { label: 'Reservas',       val: kpis.totalReservas,          color: C.purple, icon: '' },
+            { label: 'Confirmadas',    val: kpis.reservasConfirm,        color: C.success,icon: '' },
             { label: '% Cancelación',  val: `${kpis.tasaCancelacion.toFixed(1)}%`, color: C.warning,icon: '❌' },
             { label: 'Conversión',     val: `${kpis.conversionRate}%`,    color: C.cyan,   icon: '🎯' },
           ].map(k => (
@@ -305,7 +305,7 @@ export default function AnalyticsDashboard() {
 
         {/* ML Cluster Analysis */}
         <View style={s.sectionHeader}>
-          <Text style={s.sectionTitle}>🤖 ML — Análisis de Clusters</Text>
+          <Text style={s.sectionTitle}> ML — Análisis de Clusters</Text>
         </View>
         <View style={s.chartCard}>
           <DonutChart segments={clusterData} label="Distribución de clusters de usuario" />
@@ -317,10 +317,10 @@ export default function AnalyticsDashboard() {
         </View>
         <View style={s.insightsCard}>
           {[
-            { label: 'Usuarios en riesgo de churn',     val: '46', color: C.danger,  icon: '⚠️' },
+            { label: 'Usuarios en riesgo de churn',     val: '46', color: C.danger,  icon: '' },
             { label: 'Candidatos a upgrade',            val: '38', color: C.purple,  icon: '⬆️' },
-            { label: 'Alta probabilidad de compra hoy', val: '124', color: C.success, icon: '✅' },
-            { label: 'Score promedio de usuarios',      val: '67.3', color: C.electric, icon: '📊' },
+            { label: 'Alta probabilidad de compra hoy', val: '124', color: C.success, icon: '' },
+            { label: 'Score promedio de usuarios',      val: '67.3', color: C.electric, icon: '' },
             { label: 'Precisión del modelo CBF',        val: '84%', color: C.teal,   icon: '🎯' },
             { label: 'Lift colaborativo vs baseline',   val: '+31%', color: C.cyan,   icon: '📈' },
           ].map(ins => (

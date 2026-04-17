@@ -33,7 +33,8 @@ export interface HotelFilters {
   ratingMin:    number;
 }
 
-const EMOJIS = ['🏨', '🌴', '🏙️', '⛪', '🌿', '🏰', '🌊', '🏔️'];
+// Emojis removidos por estilo premium
+const EMOJIS = [''];
 const AMENIDADES_POOL = [
   ['Piscina', 'Gym', 'Spa', 'Restaurant'],
   ['WiFi', 'Parking', 'Bar', 'Concierge'],

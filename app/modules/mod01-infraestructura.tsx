@@ -7,7 +7,7 @@ import { ScreenHeader, SearchBar, DataCard, Badge, StatCard, FormModal, FF, FSel
 import { C } from '@/constants/theme';
 
 type Tab = 'aeropuertos' | 'pistas' | 'puertas';
-const TABS = [{ k: 'aeropuertos', l: '🏢 Aeropuertos' }, { k: 'pistas', l: '🛬 Pistas' }, { k: 'puertas', l: '🚪 Puertas' }];
+const TABS = [{ k: 'aeropuertos', l: ' Aeropuertos' }, { k: 'pistas', l: ' Pistas' }, { k: 'puertas', l: '🚪 Puertas' }];
 
 export default function Infraestructura() {
   const [AEROPUERTOS, set_AEROPUERTOS] = useState<any[]>([]);
@@ -81,7 +81,7 @@ export default function Infraestructura() {
       else setPuertas(d => [...d, entry]);
     }
     setModal(false); setForm({});
-    Alert.alert('✅ Guardado', editItem ? 'Registro actualizado.' : 'Registro creado exitosamente.');
+    Alert.alert(' Guardado', editItem ? 'Registro actualizado.' : 'Registro creado exitosamente.');
   };
 
   const codigosAeropuerto = aeropuertos.map(a => ({ label: `${a.codigo_aeropuerto} — ${a.nombre}`, value: a.codigo_aeropuerto }));
@@ -92,7 +92,7 @@ export default function Infraestructura() {
       return (
         <FlatList data={data} keyExtractor={a => a.codigo_aeropuerto}
           contentContainerStyle={{ padding: 14, paddingBottom: 24, flexGrow: 1 }}
-          ListEmptyComponent={<EmptyState icon="🏢" text="Sin aeropuertos" sub="Usa + Nuevo para agregar el primero" />}
+          ListEmptyComponent={<EmptyState icon="" text="Sin aeropuertos" sub="Usa + Nuevo para agregar el primero" />}
           renderItem={({ item: a }) => (
             <DataCard title={a.nombre} subtitle={`${a.codigo_aeropuerto} · ${a.ciudad ?? '—'}, ${a.pais ?? '—'}`}
               badge={<Badge value={a.activo ? 'ACTIVO' : 'INACTIVO'} />}
@@ -103,7 +103,7 @@ export default function Infraestructura() {
                 {a.continente && <Text style={{ fontSize: 11, color: C.muted }}>🌍 {a.continente}</Text>}
                 {a.huso_horario && <Text style={{ fontSize: 11, color: C.muted }}>⏰ {a.huso_horario}</Text>}
                 {a.elevacion_metros && <Text style={{ fontSize: 11, color: C.muted }}>⛰ {a.elevacion_metros} m</Text>}
-                {a.latitud && <Text style={{ fontSize: 11, color: C.muted }}>📍 {a.latitud?.toFixed(3)}, {a.longitud?.toFixed(3)}</Text>}
+                {a.latitud && <Text style={{ fontSize: 11, color: C.muted }}> {a.latitud?.toFixed(3)}, {a.longitud?.toFixed(3)}</Text>}
               </View>
             </DataCard>
           )} />
@@ -114,7 +114,7 @@ export default function Infraestructura() {
       return (
         <FlatList data={data} keyExtractor={p => String(p.id_pista)}
           contentContainerStyle={{ padding: 14, paddingBottom: 24, flexGrow: 1 }}
-          ListEmptyComponent={<EmptyState icon="🛬" text="Sin pistas registradas" />}
+          ListEmptyComponent={<EmptyState icon="" text="Sin pistas registradas" />}
           renderItem={({ item: p }) => (
             <DataCard title={`Pista ${p.numero_pista}`} subtitle={`Aeropuerto: ${p.codigo_aeropuerto} · ${p.superficie ?? '—'}`}
               badge={<Badge value={p.activo ? 'ACTIVO' : 'INACTIVO'} />}
@@ -143,7 +143,7 @@ export default function Infraestructura() {
             onEdit={() => openEdit(p)}
             onDelete={() => setPuertas(d => d.filter(x => x.id_puerta !== p.id_puerta))}>
             <Text style={{ fontSize: 11, color: p.tiene_pasarela ? C.success : C.muted }}>
-              {p.tiene_pasarela ? '✅ Con pasarela de embarque' : '🚶 Acceso directo (sin pasarela)'}
+              {p.tiene_pasarela ? ' Con pasarela de embarque' : '🚶 Acceso directo (sin pasarela)'}
             </Text>
           </DataCard>
         )} />
@@ -159,9 +159,9 @@ export default function Infraestructura() {
       <ScreenHeader title="Infraestructura Aeroportuaria" subtitle="Aeropuertos, pistas y puertas" onAdd={openNew} />
       <TabBar tabs={TABS} active={tab} onPress={k => { setTab(k as Tab); setQ(''); }} />
       <StatsRow>
-        <StatCard label="Aeropuertos" value={aeropuertos.length} color={C.navy} bg={C.infoBg} icon="🏢" />
-        <StatCard label="Activos" value={aeropuertos.filter(a => a.activo).length} color={C.success} bg={C.successBg} icon="✅" />
-        <StatCard label="Pistas" value={pistas.length} color={C.teal} bg={C.tealBg} icon="🛬" />
+        <StatCard label="Aeropuertos" value={aeropuertos.length} color={C.navy} bg={C.infoBg} icon="" />
+        <StatCard label="Activos" value={aeropuertos.filter(a => a.activo).length} color={C.success} bg={C.successBg} icon="" />
+        <StatCard label="Pistas" value={pistas.length} color={C.teal} bg={C.tealBg} icon="" />
         <StatCard label="Puertas" value={puertas.length} color={C.purple} bg={C.purpleBg} icon="🚪" />
       </StatsRow>
       <SearchBar value={q} onChangeText={setQ} placeholder={`Buscar ${tab}...`} />
@@ -174,7 +174,7 @@ export default function Infraestructura() {
           <FormSection title="Identificación" icon="🏷️" />
           <FF label="Código IATA" required value={form.codigo_aeropuerto ?? ''} onChangeText={set('codigo_aeropuerto')} autoCapitalize="characters" placeholder="Ej: GUA" hint="3 letras mayúsculas (estándar IATA)" maxLength={4} />
           <FF label="Nombre del aeropuerto" required value={form.nombre ?? ''} onChangeText={set('nombre')} placeholder="Ej: Aeropuerto Internacional La Aurora" />
-          <FormSection title="Ubicación" icon="📍" />
+          <FormSection title="Ubicación" icon="" />
           <FF label="Ciudad" value={form.ciudad ?? ''} onChangeText={set('ciudad')} placeholder="Ej: Ciudad de Guatemala" />
           <FF label="País" value={form.pais ?? ''} onChangeText={set('pais')} placeholder="Ej: Guatemala" />
           <FSelect label="Continente" value={form.continente ?? ''} onChange={set('continente')}
@@ -196,7 +196,7 @@ export default function Infraestructura() {
           <FF label="Longitud (metros)" value={String(form.longitud_metros ?? '')} onChangeText={set('longitud_metros')} keyboardType="numeric" placeholder="Ej: 2987" />
           <FF label="Anchura (metros)" value={String(form.anchura_metros ?? '')} onChangeText={set('anchura_metros')} keyboardType="numeric" placeholder="Ej: 45" />
           <FF label="Orientación (grados magnéticos)" value={String(form.orientacion_grados ?? '')} onChangeText={set('orientacion_grados')} keyboardType="numeric" placeholder="Ej: 180" />
-          <FormSection title="Características técnicas" icon="⚙️" />
+          <FormSection title="Características técnicas" icon="" />
           <FSelect label="Superficie" value={form.superficie ?? ''} onChange={set('superficie')}
             options={[{label:'Asfalto',value:'ASFALTO'},{label:'Concreto',value:'CONCRETO'},{label:'Hierba',value:'HIERBA'},{label:'Grava',value:'GRAVA'},{label:'Tierra compactada',value:'TIERRA'}]} />
           <FF label="Categoría OACI" value={form.categoria_oaci ?? ''} onChangeText={set('categoria_oaci')} placeholder="Ej: 4E" hint="Código de referencia de aeródromo" />
@@ -210,7 +210,7 @@ export default function Infraestructura() {
           <FSelect label="Aeropuerto" value={form.codigo_aeropuerto ?? ''} onChange={set('codigo_aeropuerto')} options={codigosAeropuerto} required />
           <FF label="Número de puerta" required value={form.numero_puerta ?? ''} onChangeText={set('numero_puerta')} placeholder="Ej: A1, B12, C05" />
           <FF label="Terminal" value={form.terminal ?? ''} onChangeText={set('terminal')} placeholder="Ej: A, B, Internacional" />
-          <FormSection title="Configuración" icon="⚙️" />
+          <FormSection title="Configuración" icon="" />
           <FSelect label="Tipo de puerta" value={form.tipo_puerta ?? ''} onChange={set('tipo_puerta')}
             options={[{label:'Nacional',value:'NACIONAL'},{label:'Internacional',value:'INTERNACIONAL'},{label:'Mixta',value:'MIXTA'}]} />
           <FF label="Capacidad máxima de pasajeros" value={String(form.capacidad_maxima ?? '')} onChangeText={set('capacidad_maxima')} keyboardType="numeric" placeholder="Ej: 200" />

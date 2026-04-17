@@ -34,7 +34,7 @@ export default function Screen() {
         <View style={{flexDirection:'row',gap:8,marginBottom:12}}>
           <StatCard label="Rutas" value={RUTAS_TRANSPORTE.filter((r:any)=>r.activa).length} color={C.teal} bg={C.tealBg} icon="🗺️" />
           <StatCard label="Vehículos" value={VEHICULOS.filter((v:any)=>v.disponible).length} color={C.success} bg={C.successBg} icon="🚗" />
-          <StatCard label="Choferes" value={CHOFERES.filter((c:any)=>c.disponible&&c.activo).length} color={C.info} bg={C.infoBg} icon="👨‍✈️" />
+          <StatCard label="Choferes" value={CHOFERES.filter((c:any)=>c.disponible&&c.activo).length} color={C.info} bg={C.infoBg} icon="" />
         </View>
         <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginBottom:8}}>🗺️ Rutas de Transporte</Text>
         {RUTAS_TRANSPORTE.filter((r:any)=>JSON.stringify(r).toLowerCase().includes(q.toLowerCase())).map((r:any)=>(

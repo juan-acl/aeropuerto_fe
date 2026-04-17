@@ -1,8 +1,8 @@
 /**
  * /cliente-home — Pantalla principal del cliente (Skyscanner-style)
- * ✅ Hero animado + SearchBar con airports reales (Oracle)
- * ✅ Indicador 🟢 Oracle / 🟡 Demo
- * ✅ Recomendaciones con datos reales
+ *  Hero animado + SearchBar con airports reales (Oracle)
+ *  Indicador  Oracle /  Demo
+ *  Recomendaciones con datos reales
  */
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
@@ -10,6 +10,7 @@ import {
   StyleSheet, RefreshControl, StatusBar, Animated,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { C } from '@/constants/theme';
 import { useSesion } from '@/context/session';
 import { SearchBar, SearchParams } from '@/components/client/SearchBar';
@@ -40,7 +41,7 @@ function QuickCard({
     <TouchableOpacity onPress={handlePress} activeOpacity={0.9} style={{ flex: 1 }}>
       <Animated.View style={[qa.card, { transform: [{ scale: scaleAnim }], borderColor: accentColor + '30' }]}>
         <View style={[qa.iconWrap, { backgroundColor: accentColor + '18' }]}>
-          <Text style={{ fontSize: 22 }}>{icon}</Text>
+          <Ionicons name={icon as any} size={22} color={accentColor} />
           {badge && badge > 0 ? (
             <View style={qa.badge}>
               <Text style={qa.badgeT}>{badge > 9 ? '9+' : badge}</Text>
@@ -63,15 +64,17 @@ const qa = StyleSheet.create({
 // ─── Source indicator chip ────────────────────────────────────────────────────
 function SourceChip({ isOnline }: { isOnline: boolean | null }) {
   const color = isOnline === true ? C.success : isOnline === false ? C.warning : C.muted;
-  const label = isOnline === true ? '🟢 Oracle' : isOnline === false ? '🟡 Demo' : '⏳ Conectando...';
+  const label = isOnline === true ? 'Oracle' : isOnline === false ? 'Demo' : 'Conectando';
+  const icon  = isOnline === true ? 'server-outline' : isOnline === false ? 'flask-outline' : 'sync-outline';
   return (
     <View style={[sc.chip, { borderColor: color + '40' }]}>
+      <Ionicons name={icon} size={12} color={color} />
       <Text style={[sc.t, { color }]}>{label}</Text>
     </View>
   );
 }
 const sc = StyleSheet.create({
-  chip: { borderRadius: 99, paddingHorizontal: 10, paddingVertical: 4, borderWidth: 1, backgroundColor: 'rgba(0,0,0,0.3)' },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: 99, paddingHorizontal: 10, paddingVertical: 4, borderWidth: 1, backgroundColor: 'rgba(0,0,0,0.3)' },
   t:    { fontSize: 11, fontWeight: '700' },
 });
 
@@ -152,7 +155,7 @@ export default function ClienteHome() {
             {/* Top row: greeting + source indicator + notifications */}
             <View style={s.heroTopRow}>
               <View>
-                <Text style={s.heroGreet}>{saludo}, {nombre} ✈️</Text>
+                <Text style={s.heroGreet}>{saludo}, {nombre}</Text>
                 <Text style={s.heroTitle}>¿A dónde{'\n'}viajas hoy?</Text>
               </View>
               <View style={s.heroRight}>
@@ -161,7 +164,7 @@ export default function ClienteHome() {
                   style={s.notifBtn}
                   onPress={() => router.push('/notificaciones' as any)}
                 >
-                  <Text style={{ fontSize: 18 }}>🔔</Text>
+                  <Ionicons name="notifications-outline" size={20} color={C.text} />
                   {unreadCount > 0 && (
                     <View style={s.notifBadge}>
                       <Text style={s.notifBadgeT}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
@@ -208,22 +211,22 @@ export default function ClienteHome() {
           <Text style={s.sectionTitle}>Acceso rápido</Text>
           <View style={s.quickRow}>
             <QuickCard
-              icon="✅" label="Check-in"
+              icon="checkmark-circle-outline" label="Check-in"
               color={C.success}
               onPress={() => router.push('/reservar/checkin' as any)}
             />
             <QuickCard
-              icon="🎟️" label="Mis viajes"
+              icon="ticket-outline" label="Mis viajes"
               color={C.electric}
               onPress={() => router.push('/historial' as any)}
             />
             <QuickCard
-              icon="💎" label="Lealtad"
+              icon="star-outline" label="Lealtad"
               color={C.amber}
               onPress={() => router.push('/lealtad' as any)}
             />
             <QuickCard
-              icon="🔔" label="Alertas"
+              icon="notifications-outline" label="Alertas"
               badge={unreadCount}
               color={C.purple}
               onPress={() => router.push('/notificaciones' as any)}
@@ -234,7 +237,7 @@ export default function ClienteHome() {
         {/* ── Data source info banner ── */}
         {isOnline === false && (
           <View style={s.offlineBanner}>
-            <Text style={{ fontSize: 16 }}>⚠️</Text>
+            <Ionicons name="warning-outline" size={24} color={C.warning} />
             <View>
               <Text style={s.offlineTitle}>Backend no disponible</Text>
               <Text style={s.offlineSub}>
@@ -278,9 +281,9 @@ export default function ClienteHome() {
 const s = StyleSheet.create({
   container:    { flex: 1, backgroundColor: C.bg },
   hero:         { backgroundColor: C.navyL, paddingBottom: 20, overflow: 'hidden' },
-  orb1:         { position: 'absolute', top: -60, right: -30, width: 220, height: 220, borderRadius: 110, backgroundColor: C.electric, opacity: 0.09 },
-  orb2:         { position: 'absolute', top: 20, left: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: C.cyan, opacity: 0.06 },
-  orb3:         { position: 'absolute', bottom: 30, right: 40, width: 90, height: 90, borderRadius: 45, backgroundColor: C.purple, opacity: 0.07 },
+  orb1:         { position: 'absolute', top: -60, right: -30, width: 220, height: 220, borderRadius: 110, backgroundColor: C.electric, opacity: 0.04 },
+  orb2:         { position: 'absolute', top: 20, left: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: C.textSub, opacity: 0.02 },
+  orb3:         { position: 'absolute', bottom: 30, right: 40, width: 90, height: 90, borderRadius: 45, backgroundColor: C.electric, opacity: 0.03 },
   heroContent:  { paddingTop: 14 },
   heroTopRow:   { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingHorizontal: 20, paddingBottom: 10 },
   heroGreet:    { fontSize: 13, color: C.muted, fontWeight: '500', marginBottom: 4 },

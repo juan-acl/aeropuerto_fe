@@ -29,7 +29,7 @@ export default function SistemasTab() {
       </View>
       <View style={s.searchWrap}>
         <View style={s.searchBox}>
-          <Text style={s.searchIcon}>🔍</Text>
+          <Text style={s.searchIcon}></Text>
           <TextInput style={s.searchInput} placeholder="Buscar sección..." placeholderTextColor={C.placeholder}
             value={q} onChangeText={setQ} clearButtonMode="while-editing" />
         </View>
@@ -54,7 +54,7 @@ export default function SistemasTab() {
         ))}
         {filtrados.length === 0 && (
           <View style={{ alignItems: 'center', paddingVertical: 50 }}>
-            <Text style={{ fontSize: 40, marginBottom: 10 }}>{q ? '🔍' : '🔒'}</Text>
+            <Text style={{ fontSize: 40, marginBottom: 10 }}>{q ? '' : '🔒'}</Text>
             <Text style={{ fontSize: 15, fontWeight: '700', color: C.textSub }}>{q ? `Sin resultados` : 'Sin secciones asignadas'}</Text>
             {!q && <Text style={{ fontSize: 12, color: C.muted, marginTop: 6, textAlign: 'center' }}>Tu rol no tiene acceso a secciones en esta área.</Text>}
           </View>

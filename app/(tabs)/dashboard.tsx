@@ -49,7 +49,7 @@ function SectionHeader({ title, action, onAction }: {
 function AlertRow({ text, level }: { text: string; level: 'info' | 'warn' | 'crit' }) {
   const cfgs = {
     info: { bg: C.infoBg,    color: C.electric, icon: 'ℹ️', border: C.borderE  },
-    warn: { bg: C.warningBg, color: C.warning,  icon: '⚠️',  border: C.warningL },
+    warn: { bg: C.warningBg, color: C.warning,  icon: '',  border: C.warningL },
     crit: { bg: C.dangerBg,  color: C.danger,   icon: '🚨', border: C.dangerL  },
   };
   const cfg = cfgs[level];
@@ -75,7 +75,7 @@ function DashboardCliente({ PROGRAMAS_LEALTAD, HOTELES, VUELOS }: { PROGRAMAS_LE
     BRONCE:  { color: '#B45309', icon: '🥉', next: 5000   },
     PLATA:   { color: '#6B7280', icon: '🥈', next: 15000  },
     ORO:     { color: '#D97706', icon: '🥇', next: 40000  },
-    PLATINO: { color: C.purple,  icon: '💎', next: 999999 },
+    PLATINO: { color: C.purple,  icon: '', next: 999999 },
   };
   const nc  = NIVEL_CFG[nivel] ?? NIVEL_CFG.BRONCE;
   const pct = Math.min(100, Math.round((puntos / nc.next) * 100));
@@ -122,10 +122,10 @@ function DashboardCliente({ PROGRAMAS_LEALTAD, HOTELES, VUELOS }: { PROGRAMAS_LE
       >
         <View style={s.quickRow}>
           {[
-            { icon: '✈️', label: 'Buscar',     path: '/buscar'            },
-            { icon: '✅', label: 'Check-in',   path: '/reservar/checkin'  },
-            { icon: '🎟️', label: 'Mis viajes', path: '/historial'         },
-            { icon: '💎', label: 'Lealtad',    path: '/lealtad'           },
+            { icon: '', label: 'Buscar',     path: '/buscar'            },
+            { icon: '', label: 'Check-in',   path: '/reservar/checkin'  },
+            { icon: '', label: 'Mis viajes', path: '/historial'         },
+            { icon: '', label: 'Lealtad',    path: '/lealtad'           },
           ].map(q => (
             <TouchableOpacity key={q.label} style={s.quickBtn}
               onPress={() => router.push(q.path as any)} activeOpacity={0.8}>
@@ -141,7 +141,7 @@ function DashboardCliente({ PROGRAMAS_LEALTAD, HOTELES, VUELOS }: { PROGRAMAS_LE
         {proximos.length === 0 ? (
           <TouchableOpacity style={s.emptyCard}
             onPress={() => router.push('/reservar' as any)} activeOpacity={0.85}>
-            <Text style={{ fontSize: 36, marginBottom: 8 }}>✈️</Text>
+            <Text style={{ fontSize: 36, marginBottom: 8 }}></Text>
             <Text style={s.emptyT}>No tienes vuelos próximos</Text>
             <View style={s.emptyBtn}><Text style={s.emptyBtnT}>Reservar ahora →</Text></View>
           </TouchableOpacity>
@@ -176,7 +176,7 @@ function DashboardCliente({ PROGRAMAS_LEALTAD, HOTELES, VUELOS }: { PROGRAMAS_LE
             <View key={h.id_hotel} style={s.hotelCard}>
               <Text style={s.hotelStars}>{'★'.repeat(Number((h.categoria ?? '3*').charAt(0)))}</Text>
               <Text style={s.hotelName} numberOfLines={2}>{h.nombre_hotel}</Text>
-              <Text style={s.hotelDist}>📍 {h.distancia_km} km</Text>
+              <Text style={s.hotelDist}> {h.distancia_km} km</Text>
               <Text style={s.hotelPrice}>
                 desde <Text style={{ color: C.electric, fontWeight: '800' }}>
                   Q {h.tarifa_noche_desde ?? 150}
@@ -184,7 +184,7 @@ function DashboardCliente({ PROGRAMAS_LEALTAD, HOTELES, VUELOS }: { PROGRAMAS_LE
               </Text>
               {h.tiene_shuttle ? (
                 <View style={s.shuttleBadge}>
-                  <Text style={s.shuttleBadgeT}>🚌 Shuttle gratis</Text>
+                  <Text style={s.shuttleBadgeT}> Shuttle gratis</Text>
                 </View>
               ) : null}
             </View>
@@ -240,7 +240,7 @@ function DashboardEmpleado({ VUELOS, ALERTAS_DATA }: { VUELOS: any[]; ALERTAS_DA
             <Text style={s.opsTitle}>Operaciones del Día</Text>
           </View>
           <View style={s.staffPill}>
-            <Text style={{ fontSize: 20 }}>{usuario?.avatar ?? '👤'}</Text>
+            <Text style={{ fontSize: 20 }}>{usuario?.avatar ?? ''}</Text>
             <View>
               <Text style={s.staffName}>{usuario?.nombre}</Text>
               <Text style={s.staffDept}>{usuario?.departamento}</Text>
@@ -269,7 +269,7 @@ function DashboardEmpleado({ VUELOS, ALERTAS_DATA }: { VUELOS: any[]; ALERTAS_DA
       >
         {alertas.length > 0 && (
           <>
-            <SectionHeader title={"⚠️ Alertas activas (" + alertas.length + ")"} />
+            <SectionHeader title={" Alertas activas (" + alertas.length + ")"} />
             {alertas.map((a: any, i: number) => (
               <AlertRow key={i}
                 text={a.descripcion ?? a.tipo_alerta ?? 'Alerta técnica'}
@@ -349,11 +349,11 @@ function DashboardAdmin({ VUELOS, ALERTAS_DATA, EMPLEADOS, INGRESOS_DATA, GASTOS
 
   const ADMIN_LINKS = [
     { icon: '📈', label: 'Analytics', path: '/analytics'                  },
-    { icon: '👤', label: 'Usuarios',  path: '/(tabs)/admin'              },
-    { icon: '💰', label: 'Finanzas',  path: '/modules/mod16-finanzas'    },
+    { icon: '', label: 'Usuarios',  path: '/(tabs)/admin'              },
+    { icon: '', label: 'Finanzas',  path: '/modules/mod16-finanzas'    },
     { icon: '👥', label: 'RRHH',      path: '/modules/mod15-rrhh'        },
-    { icon: '🔐', label: 'Seg. IT',   path: '/modules/mod24-seguridad-info'},
-    { icon: '🔔', label: 'Alertas',   path: '/notificaciones'            },
+    { icon: '', label: 'Seg. IT',   path: '/modules/mod24-seguridad-info'},
+    { icon: '', label: 'Alertas',   path: '/notificaciones'            },
   ];
 
   return (
@@ -378,7 +378,7 @@ function DashboardAdmin({ VUELOS, ALERTAS_DATA, EMPLEADOS, INGRESOS_DATA, GASTOS
           {[
             { icon: '📈', val: 'Q ' + (totalIngresos/1000).toFixed(0) + 'K', label: 'Ingresos', c: C.success },
             { icon: '📉', val: 'Q ' + (totalGastos  /1000).toFixed(0) + 'K', label: 'Gastos',   c: C.danger  },
-            { icon: '💰', val: 'Q ' + (Math.abs(balance)/1000).toFixed(0) + 'K', label: 'Balance', c: balance >= 0 ? C.electric : C.danger },
+            { icon: '', val: 'Q ' + (Math.abs(balance)/1000).toFixed(0) + 'K', label: 'Balance', c: balance >= 0 ? C.electric : C.danger },
           ].map(f => (
             <View key={f.label} style={[s.finCard, { borderColor: f.c + '40' }]}>
               <Text style={{ fontSize: 22 }}>{f.icon}</Text>
@@ -390,12 +390,12 @@ function DashboardAdmin({ VUELOS, ALERTAS_DATA, EMPLEADOS, INGRESOS_DATA, GASTOS
 
         <SectionHeader title="Indicadores operacionales" />
         <View style={s.kpiGrid}>
-          <KpiCard label="Vuelos"       value={stats.vuelos}       icon="✈️" color={C.electric} bg={C.infoBg}    />
+          <KpiCard label="Vuelos"       value={stats.vuelos}       icon="" color={C.electric} bg={C.infoBg}    />
           <KpiCard label="En vuelo"     value={stats.enVuelo}      icon="🛫" color={C.success}  bg={C.successBg} />
           <KpiCard label="Personal"     value={stats.empleados}    icon="👥" color={C.teal}     bg={C.tealBg}    />
-          <KpiCard label="Alertas"      value={stats.alertas}      icon="⚠️" color={C.warning}  bg={C.warningBg} sub={stats.alertas > 0 ? 'sin atender' : 'al día'} />
+          <KpiCard label="Alertas"      value={stats.alertas}      icon="" color={C.warning}  bg={C.warningBg} sub={stats.alertas > 0 ? 'sin atender' : 'al día'} />
           <KpiCard label="Cancelaciones" value={stats.cancelaciones} icon="❌" color={C.danger} bg={C.dangerBg}  />
-          <KpiCard label="Módulos"      value={29}                 icon="⚙️" color={C.purple}   bg={C.purpleBg}  sub="activos" />
+          <KpiCard label="Módulos"      value={29}                 icon="" color={C.purple}   bg={C.purpleBg}  sub="activos" />
         </View>
 
         {alertasCrit.length > 0 && (

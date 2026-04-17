@@ -1,14 +1,15 @@
 import { Tabs } from 'expo-router';
 import { Platform, View, Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { C } from '@/constants/theme';
 import { useSesion, PERMISOS_POR_ROL } from '@/context/session';
 import { useNotifications } from '@/hooks/useNotifications';
 
-function TabIcon({ emoji, focused, badge }: { emoji: string; focused: boolean; badge?: number }) {
+function TabIcon({ icon, focused, badge }: { icon: any; focused: boolean; badge?: number }) {
   return (
     <View style={{ alignItems: 'center', justifyContent: 'center', paddingTop: 2 }}>
       <View style={{ position: 'relative' }}>
-        <Text style={{ fontSize: focused ? 22 : 19, opacity: focused ? 1 : 0.45 }}>{emoji}</Text>
+        <Ionicons name={focused ? icon : `${icon}-outline`} size={22} color={focused ? C.electric : C.muted} />
         {badge && badge > 0 ? (
           <View style={{
             position: 'absolute', top: -3, right: -7,
@@ -63,7 +64,7 @@ export default function TabLayout() {
         options={{
           title: esCliente ? 'Inicio' : 'Dashboard',
           tabBarIcon: ({ focused }) =>
-            <TabIcon emoji={esCliente ? '🏠' : '📊'} focused={focused} />,
+            <TabIcon icon={esCliente ? 'home' : 'grid'} focused={focused} />,
         }}
       />
 
@@ -71,7 +72,7 @@ export default function TabLayout() {
       <Tabs.Screen name="index"
         options={{
           title: esCliente ? 'Vuelos' : 'Panel',
-          tabBarIcon: ({ focused }) => <TabIcon emoji="✈️" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon icon="airplane" focused={focused} />,
         }}
       />
 
@@ -79,21 +80,21 @@ export default function TabLayout() {
       <Tabs.Screen name="operaciones"
         options={{
           title: 'Operaciones',
-          tabBarIcon: ({ focused }) => <TabIcon emoji="🛬" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon icon="radio" focused={focused} />,
           href: showOps ? undefined : null,
         }}
       />
       <Tabs.Screen name="servicios"
         options={{
           title: 'Servicios',
-          tabBarIcon: ({ focused }) => <TabIcon emoji="🛍️" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon icon="bag-handle" focused={focused} />,
           href: showServ ? undefined : null,
         }}
       />
       <Tabs.Screen name="sistemas"
         options={{
           title: 'Sistemas',
-          tabBarIcon: ({ focused }) => <TabIcon emoji="⚙️" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon icon="hardware-chip" focused={focused} />,
           href: showSistemas ? undefined : null,
         }}
       />
@@ -104,7 +105,7 @@ export default function TabLayout() {
           title: esCliente ? 'Mi Cuenta' : 'Perfil',
           tabBarIcon: ({ focused }) => (
             <TabIcon
-              emoji={usuario?.avatar ?? '👤'}
+              icon="person"
               focused={focused}
               badge={esCliente ? unreadCount : undefined}
             />
@@ -116,7 +117,7 @@ export default function TabLayout() {
       <Tabs.Screen name="admin"
         options={{
           title: 'Admin',
-          tabBarIcon: ({ focused }) => <TabIcon emoji="🔐" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon icon="shield-half" focused={focused} />,
           href: rol === 'ADMIN' ? undefined : null,
         }}
       />

@@ -24,12 +24,12 @@ export default function Mod13() {
   const [ventas, setVentas] = useState(VENTAS);
   const [salones, setSalones] = useState(SALONES_VIP);
   const [estacionamientos, setEstacionamientos] = useState(ESTACIONAMIENTOS);
-  const TABS = [{k:'concesiones',l:'🛍️ Concesiones'},{k:'ventas',l:'💳 Ventas'},{k:'salones',l:'🛋️ VIP'},{k:'estacionamiento',l:'🚗 Estacion.'}];
+  const TABS = [{k:'concesiones',l:' Concesiones'},{k:'ventas',l:'💳 Ventas'},{k:'salones',l:'🛋️ VIP'},{k:'estacionamiento',l:'🚗 Estacion.'}];
   const renderContent = () => {
     if (tab==='concesiones') {
       const data = concesiones.filter(c=>`${c.nombre_comercial} ${c.tipo_negocio}`.toLowerCase().includes(q.toLowerCase()));
       return <FlatList data={data} keyExtractor={c=>String(c.id_concesion)} contentContainerStyle={{padding:14, paddingBottom:24, flexGrow:1}}
-        ListEmptyComponent={<EmptyState icon="🛍️" />}
+        ListEmptyComponent={<EmptyState icon="" />}
         renderItem={({item:c})=>(
           <DataCard title={c.nombre_comercial} subtitle={`${c.tipo_negocio} · ${c.ubicacion_terminal??'—'}`}
             badge={<Badge value={c.activo?'ACTIVO':'INACTIVO'} />} meta={`Q ${c.canon_mensual?.toLocaleString()}/mes`} accentColor={C.orange}
@@ -81,7 +81,7 @@ export default function Mod13() {
         </View>)}
       </View>
       <StatsRow>
-        <StatCard label="Concesiones" value={concesiones.length} color={C.orange} bg={C.orangeBg} icon="🛍️" />
+        <StatCard label="Concesiones" value={concesiones.length} color={C.orange} bg={C.orangeBg} icon="" />
         <StatCard label="Ventas" value={ventas.length} color={C.green} bg={C.greenBg} icon="💳" />
         <StatCard label="Disponibles" value={estacionamientos.filter(e=>e.disponible).length} color={C.success} bg={C.successBg} icon="🚗" />
       </StatsRow>

@@ -8,6 +8,7 @@ import { C } from '@/constants/theme';
 import { useSesion } from '@/context/session';
 // admin uses its own auth — context available if needed
 import { backendApi } from '@/services/backendApi';
+import axiosInstance from '@/src/core/infrastructure/api/axiosInstance';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Rol = 'SUPERADMIN' | 'JEFE_OPERACIONES' | 'AGENTE_OPERACIONES' | 'FINANZAS' | 'SEGURIDAD' | 'AUDITORIA';
@@ -85,7 +86,7 @@ const CREDENCIALES: Record<string, { pass: string; id: number }> = {
 };
 
 const ROL_SECCIONES: Record<Rol, string[]> = {
-  SUPERADMIN:         ['usuarios', 'empleados', 'salarios', 'cuentas', 'presupuestos', 'prohibiciones', 'seginfo', 'alertas', 'logs'],
+  SUPERADMIN:         ['usuarios', 'roles', 'empleados', 'salarios', 'cuentas', 'presupuestos', 'prohibiciones', 'seginfo', 'alertas', 'logs'],
   JEFE_OPERACIONES:   ['empleados', 'prohibiciones', 'alertas'],
   AGENTE_OPERACIONES: ['alertas'],
   FINANZAS:           ['cuentas', 'presupuestos'],
@@ -94,23 +95,24 @@ const ROL_SECCIONES: Record<Rol, string[]> = {
 };
 
 const SECCIONES_META: Record<string, { icon: string; label: string; color: string; bg: string; desc: string }> = {
-  usuarios:     { icon: '👤', label: 'Gestión de Usuarios',       color: C.navy,    bg: C.infoBg,    desc: 'Crear, editar y controlar accesos' },
+  usuarios:     { icon: '', label: 'Gestión de Usuarios',       color: C.navy,    bg: C.infoBg,    desc: 'Crear, editar y controlar accesos' },
+  roles:        { icon: '⭐', label: 'Gestión de Roles',        color: C.electric,bg: C.successBg, desc: 'Definir perfiles de lectura o manejo de info' },
   empleados:    { icon: '👥', label: 'Nómina y Empleados',        color: C.teal,    bg: C.tealBg,    desc: 'Datos laborales del personal' },
-  salarios:     { icon: '💰', label: 'Salarios Confidenciales',   color: C.green,   bg: C.greenBg,   desc: 'Remuneraciones por empleado' },
+  salarios:     { icon: '', label: 'Salarios Confidenciales',   color: C.green,   bg: C.greenBg,   desc: 'Remuneraciones por empleado' },
   cuentas:      { icon: '🏦', label: 'Cuentas Bancarias',         color: C.success, bg: C.successBg, desc: 'Saldos e información bancaria' },
-  presupuestos: { icon: '📊', label: 'Presupuestos',              color: C.purple,  bg: C.purpleBg,  desc: 'Asignaciones y ejecución presupuestaria' },
+  presupuestos: { icon: '', label: 'Presupuestos',              color: C.purple,  bg: C.purpleBg,  desc: 'Asignaciones y ejecución presupuestaria' },
   prohibiciones:{ icon: '🚫', label: 'Prohibiciones de Vuelo',    color: C.danger,  bg: C.dangerBg,  desc: 'Lista de restricción de embarque' },
-  seginfo:      { icon: '🔐', label: 'Seguridad Informática',     color: C.red,     bg: C.redBg,     desc: 'Incidentes y accesos indebidos' },
-  alertas:      { icon: '⚠️', label: 'Alertas Técnicas',          color: C.warning, bg: C.warningBg, desc: 'Alertas sin atender del sistema' },
+  seginfo:      { icon: '', label: 'Seguridad Informática',     color: C.red,     bg: C.redBg,     desc: 'Incidentes y accesos indebidos' },
+  alertas:      { icon: '', label: 'Alertas Técnicas',          color: C.warning, bg: C.warningBg, desc: 'Alertas sin atender del sistema' },
   logs:         { icon: '📋', label: 'Bitácora del Sistema',      color: C.gray,    bg: C.grayBg,    desc: 'Registro de actividad y auditoría' },
 };
 
 // ─── Helper components ────────────────────────────────────────────────────────
 const ESTADO_CFG: Record<EstadoUsuario, { color: string; bg: string; icon: string }> = {
-  ACTIVO:    { color: C.success, bg: C.successBg, icon: '🟢' },
+  ACTIVO:    { color: C.success, bg: C.successBg, icon: '' },
   INACTIVO:  { color: C.gray,    bg: C.grayBg,    icon: '⚫' },
   BLOQUEADO: { color: C.danger,  bg: C.dangerBg,  icon: '🔴' },
-  PENDIENTE: { color: C.warning, bg: C.warningBg, icon: '🟡' },
+  PENDIENTE: { color: C.warning, bg: C.warningBg, icon: '' },
 };
 
 function EstadoBadge({ estado }: { estado: EstadoUsuario }) {
@@ -142,7 +144,21 @@ export default function AdminTab() {
   const [PROHIBICIONES, set_PROHIBICIONES] = useState<any[]>([]);
   const [ALERTAS_DATA, set_ALERTAS_DATA] = useState<any[]>([]);
   const [INCIDENTES_SEG, set_INCIDENTES_SEG] = useState<any[]>([]);
+  const [roles, setRoles]         = useState<any[]>([]);
   useEffect(() => {
+      // ─── Migración DB Oracle ───
+      axiosInstance.get('/AdminRoles').then((res: any) => setRoles(res.data)).catch(() => {});
+      axiosInstance.get('/AdminUsuarios/ListarConsolidado').then((res: any) => {
+         // Parsear los usuarios devueltos
+         const parseados = res.data.map((u: any) => ({
+             id: u.id, nombre_usuario: u.nombre_usuario, nombre_completo: u.nombre_completo,
+             email: u.email, rol: u.rol, estado: u.estado, intentos_fallidos: 0,
+             ultima_sesion: null, fecha_creacion: u.fecha_creacion, creado_por: 'Sistema',
+             departamento: u.departamento, requiere_cambio_pass: false, rolId: u.rolId
+         }));
+         setUsuarios(parseados);
+      }).catch(() => {});
+
       backendApi.empleados.listar().then((d: any) => set_EMPLEADOS(d)).catch(() => {});
       backendApi.cuentasBancarias.listar().then((d: any) => set_CUENTAS_BANCARIAS(d)).catch(() => {});
       backendApi.finanzas.presupuestos.listar().then((d: any) => set_PRESUPUESTOS_DATA(d)).catch(() => {});
@@ -165,7 +181,7 @@ export default function AdminTab() {
   const [seccionActiva, setSeccionActiva] = useState<string | null>(null);
 
   // Users CRUD state
-  const [usuarios, setUsuarios]   = useState<UsuarioAdmin[]>(INIT_USUARIOS);
+  const [usuarios, setUsuarios]   = useState<UsuarioAdmin[]>([]);
   const [logs, setLogs]           = useState<LogEntry[]>(INIT_LOGS);
   const [usuarioModal, setUsuarioModal] = useState(false);
   const [editUsuario, setEditUsuario]   = useState<UsuarioAdmin | null>(null);
@@ -179,6 +195,25 @@ export default function AdminTab() {
     rol: '' as Rol | '', departamento: '', pass_temp: '',
   });
   const sf = (k: string) => (v: string) => setForm(f => ({ ...f, [k]: v }));
+
+  // New role form
+  const [rolModal, setRolModal] = useState(false);
+  const [rolForm, setRolForm]   = useState({ nombreRol: '', descripcion: '', jerarquia: '3' });
+  const [rolSaving, setRolSaving] = useState(false);
+
+  const crearNuevoRol = async () => {
+     if (!rolForm.nombreRol.trim() || !rolForm.descripcion.trim()) return Alert.alert('Inválido', 'Llena todos los campos');
+     setRolSaving(true);
+     try {
+       const res = await axiosInstance.post('/AdminRoles', {
+         NombreRol: rolForm.nombreRol, Descripcion: rolForm.descripcion, NivelJerarquico: parseInt(rolForm.jerarquia)
+       });
+       setRoles(prev => [...prev, res.data.rol]);
+       setRolModal(false); setRolForm({nombreRol: '', descripcion: '', jerarquia: '3'});
+       Alert.alert('Éxito', res.data.mensaje);
+     } catch(e: any){ Alert.alert('Error Oracle', e.message); }
+     setRolSaving(false);
+  };
 
   // ── Auth ──────────────────────────────────────────────────────────────────
   const handleLogin = () => {
@@ -236,41 +271,44 @@ export default function AdminTab() {
     setUsuarioModal(true);
   };
 
-  const guardarUsuario = () => {
-    if (!form.nombre_usuario.trim() || !form.nombre_completo.trim() || !form.email.trim() || !form.rol) {
-      Alert.alert('Campos requeridos', 'Usuario, nombre, email y rol son obligatorios.'); return;
+  const guardarUsuario = async () => {
+    if (!form.nombre_usuario.trim() || !form.email.trim() || !form.rol) {
+      Alert.alert('Campos requeridos', 'Usuario, email y rol son obligatorios.'); return;
     }
     if (!/\S+@\S+\.\S+/.test(form.email)) {
       Alert.alert('Email inválido', 'Ingresa un correo electrónico válido.'); return;
     }
-    if (!editUsuario && !form.pass_temp.trim()) {
-      Alert.alert('Contraseña requerida', 'La contraseña temporal es obligatoria para nuevos usuarios.'); return;
-    }
-    if (!editUsuario && usuarios.find(u => u.nombre_usuario === form.nombre_usuario.toLowerCase())) {
-      Alert.alert('Usuario duplicado', 'Ya existe un usuario con ese nombre de usuario.'); return;
-    }
+    
+    try {
+        setAuthLoading(true);
+        const res = await axiosInstance.post<{mensaje: string, usuario: any}>('/AdminUsuarios', {
+            NombreUsuario: form.nombre_usuario,
+            NombreCompleto: form.nombre_completo,
+            Email: form.email,
+            IdRolSistema: parseInt(form.rol as string),
+            Password: form.pass_temp || '1234',
+            Departamento: form.departamento
+        });
 
-    if (editUsuario) {
-      setUsuarios(prev => prev.map(u => u.id === editUsuario.id
-        ? { ...u, nombre_completo: form.nombre_completo, email: form.email, rol: form.rol as Rol, departamento: form.departamento }
-        : u
-      ));
-      addLog('USUARIO_EDITADO', sesion!.nombre_usuario, `Editó usuario: ${form.nombre_usuario} (rol: ${form.rol})`, '192.168.1.x', true);
-      Alert.alert('✅ Actualizado', 'El usuario fue actualizado correctamente.');
-    } else {
-      const nuevo: UsuarioAdmin = {
-        id: Date.now(), nombre_usuario: form.nombre_usuario.trim().toLowerCase(),
-        nombre_completo: form.nombre_completo.trim(), email: form.email.trim(),
-        rol: form.rol as Rol, estado: 'PENDIENTE', intentos_fallidos: 0,
-        ultima_sesion: null, fecha_creacion: new Date().toISOString().split('T')[0],
-        creado_por: sesion!.nombre_usuario, departamento: form.departamento,
-        requiere_cambio_pass: true,
-      };
-      setUsuarios(prev => [...prev, nuevo]);
-      addLog('USUARIO_CREADO', sesion!.nombre_usuario, `Creó usuario: ${nuevo.nombre_usuario} (${nuevo.rol})`, '192.168.1.x', true);
-      Alert.alert('✅ Usuario creado', `Se creó "${nuevo.nombre_usuario}" con contraseña temporal. El usuario deberá cambiarla en su primer acceso.`);
+        const numId = res.data.usuario.id;
+        // Agregarlo a la lista visual de inmediato
+        const nuevo: UsuarioAdmin = {
+          id: numId, nombre_usuario: res.data.usuario.nombre_usuario,
+          nombre_completo: form.nombre_completo.trim(), email: res.data.usuario.email,
+          rol: form.rol as Rol, estado: 'ACTIVO', intentos_fallidos: 0,
+          ultima_sesion: null, fecha_creacion: new Date().toISOString().split('T')[0],
+          creado_por: sesion!.nombre_usuario, departamento: form.departamento,
+          requiere_cambio_pass: true,
+        };
+        setUsuarios(prev => [...prev, nuevo]);
+        addLog('USUARIO_CREADO', sesion!.nombre_usuario, `Creó usuario Oracle DB: ${nuevo.nombre_usuario}`, '192.168.1.x', true);
+        Alert.alert('Exito DB', res.data.mensaje);
+        setUsuarioModal(false);
+    } catch(err: any) {
+        Alert.alert('Error DB', err.message);
+    } finally {
+        setAuthLoading(false);
     }
-    setUsuarioModal(false);
   };
 
   const cambiarEstado = (u: UsuarioAdmin, nuevoEstado: EstadoUsuario) => {
@@ -294,7 +332,7 @@ export default function AdminTab() {
       { text: 'Resetear', onPress: () => {
         setUsuarios(prev => prev.map(x => x.id === u.id ? { ...x, requiere_cambio_pass: true, intentos_fallidos: 0 } : x));
         addLog('PASS_RESET', sesion!.nombre_usuario, `Reseteó contraseña de: ${u.nombre_usuario}`, '192.168.1.x', true);
-        Alert.alert('✅ Contraseña reseteada', 'El usuario deberá cambiar su contraseña en el próximo acceso.');
+        Alert.alert(' Contraseña reseteada', 'El usuario deberá cambiar su contraseña en el próximo acceso.');
         setDetalleUsuario(prev => prev ? { ...prev, requiere_cambio_pass: true } : null);
       }},
     ]);
@@ -302,7 +340,7 @@ export default function AdminTab() {
 
   const eliminarUsuario = (u: UsuarioAdmin) => {
     if (u.id === sesion?.id) { Alert.alert('Acción no permitida', 'No puedes eliminar tu propia cuenta.'); return; }
-    Alert.alert('⚠️ Eliminar usuario', `Esto eliminará permanentemente la cuenta de "${u.nombre_usuario}". Esta acción no se puede deshacer.`, [
+    Alert.alert(' Eliminar usuario', `Esto eliminará permanentemente la cuenta de "${u.nombre_usuario}". Esta acción no se puede deshacer.`, [
       { text: 'Cancelar', style: 'cancel' },
       { text: 'Eliminar', style: 'destructive', onPress: () => {
         setUsuarios(prev => prev.filter(x => x.id !== u.id));
@@ -335,7 +373,7 @@ export default function AdminTab() {
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
           <ScrollView contentContainerStyle={s.loginScroll} keyboardShouldPersistTaps="handled">
             <View style={s.loginTop}>
-              <View style={s.lockCircle}><Text style={{ fontSize: 38 }}>🔐</Text></View>
+              <View style={s.lockCircle}><Text style={{ fontSize: 38 }}></Text></View>
               <Text style={s.loginBrand}>AEROPUERTO LA AURORA</Text>
               <Text style={s.loginHeading}>Panel Administrativo</Text>
               <Text style={s.loginSub}>Área restringida — solo personal autorizado</Text>
@@ -345,7 +383,7 @@ export default function AdminTab() {
               <View style={s.fieldWrap}>
                 <Text style={s.fieldLabel}>USUARIO</Text>
                 <View style={s.inputRow}>
-                  <Text style={s.inputIcon}>👤</Text>
+                  <Text style={s.inputIcon}></Text>
                   <TextInput style={s.input} value={userInput} onChangeText={setUserInput}
                     placeholder="nombre.apellido" placeholderTextColor={C.placeholder}
                     autoCapitalize="none" autoCorrect={false} returnKeyType="next" />
@@ -399,7 +437,7 @@ export default function AdminTab() {
   }
 
   // ── Panel ─────────────────────────────────────────────────────────────────
-  const secciones = ROL_SECCIONES[sesion!.rol] ?? [];
+  const secciones = ROL_SECCIONES[sesion!.rol as Rol] ?? (sesion?.esSoloLectura ? ['usuarios', 'roles'] : ROL_SECCIONES['SUPERADMIN']);
 
   return (
     <SafeAreaView style={s.container}>
@@ -483,9 +521,9 @@ export default function AdminTab() {
               <Text style={sd.headerTitle}>{seccionActiva ? SECCIONES_META[seccionActiva]?.label : ''}</Text>
               <Text style={sd.headerSub}>{seccionActiva ? SECCIONES_META[seccionActiva]?.desc : ''}</Text>
             </View>
-            {seccionActiva === 'usuarios' && sesion?.rol === 'SUPERADMIN' && (
-              <TouchableOpacity style={sd.addBtn} onPress={abrirNuevoUsuario} activeOpacity={0.85}>
-                <Text style={sd.addBtnT}>+ Nuevo</Text>
+            {seccionActiva === 'usuarios' && !sesion?.esSoloLectura && (
+              <TouchableOpacity style={sd.addBtn} onPress={() => { setForm({ nombre_usuario: '', nombre_completo: '', email: '', rol: '', pass_temp: '', departamento: 'General' }); setEditUsuario(null); setUsuarioModal(true); }} activeOpacity={0.85}>
+                <Text style={sd.addBtnT}>+ Nuevo Usuario</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -511,7 +549,7 @@ export default function AdminTab() {
 
               {/* Search + filter */}
               <View style={sd.searchBar}>
-                <Text style={{ fontSize: 16, color: C.light, marginRight: 8 }}>🔍</Text>
+                <Text style={{ fontSize: 16, color: C.light, marginRight: 8 }}></Text>
                 <TextInput style={{ flex: 1, fontSize: 14, color: C.text }}
                   value={busqueda} onChangeText={setBusqueda}
                   placeholder="Buscar usuario, nombre, email..." placeholderTextColor={C.placeholder} />
@@ -537,7 +575,7 @@ export default function AdminTab() {
                 contentContainerStyle={{ padding: 14, paddingBottom: 30, flexGrow: 1 }}
                 ListEmptyComponent={
                   <View style={{ alignItems: 'center', paddingVertical: 50 }}>
-                    <Text style={{ fontSize: 36, marginBottom: 10 }}>🔍</Text>
+                    <Text style={{ fontSize: 36, marginBottom: 10 }}></Text>
                     <Text style={{ color: C.muted, fontSize: 14 }}>Sin usuarios que coincidan</Text>
                   </View>
                 }
@@ -545,7 +583,7 @@ export default function AdminTab() {
                   <TouchableOpacity style={[sd.userCard, u.estado === 'BLOQUEADO' && sd.userCardBlocked]}
                     onPress={() => setDetalleUsuario(u)} activeOpacity={0.82}>
                     <View style={[sd.userAvatar, { backgroundColor: (ROLES_DISPONIBLES.find(r => r.value === u.rol)?.color ?? C.electric) + '20' }]}>
-                      <Text style={{ fontSize: 20 }}>{u.estado === 'BLOQUEADO' ? '🔒' : u.estado === 'PENDIENTE' ? '⏳' : '👤'}</Text>
+                      <Text style={{ fontSize: 20 }}>{u.estado === 'BLOQUEADO' ? '🔒' : u.estado === 'PENDIENTE' ? '' : ''}</Text>
                     </View>
                     <View style={{ flex: 1 }}>
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
@@ -581,7 +619,7 @@ export default function AdminTab() {
                               <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 20 }}>✕</Text>
                             </TouchableOpacity>
                             <View style={sd.sheetAvatarBig}>
-                              <Text style={{ fontSize: 36 }}>{u.estado === 'BLOQUEADO' ? '🔒' : '👤'}</Text>
+                              <Text style={{ fontSize: 36 }}>{u.estado === 'BLOQUEADO' ? '🔒' : ''}</Text>
                             </View>
                             <Text style={sd.sheetHeroUser}>{u.nombre_usuario}</Text>
                             <Text style={sd.sheetHeroName}>{u.nombre_completo}</Text>
@@ -599,7 +637,7 @@ export default function AdminTab() {
                                 ['Fecha de creación', u.fecha_creacion],
                                 ['Última sesión', u.ultima_sesion ?? 'Nunca'],
                                 ['Intentos fallidos', String(u.intentos_fallidos)],
-                                ['Cambio de contraseña', u.requiere_cambio_pass ? '⚡ Requerido' : '✅ No requerido'],
+                                ['Cambio de contraseña', u.requiere_cambio_pass ? '⚡ Requerido' : ' No requerido'],
                               ].map(([l, v]) => (
                                 <View key={l} style={sd.infoRow}>
                                   <Text style={sd.infoL}>{l}</Text>
@@ -628,8 +666,8 @@ export default function AdminTab() {
                               </View>
                             </View>
 
-                            {/* Actions — only for superadmin */}
-                            {sesion?.rol === 'SUPERADMIN' && (
+                            {/* Actions — only for superadmin or authorized editors */}
+                            {!sesion?.esSoloLectura && (
                               <View style={sd.sheetCard}>
                                 <Text style={sd.sheetCardTitle}>Acciones administrativas</Text>
                                 <View style={{ gap: 8, marginTop: 8 }}>
@@ -649,7 +687,7 @@ export default function AdminTab() {
                                   </TouchableOpacity>
                                   {u.estado !== 'ACTIVO' && (
                                     <TouchableOpacity style={[sd.actionBtn, { borderColor: C.successL }]} onPress={() => cambiarEstado(u, 'ACTIVO')} activeOpacity={0.8}>
-                                      <Text style={sd.actionIcon}>✅</Text>
+                                      <Text style={sd.actionIcon}></Text>
                                       <View><Text style={[sd.actionTitle, { color: C.success }]}>Activar cuenta</Text><Text style={sd.actionSub}>Restaurar acceso al sistema</Text></View>
                                     </TouchableOpacity>
                                   )}
@@ -685,6 +723,65 @@ export default function AdminTab() {
             </View>
           )}
 
+          {/* ROLES section */}
+          {seccionActiva === 'roles' && (
+            <View style={{ flex: 1 }}>
+               <View style={sd.header}>
+                  <TouchableOpacity style={sd.backBtn} onPress={() => setSeccionActiva(null)} activeOpacity={0.75}><Text style={sd.backT}>‹</Text></TouchableOpacity>
+                  <View style={{ flex: 1 }}>
+                    <Text style={sd.headerTitle}>Gestión de Roles</Text>
+                  </View>
+                  {!sesion?.esSoloLectura && (
+                    <TouchableOpacity style={sd.addBtn} onPress={() => setRolModal(true)} activeOpacity={0.85}><Text style={sd.addBtnT}>+ Nuevo Rol</Text></TouchableOpacity>
+                  )}
+               </View>
+               <FlatList data={roles} keyExtractor={r => String(r.idRolSistema)} contentContainerStyle={{ padding: 14 }} renderItem={({ item: r }) => (
+                  <View style={sd.card}>
+                    <Text style={sd.cardTitle}>{r.nombreRol}</Text>
+                    <Text style={sd.cardSub}>{r.descripcion} · Nivel: {r.nivelJerarquico}</Text>
+                    <View style={{ flexDirection: 'row', gap: 6, marginTop: 8}}>
+                       {r.nivelJerarquico <= 2 ? (
+                         <View style={{backgroundColor: C.dangerBg, padding:4, borderRadius: 4}}><Text style={{fontSize: 10, color: C.danger, fontWeight: '800'}}>Manejo de Información Sensible</Text></View>
+                       ) : (
+                         <View style={{backgroundColor: C.infoBg, padding:4, borderRadius: 4}}><Text style={{fontSize: 10, color: C.info, fontWeight: '800'}}>Solo Lectura (Vistas)</Text></View>
+                       )}
+                    </View>
+                  </View>
+                )} />
+
+                {/* MODAL CREAR ROL */}
+                <Modal visible={rolModal} animationType="slide" transparent onRequestClose={() => setRolModal(false)}>
+                  <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 20 }}>
+                     <View style={[sd.card, { backgroundColor: C.bgCard, padding: 20 }]}>
+                         <Text style={{ fontSize: 18, color: C.electric, fontWeight: '800', marginBottom: 15 }}>Crea un Perfil de Acceso</Text>
+                         <Text style={sd.fieldLabel}>Nombre Rol (Ej: LECTURA_FINANZAS)</Text>
+                         <View style={s.inputRow}><TextInput style={s.input} value={rolForm.nombreRol} onChangeText={t => setRolForm(f=>({...f, nombreRol: t.toUpperCase()}))} autoCapitalize="characters" /></View>
+                         
+                         <Text style={[sd.fieldLabel, { marginTop: 15 }]}>Descripción</Text>
+                         <View style={s.inputRow}><TextInput style={s.input} value={rolForm.descripcion} onChangeText={t => setRolForm(f=>({...f, descripcion: t}))} /></View>
+
+                         <Text style={[sd.fieldLabel, { marginTop: 15 }]}>Permisos sobre la Información</Text>
+                         <View style={{ flexDirection: 'row', gap: 10, marginTop: 5 }}>
+                             <TouchableOpacity onPress={()=>setRolForm(f=>({...f, jerarquia: '3'}))} style={[sd.permTag, rolForm.jerarquia === '3' ? {backgroundColor: C.electric} : {backgroundColor: C.bgElevated}]}>
+                                <Text style={{color: rolForm.jerarquia === '3' ? C.white : C.text, fontWeight: '800'}}>Solo Vistas (Lectura)</Text>
+                             </TouchableOpacity>
+                             <TouchableOpacity onPress={()=>setRolForm(f=>({...f, jerarquia: '1'}))} style={[sd.permTag, rolForm.jerarquia === '1' ? {backgroundColor: C.danger} : {backgroundColor: C.bgElevated}]}>
+                                <Text style={{color: rolForm.jerarquia === '1' ? C.white : C.text, fontWeight: '800'}}>Manejar / Editar Info</Text>
+                             </TouchableOpacity>
+                         </View>
+
+                         <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 25, gap: 10 }}>
+                             <TouchableOpacity onPress={() => setRolModal(false)}><Text style={{ color: C.muted, fontWeight: '700', padding: 10 }}>Cancelar</Text></TouchableOpacity>
+                             <TouchableOpacity onPress={crearNuevoRol} disabled={rolSaving} style={{ backgroundColor: C.electric, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 8 }}>
+                                <Text style={{ color: C.white, fontWeight: '800' }}>{rolSaving ? '...' : 'Generar en Oracle'}</Text>
+                             </TouchableOpacity>
+                         </View>
+                     </View>
+                  </View>
+                </Modal>
+            </View>
+          )}
+
           {/* LOGS section */}
           {seccionActiva === 'logs' && (
             <FlatList
@@ -693,7 +790,7 @@ export default function AdminTab() {
               contentContainerStyle={{ padding: 14, paddingBottom: 30, flexGrow: 1 }}
               renderItem={({ item: l }) => (
                 <View style={[sd.logRow, !l.exitoso && { borderLeftColor: C.danger, borderLeftWidth: 3 }]}>
-                  <Text style={[sd.logIcon]}>{l.exitoso ? '✅' : '❌'}</Text>
+                  <Text style={[sd.logIcon]}>{l.exitoso ? '' : '❌'}</Text>
                   <View style={{ flex: 1 }}>
                     <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
                       <Text style={sd.logAccion}>{l.accion}</Text>
@@ -713,7 +810,7 @@ export default function AdminTab() {
               contentContainerStyle={{ padding: 14, paddingBottom: 30, flexGrow: 1 }}
               renderItem={({ item: e }) => (
                 <View style={sd.card}>
-                  <View style={[sd.cardAvatar, { backgroundColor: C.tealBg }]}><Text style={{ fontSize: 20 }}>👤</Text></View>
+                  <View style={[sd.cardAvatar, { backgroundColor: C.tealBg }]}><Text style={{ fontSize: 20 }}></Text></View>
                   <View style={{ flex: 1 }}>
                     <Text style={sd.cardTitle}>{e.nombres} {e.apellidos}</Text>
                     <Text style={sd.cardSub}>{e.cargo} · {e.departamento}</Text>
@@ -730,7 +827,7 @@ export default function AdminTab() {
           {/* SALARIOS */}
           {seccionActiva === 'salarios' && (
             <>
-              <View style={sd.secBanner}><Text style={sd.secBannerT}>⚠️ Información salarial — CONFIDENCIAL · Solo SUPERADMIN</Text></View>
+              <View style={sd.secBanner}><Text style={sd.secBannerT}> Información salarial — CONFIDENCIAL · Solo SUPERADMIN</Text></View>
               <FlatList data={EMPLEADOS} keyExtractor={e => String(e.id)}
                 contentContainerStyle={{ padding: 14, paddingBottom: 30, flexGrow: 1 }}
                 renderItem={({ item: e }) => (
@@ -807,7 +904,7 @@ export default function AdminTab() {
               <View style={sd.secBanner}><Text style={sd.secBannerT}>🚫 Lista de restricción de embarque — CONFIDENCIAL</Text></View>
               <FlatList data={PROHIBICIONES} keyExtractor={p => String(p.id_prohibicion)}
                 contentContainerStyle={{ padding: 14, paddingBottom: 30, flexGrow: 1 }}
-                ListEmptyComponent={<View style={{ alignItems: 'center', padding: 50 }}><Text style={{ fontSize: 36 }}>✅</Text><Text style={{ color: C.muted, marginTop: 10 }}>Sin prohibiciones activas</Text></View>}
+                ListEmptyComponent={<View style={{ alignItems: 'center', padding: 50 }}><Text style={{ fontSize: 36 }}></Text><Text style={{ color: C.muted, marginTop: 10 }}>Sin prohibiciones activas</Text></View>}
                 renderItem={({ item: p }) => (
                   <View style={[sd.card, { borderLeftWidth: 3, borderLeftColor: p.activa ? C.danger : C.gray }]}>
                     <View style={[sd.cardAvatar, { backgroundColor: C.dangerBg }]}><Text style={{ fontSize: 18 }}>🚫</Text></View>
@@ -828,7 +925,7 @@ export default function AdminTab() {
           {seccionActiva === 'seginfo' && (
             <>
               <View style={[sd.secBanner, { borderColor: C.dangerL, backgroundColor: C.dangerBg }]}>
-                <Text style={[sd.secBannerT, { color: C.danger }]}>🔐 Incidentes de Seguridad IT — Solo SUPERADMIN / SEGURIDAD</Text>
+                <Text style={[sd.secBannerT, { color: C.danger }]}> Incidentes de Seguridad IT — Solo SUPERADMIN / SEGURIDAD</Text>
               </View>
               <FlatList data={INCIDENTES_SEG} keyExtractor={i => String(i.id_incidente_seguridad_info)}
                 contentContainerStyle={{ padding: 14, paddingBottom: 30, flexGrow: 1 }}
@@ -854,7 +951,7 @@ export default function AdminTab() {
               contentContainerStyle={{ padding: 14, paddingBottom: 30, flexGrow: 1 }}
               renderItem={({ item: a }: any) => (
                 <View style={[sd.card, { opacity: a.atendida ? 0.55 : 1 }]}>
-                  <View style={[sd.cardAvatar, { backgroundColor: !a.atendida ? C.warningBg : C.grayBg }]}><Text style={{ fontSize: 18 }}>⚠️</Text></View>
+                  <View style={[sd.cardAvatar, { backgroundColor: !a.atendida ? C.warningBg : C.grayBg }]}><Text style={{ fontSize: 18 }}></Text></View>
                   <View style={{ flex: 1 }}>
                     <Text style={sd.cardTitle}>{a.tipo_alerta ?? a.descripcion ?? 'Alerta técnica'}</Text>
                     <Text style={sd.cardSub}>{a.descripcion ?? a.matricula_avion ?? '—'}</Text>

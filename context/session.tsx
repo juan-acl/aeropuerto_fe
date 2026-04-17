@@ -19,7 +19,8 @@ export interface Usuario {
   nombre: string;
   apellido: string;
   email: string;
-  rol: RolUsuario;
+  rol: string;
+  jerarquia?: number; // <-- Nuevo anclaje robusto a DB
   departamento?: string;
   avatar: string;
   token?: string;
@@ -43,6 +44,7 @@ interface SesionCtx {
   esCliente: boolean;
   esPersonal: boolean;
   esAdmin: boolean;
+  esSoloLectura: boolean;
   misReservas: any[];
   agregarReserva: (r: any) => void;
   registrarEvento: (evento: string, detalles?: Record<string, unknown>) => void;
@@ -53,7 +55,7 @@ const defaultCtx: SesionCtx = {
   login: async () => false, loginDemo: () => {}, logout: () => {},
   sessionKey: 0,
   permisos: PERMISOS_POR_ROL['CLIENTE'], puede: () => false,
-  esCliente: true, esPersonal: false, esAdmin: false,
+  esCliente: true, esPersonal: false, esAdmin: false, esSoloLectura: true,
   misReservas: [], agregarReserva: () => {},
   registrarEvento: () => {},
 };
@@ -64,15 +66,15 @@ const Ctx = createContext<SesionCtx>(defaultCtx);
 export const DEMO_ACCOUNTS: Array<{ usuario: string; pass: string; datos: Usuario }> = [
   { usuario: 'cliente',      pass: '1234', datos: { id: 100, nombre: 'Andrea',      apellido: 'Morales',   email: 'a.morales@gmail.com',     rol: 'CLIENTE',          avatar: '🧳' } },
   { usuario: 'recepcion',    pass: '1234', datos: { id: 2,   nombre: 'Carlos',      apellido: 'Méndez',    email: 'c.mendez@aurora.aero',    rol: 'RECEPCIONISTA',    avatar: '🎫', departamento: 'Recepción' } },
-  { usuario: 'checkin',      pass: '1234', datos: { id: 3,   nombre: 'Ana',         apellido: 'Hernández', email: 'a.hernandez@aurora.aero',  rol: 'CHECKIN',          avatar: '✅', departamento: 'Check-in' } },
-  { usuario: 'operaciones',  pass: '1234', datos: { id: 4,   nombre: 'Roberto',     apellido: 'Pérez',     email: 'r.perez@aurora.aero',     rol: 'OPERACIONES',      avatar: '🛬', departamento: 'Operaciones' } },
+  { usuario: 'checkin',      pass: '1234', datos: { id: 3,   nombre: 'Ana',         apellido: 'Hernández', email: 'a.hernandez@aurora.aero',  rol: 'CHECKIN',          avatar: '', departamento: 'Check-in' } },
+  { usuario: 'operaciones',  pass: '1234', datos: { id: 4,   nombre: 'Roberto',     apellido: 'Pérez',     email: 'r.perez@aurora.aero',     rol: 'OPERACIONES',      avatar: '', departamento: 'Operaciones' } },
   { usuario: 'seguridad',    pass: '1234', datos: { id: 5,   nombre: 'María',       apellido: 'López',     email: 'm.lopez@aurora.aero',     rol: 'SEGURIDAD',        avatar: '🛡️', departamento: 'Seguridad' } },
-  { usuario: 'supervisor',   pass: '1234', datos: { id: 6,   nombre: 'Sofía',       apellido: 'Ramírez',   email: 's.ramirez@aurora.aero',   rol: 'SUPERVISOR',       avatar: '⭐', departamento: 'Supervisión' } },
-  { usuario: 'jefe',         pass: '1234', datos: { id: 7,   nombre: 'Diego',       apellido: 'Torres',    email: 'd.torres@aurora.aero',    rol: 'JEFE_OPERACIONES', avatar: '✈️', departamento: 'Control Aéreo' } },
-  { usuario: 'finanzas',     pass: '1234', datos: { id: 8,   nombre: 'Luis',        apellido: 'González',  email: 'l.gonzalez@aurora.aero',  rol: 'FINANZAS',         avatar: '💰', departamento: 'Finanzas' } },
+  { usuario: 'supervisor',   pass: '1234', datos: { id: 6,   nombre: 'Sofía',       apellido: 'Ramírez',   email: 's.ramirez@aurora.aero',   rol: 'SUPERVISOR',       avatar: '', departamento: 'Supervisión' } },
+  { usuario: 'jefe',         pass: '1234', datos: { id: 7,   nombre: 'Diego',       apellido: 'Torres',    email: 'd.torres@aurora.aero',    rol: 'JEFE_OPERACIONES', avatar: '', departamento: 'Control Aéreo' } },
+  { usuario: 'finanzas',     pass: '1234', datos: { id: 8,   nombre: 'Luis',        apellido: 'González',  email: 'l.gonzalez@aurora.aero',  rol: 'FINANZAS',         avatar: '', departamento: 'Finanzas' } },
   { usuario: 'rrhh',         pass: '1234', datos: { id: 9,   nombre: 'Patricia',    apellido: 'Vidal',     email: 'p.vidal@aurora.aero',     rol: 'RRHH',             avatar: '👥', departamento: 'RRHH' } },
-  { usuario: 'mantenimiento',pass: '1234', datos: { id: 10,  nombre: 'Jorge',       apellido: 'Castillo',  email: 'j.castillo@aurora.aero',  rol: 'MANTENIMIENTO',    avatar: '🔧', departamento: 'Mantenimiento' } },
-  { usuario: 'admin',        pass: '1234', datos: { id: 1,   nombre: 'Admin',       apellido: 'General',   email: 'admin@aurora.aero',       rol: 'ADMIN',            avatar: '⚙️', departamento: 'TI' } },
+  { usuario: 'mantenimiento',pass: '1234', datos: { id: 10,  nombre: 'Jorge',       apellido: 'Castillo',  email: 'j.castillo@aurora.aero',  rol: 'MANTENIMIENTO',    avatar: '', departamento: 'Mantenimiento' } },
+  { usuario: 'admin',        pass: '1234', datos: { id: 1,   nombre: 'Admin',       apellido: 'General',   email: 'admin@aurora.aero',       rol: 'ADMIN',            avatar: '', departamento: 'TI' } },
 ];
 
 export function SesionProvider({ children }: { children: ReactNode }) {
@@ -115,7 +117,7 @@ export function SesionProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (usr: string, pass: string): Promise<boolean> => {
     setLoading(true);
     try {
-      // 1. Try real backend
+      // 1. Validar estrictamente contra backend Oracle
       try {
         const res = await axiosInstance.post<{ token: string; usuario: Usuario }>(
           '/auth/login', { usuario: usr, password: pass }
@@ -125,20 +127,10 @@ export function SesionProvider({ children }: { children: ReactNode }) {
         setToken(t);
         setUsuario({ ...u, token: t });
         return true;
-      } catch { /* offline or auth error — fall through */ }
-
-      // 2. Demo account fallback
-      const demo = DEMO_ACCOUNTS.find(
-        a => a.usuario === usr.trim().toLowerCase() && a.pass === pass
-      );
-      if (demo) {
-        const fakeToken = `demo-${demo.datos.id}-${Date.now()}`;
-        await storeToken(fakeToken);
-        setToken(fakeToken);
-        setUsuario({ ...demo.datos, token: fakeToken });
-        return true;
+      } catch (error) {
+        console.warn("Fallo de authenticación BD:", error);
+        return false;
       }
-      return false;
     } finally {
       setLoading(false);
     }
@@ -196,9 +188,10 @@ export function SesionProvider({ children }: { children: ReactNode }) {
       usuario, token, loading, initialized,
       login, loginDemo, logout, sessionKey,
       permisos, puede,
-      esCliente:  !usuario || usuario.rol === 'CLIENTE',
-      esPersonal: !!usuario && usuario.rol !== 'CLIENTE' && usuario.rol !== 'ADMIN',
-      esAdmin:    usuario?.rol === 'ADMIN',
+      esCliente:  !usuario || (usuario.jerarquia !== undefined ? usuario.jerarquia >= 4 : usuario.rol === 'CLIENTE'),
+      esPersonal: !!usuario && (usuario.jerarquia !== undefined ? usuario.jerarquia <= 3 : usuario.rol !== 'CLIENTE' && usuario.rol !== 'ADMIN'),
+      esAdmin:    usuario?.jerarquia === 1 || usuario?.rol?.toUpperCase().includes('ADMIN'),
+      esSoloLectura: usuario?.jerarquia !== undefined ? usuario.jerarquia >= 3 : (!usuario?.rol?.toUpperCase().includes('ADMIN')),
       misReservas, agregarReserva, registrarEvento,
     }}>
       {children}

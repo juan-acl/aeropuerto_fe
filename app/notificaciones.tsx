@@ -35,7 +35,7 @@ export default function NotificationsScreen() {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={s.empty}>
-            <Text style={{ fontSize: 48, marginBottom: 12 }}>🔔</Text>
+            <Text style={{ fontSize: 48, marginBottom: 12 }}></Text>
             <Text style={s.emptyT}>Sin notificaciones</Text>
             <Text style={s.emptySub}>Las alertas de tus vuelos y reservas aparecerán aquí</Text>
           </View>

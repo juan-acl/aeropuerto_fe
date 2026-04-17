@@ -64,7 +64,7 @@ export default function PerfilTab() {
           {/* Hero */}
           <View style={s.loginHero}>
             <View style={s.loginOrb1} /><View style={s.loginOrb2} />
-            <View style={s.loginAvatarWrap}><Text style={{ fontSize: 44 }}>✈️</Text></View>
+            <View style={s.loginAvatarWrap}><Text style={{ fontSize: 44 }}></Text></View>
             <Text style={s.loginBrand}>AEROPUERTO LA AURORA</Text>
             <Text style={s.loginTitle}>Bienvenido</Text>
             <Text style={s.loginSub}>Inicia sesión con tu cuenta{'\n'}institucional o de pasajero</Text>
@@ -75,7 +75,7 @@ export default function PerfilTab() {
             <View style={s.inputGroup}>
               <Text style={s.inputLabel}>USUARIO</Text>
               <View style={s.inputWrap}>
-                <Text style={s.inputIcon}>👤</Text>
+                <Text style={s.inputIcon}></Text>
                 <TextInput style={s.input} value={usr} onChangeText={setUsr}
                   placeholder="ej: cliente, recepcion, admin..." placeholderTextColor={C.placeholder}
                   autoCapitalize="none" autoCorrect={false} returnKeyType="next" />
@@ -142,7 +142,7 @@ export default function PerfilTab() {
           <View style={[s.rolBadge, { backgroundColor: meta.color + '20', borderColor: meta.color + '50' }]}>
             <Text style={[s.rolBadgeT, { color: meta.color }]}>{meta.label}</Text>
           </View>
-          {usuario.departamento && <Text style={s.profileDept}>📍 {usuario.departamento}</Text>}
+          {usuario.departamento && <Text style={s.profileDept}> {usuario.departamento}</Text>}
           <Text style={s.profileEmail}>{usuario.email}</Text>
           <View style={{ marginTop: 6 }}><BackendStatus isOnline={isOnline} /></View>
         </View>
@@ -159,11 +159,11 @@ export default function PerfilTab() {
               </View>
               {misReservas.length === 0 ? (
                 <View style={s.emptyCard}>
-                  <Text style={{ fontSize: 36 }}>🎟️</Text>
+                  <Text style={{ fontSize: 36 }}></Text>
                   <Text style={s.emptyCardT}>Aún no tienes reservas</Text>
                   <TouchableOpacity style={[s.emptyBtn, { backgroundColor: meta.color + '20', borderColor: meta.color + '40' }]}
                     onPress={() => router.push('/reservar' as any)}>
-                    <Text style={[s.emptyBtnT, { color: meta.color }]}>Reservar vuelo ✈️</Text>
+                    <Text style={[s.emptyBtnT, { color: meta.color }]}>Reservar vuelo </Text>
                   </TouchableOpacity>
                 </View>
               ) : misReservas.slice(0, 5).map((r, i) => (
@@ -189,8 +189,8 @@ export default function PerfilTab() {
           {esCliente && (
             <View style={s.actionsGrid}>
               {[
-                { icon: '✈️', t: 'Buscar vuelo', fn: () => router.push('/reservar' as any) },
-                { icon: '✅', t: 'Check-in', fn: () => router.push('/reservar/checkin' as any) },
+                { icon: '', t: 'Buscar vuelo', fn: () => router.push('/reservar' as any) },
+                { icon: '', t: 'Check-in', fn: () => router.push('/reservar/checkin' as any) },
               ].map(a => (
                 <TouchableOpacity key={a.t} style={s.actionCard} onPress={a.fn} activeOpacity={0.8}>
                   <Text style={{ fontSize: 28 }}>{a.icon}</Text>

@@ -8,10 +8,10 @@ import { useSesion } from '@/context/session';
 import { backendApi } from '@/services/backendApi';
 
 const FILTERS = [
-  { k: 'TODOS', l: 'Todos', icon: '✈️' },
-  { k: 'EN_VUELO', l: 'En Vuelo', icon: '🟢' },
+  { k: 'TODOS', l: 'Todos', icon: '' },
+  { k: 'EN_VUELO', l: 'En Vuelo', icon: '' },
   { k: 'PROGRAMADO', l: 'Programado', icon: '🔵' },
-  { k: 'DEMORADO', l: 'Demorado', icon: '🟡' },
+  { k: 'DEMORADO', l: 'Demorado', icon: '' },
   { k: 'CANCELADO', l: 'Cancelado', icon: '🔴' },
   { k: 'ATERRIZADO', l: 'Aterrizado', icon: '⚫' },
 ];
@@ -46,7 +46,7 @@ function VistaPasajero({ VUELOS }: { VUELOS: any[] }) {
         <View style={s.orb2} />
 
         <View style={s.heroContent}>
-          <Text style={s.heroBrand}>✈ LA AURORA · GUA</Text>
+          <Text style={s.heroBrand}> LA AURORA · GUA</Text>
           <Text style={s.heroTitle}>Tablero de{'\n'}Vuelos</Text>
           <Text style={s.heroDate}>{dateStr.charAt(0).toUpperCase() + dateStr.slice(1)}</Text>
 
@@ -70,7 +70,7 @@ function VistaPasajero({ VUELOS }: { VUELOS: any[] }) {
           {(['SALIDAS', 'LLEGADAS'] as const).map(t => (
             <TouchableOpacity key={t} style={[s.toggleBtn, filtro === t && s.toggleActive]}
               onPress={() => setFiltro(t)} activeOpacity={0.8}>
-              <Text style={s.toggleIcon}>{t === 'SALIDAS' ? '🛫' : '🛬'}</Text>
+              <Text style={s.toggleIcon}>{t === 'SALIDAS' ? '🛫' : ''}</Text>
               <Text style={[s.toggleT, filtro === t && s.toggleTActive]}>{t}</Text>
             </TouchableOpacity>
           ))}
@@ -80,7 +80,7 @@ function VistaPasajero({ VUELOS }: { VUELOS: any[] }) {
       {/* CTA Banner */}
       <TouchableOpacity style={s.ctaBanner} onPress={() => router.push('/buscar' as any)} activeOpacity={0.88}>
         <View style={s.ctaGlow} />
-        <Text style={s.ctaIcon}>✈️</Text>
+        <Text style={s.ctaIcon}></Text>
         <View style={{ flex: 1 }}>
           <Text style={s.ctaTitle}>Reservar vuelo</Text>
           <Text style={s.ctaSub}>Busca, elige tu asiento y paga en minutos</Text>
@@ -93,7 +93,7 @@ function VistaPasajero({ VUELOS }: { VUELOS: any[] }) {
       {/* Search */}
       <View style={s.searchWrap}>
         <View style={s.searchBox}>
-          <Text style={s.searchIcon}>🔍</Text>
+          <Text style={s.searchIcon}></Text>
           <TextInput style={s.searchInput} placeholder="Vuelo, destino, origen..."
             placeholderTextColor={C.placeholder} value={q} onChangeText={setQ} clearButtonMode="while-editing" />
         </View>
@@ -107,7 +107,7 @@ function VistaPasajero({ VUELOS }: { VUELOS: any[] }) {
         renderItem={({ item }) => <FlightCard vuelo={item} modoPublico />}
         ListEmptyComponent={
           <View style={s.empty}>
-            <Text style={{ fontSize: 52, marginBottom: 14 }}>✈️</Text>
+            <Text style={{ fontSize: 52, marginBottom: 14 }}></Text>
             <Text style={s.emptyT}>{q ? 'Sin resultados' : `No hay ${filtro.toLowerCase()}`}</Text>
             <Text style={s.emptyS}>{q ? 'Ajusta tu búsqueda' : 'Consulta más tarde'}</Text>
           </View>
@@ -149,7 +149,7 @@ function VistaPersonal({ VUELOS }: { VUELOS: any[] }) {
             <Text style={s.opsTitle}>Panel Operacional</Text>
           </View>
           <View style={s.staffPill}>
-            <Text style={s.staffPillIcon}>{usuario?.avatar ?? '👤'}</Text>
+            <Text style={s.staffPillIcon}>{usuario?.avatar ?? ''}</Text>
             <View>
               <Text style={s.staffPillName}>{usuario?.nombre}</Text>
               <Text style={s.staffPillRol}>{usuario?.departamento ?? ''}</Text>
@@ -176,7 +176,7 @@ function VistaPersonal({ VUELOS }: { VUELOS: any[] }) {
       {/* Search */}
       <View style={s.searchWrap}>
         <View style={s.searchBox}>
-          <Text style={s.searchIcon}>🔍</Text>
+          <Text style={s.searchIcon}></Text>
           <TextInput style={s.searchInput} placeholder="Vuelo, matrícula, destino..."
             placeholderTextColor={C.placeholder} value={q} onChangeText={setQ} clearButtonMode="while-editing" />
         </View>
@@ -204,7 +204,7 @@ function VistaPersonal({ VUELOS }: { VUELOS: any[] }) {
         )}
         ListEmptyComponent={
           <View style={s.empty}>
-            <Text style={{ fontSize: 52, marginBottom: 14 }}>✈️</Text>
+            <Text style={{ fontSize: 52, marginBottom: 14 }}></Text>
             <Text style={s.emptyT}>Sin vuelos</Text>
             <Text style={s.emptyS}>Ajusta los filtros</Text>
           </View>

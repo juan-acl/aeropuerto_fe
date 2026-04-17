@@ -1,13 +1,14 @@
 /**
  * SearchBar — Skyscanner-style dual-mode search (flights + hotels)
- * ✅ Airports desde prop (datos reales de useBackend)
- * ✅ Animación de swap, indicador de carga
+ *  Airports desde prop (datos reales de useBackend)
+ *  Animación de swap, indicador de carga
  */
 import React, { useState, useRef } from 'react';
 import {
   View, Text, TouchableOpacity, TextInput, StyleSheet,
   Modal, ScrollView, Animated, ActivityIndicator,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { C } from '@/constants/theme';
 
 export type SearchMode = 'vuelos' | 'hoteles';
@@ -74,7 +75,7 @@ function AirportPicker({ visible, onSelect, onClose, title, airports, loading }:
           <View style={pk.titleRow}>
             <Text style={pk.title}>{title}</Text>
             <TouchableOpacity onPress={onClose} style={pk.closeBtn}>
-              <Text style={pk.closeT}>✕</Text>
+              <Ionicons name="close-outline" size={20} color={C.muted} />
             </TouchableOpacity>
           </View>
 
@@ -86,7 +87,7 @@ function AirportPicker({ visible, onSelect, onClose, title, airports, loading }:
           ) : null}
 
           <View style={pk.search}>
-            <Text style={pk.searchIcon}>🔍</Text>
+            <Ionicons name="search-outline" size={18} color={C.muted} style={{ marginRight: 8 }} />
             <TextInput
               style={pk.searchInput} value={q} onChangeText={setQ}
               placeholder="Ciudad, país o código IATA..."
@@ -95,7 +96,7 @@ function AirportPicker({ visible, onSelect, onClose, title, airports, loading }:
             />
             {q ? (
               <TouchableOpacity onPress={() => setQ('')}>
-                <Text style={{ color: C.muted, fontSize: 16 }}>✕</Text>
+                <Ionicons name="close-circle" size={18} color={C.muted} />
               </TouchableOpacity>
             ) : null}
           </View>
@@ -140,7 +141,7 @@ function AirportRow({ a, onSelect }: { a: AirportOption; onSelect: () => void })
           <Text style={pk.itemName} numberOfLines={1}>{a.name}</Text>
         </View>
       </View>
-      <Text style={pk.itemArrow}>›</Text>
+      <Ionicons name="chevron-forward" size={18} color={C.muted} />
     </TouchableOpacity>
   );
 }
@@ -219,7 +220,7 @@ export function SearchBar({
             onPress={() => setModo(m)}
             activeOpacity={0.8}
           >
-            <Text style={s.modeIcon}>{m === 'vuelos' ? '✈️' : '🏨'}</Text>
+            <Ionicons name={m === 'vuelos' ? 'airplane-outline' : 'business-outline'} size={18} color={modo === m ? C.white : C.muted} />
             <Text style={[s.modeBtnT, modo === m && s.modeBtnTActive]}>
               {m.charAt(0).toUpperCase() + m.slice(1)}
             </Text>
@@ -236,9 +237,9 @@ export function SearchBar({
             <Text style={s.fieldCode}>{origen}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={s.swapBtn} onPress={handleSwap}>
-            <Animated.Text style={{ color: C.electric, fontSize: 18, transform: [{ rotate: swapRotate }] }}>
-              ⇄
-            </Animated.Text>
+            <Animated.View style={{ transform: [{ rotate: swapRotate }] }}>
+              <Ionicons name="swap-horizontal-outline" size={20} color={C.electric} />
+            </Animated.View>
           </TouchableOpacity>
           <TouchableOpacity style={[s.field, s.fieldFlex]} onPress={() => setPicker('destino')}>
             <Text style={s.fieldLabel}>HASTA</Text>
@@ -305,7 +306,7 @@ export function SearchBar({
         {loading ? (
           <ActivityIndicator color={C.white} style={{ marginRight: 8 }} />
         ) : (
-          <Text style={s.searchBtnIcon}>🔍</Text>
+          <Ionicons name="search" size={20} color={C.white} />
         )}
         <Text style={s.searchBtnT}>
           {loading ? 'Buscando...' : modo === 'vuelos' ? 'Buscar vuelos' : 'Buscar hoteles'}

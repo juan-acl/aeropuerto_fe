@@ -43,7 +43,7 @@ export default function Screen() {
   };
 
   const handleSave = () => {
-    Alert.alert('✅ Guardado', 'Registro creado exitosamente.');
+    Alert.alert(' Guardado', 'Registro creado exitosamente.');
     setModal(false);
     setForm({});
   };
@@ -56,7 +56,7 @@ export default function Screen() {
       
       <StatsRow>
         <StatCard label='Aerolíneas' value={aerolineas.length} color={C.info} bg={C.infoBg} icon='🛫' />
-        <StatCard label='Activas' value={aerolineas.filter(a=>a.activo).length} color={C.success} bg={C.successBg} icon='✅' />
+        <StatCard label='Activas' value={aerolineas.filter(a=>a.activo).length} color={C.success} bg={C.successBg} icon='' />
       </StatsRow>
       <SearchBar value={q} onChangeText={setQ} placeholder="Buscar..." />
       {renderContent()}
@@ -66,7 +66,7 @@ export default function Screen() {
           <FF label="Código IATA de aerolínea" required value={form.codigo_iata??''} onChangeText={set('codigo_iata')} autoCapitalize="characters" placeholder="Ej: AA, UA, AV" maxLength={3} hint="2-3 letras mayúsculas" />
           <FF label="Nombre de la aerolínea" required value={form.nombre??''} onChangeText={set('nombre')} placeholder="Ej: American Airlines" />
           <FF label="País de origen" value={form.pais_origen??''} onChangeText={set('pais_origen')} placeholder="Ej: Estados Unidos" />
-          <FormSection title="Detalles operativos" icon="⚙️" />
+          <FormSection title="Detalles operativos" icon="" />
           <FSelect label="Tipo de aerolínea" value={form.tipo_aerolinea??''} onChange={set('tipo_aerolinea')}
           options={[{label:'Full service / Línea regular',value:'FULL_SERVICE'},{label:'Low cost / Bajo costo',value:'LOW_COST'},{label:'Chárter',value:'CHARTER'},{label:'Carga',value:'CARGA'},{label:'Regional',value:'REGIONAL'}]} />
           <FSelect label="Alianza" value={form.alianza??''} onChange={set('alianza')}

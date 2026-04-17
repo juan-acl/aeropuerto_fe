@@ -8,10 +8,10 @@ import { C } from '@/constants/theme';
 type Tab = 'vuelos' | 'retrasos' | 'cancelaciones' | 'incidentes' | 'combustible';
 
 const TABS = [
-  { k: 'vuelos',         l: '✈️ Vuelos' },
-  { k: 'retrasos',       l: '⏱️ Retrasos' },
+  { k: 'vuelos',         l: ' Vuelos' },
+  { k: 'retrasos',       l: ' Retrasos' },
   { k: 'cancelaciones',  l: '❌ Cancelaciones' },
-  { k: 'incidentes',     l: '⚠️ Incidentes' },
+  { k: 'incidentes',     l: ' Incidentes' },
   { k: 'combustible',    l: '⛽ Combustible' },
 ];
 
@@ -77,7 +77,7 @@ export default function Mod05() {
       }]);
     }
     setModal(false); setForm({});
-    Alert.alert('✅ Registrado', 'El registro fue guardado exitosamente.');
+    Alert.alert(' Registrado', 'El registro fue guardado exitosamente.');
   };
 
   const changeEstadoVuelo = (id: number, actual: string) => {
@@ -85,7 +85,7 @@ export default function Mod05() {
     Alert.alert('Cambiar Estado', `Estado actual: ${actual}`, [
       ...options.map(e => ({ text: e, onPress: () => {
         setVuelos(d => d.map(v => v.id_vuelo === id ? { ...v, estado_vuelo: e as any } : v));
-        Alert.alert('✅ Actualizado', `Estado cambiado a ${e}`);
+        Alert.alert(' Actualizado', `Estado cambiado a ${e}`);
       }})),
       { text: 'Cancelar', style: 'cancel' },
     ]);
@@ -97,7 +97,7 @@ export default function Mod05() {
       return (
         <FlatList data={data} keyExtractor={v => String(v.id_vuelo)}
           contentContainerStyle={{ padding: 14, paddingBottom: 24, flexGrow: 1 }}
-          ListEmptyComponent={<EmptyState icon="✈️" text="Sin vuelos" sub="No hay vuelos que coincidan con la búsqueda" />}
+          ListEmptyComponent={<EmptyState icon="" text="Sin vuelos" sub="No hay vuelos que coincidan con la búsqueda" />}
           renderItem={({ item }) => (
             <View>
               <FlightCard vuelo={item} />
@@ -118,7 +118,7 @@ export default function Mod05() {
       return (
         <FlatList data={data} keyExtractor={r => String(r.id_retraso)}
           contentContainerStyle={{ padding: 14, paddingBottom: 24, flexGrow: 1 }}
-          ListEmptyComponent={<EmptyState icon="⏱️" text="Sin retrasos registrados" />}
+          ListEmptyComponent={<EmptyState icon="" text="Sin retrasos registrados" />}
           renderItem={({ item: r }) => (
             <DataCard
               title={`Vuelo #${r.id_vuelo} — ${r.tipo_retraso}`}
@@ -128,8 +128,8 @@ export default function Mod05() {
               accentColor={C.warning}
               onDelete={() => setRetrasos(d => d.filter(x => x.id_retraso !== r.id_retraso))}
             >
-              <Text style={s.cardDetail}>👤 Responsable: {r.responsable ?? '—'}</Text>
-              <Text style={s.cardDetail}>💰 Compensación: {r.compensacion_pasajeros ? '✅ Aplicada' : '❌ Sin compensación'}</Text>
+              <Text style={s.cardDetail}> Responsable: {r.responsable ?? '—'}</Text>
+              <Text style={s.cardDetail}> Compensación: {r.compensacion_pasajeros ? ' Aplicada' : '❌ Sin compensación'}</Text>
             </DataCard>
           )}
         />
@@ -150,9 +150,9 @@ export default function Mod05() {
               accentColor={C.danger}
               onDelete={() => setCancelaciones(d => d.filter(x => x.id_cancelacion !== c.id_cancelacion))}
             >
-              <Text style={s.cardDetail}>✈️ {c.motivo_detallado ?? '—'}</Text>
-              <Text style={s.cardDetail}>🧍 Reubicados: {c.pasajeros_reubicados ?? 0} pasajeros</Text>
-              <Text style={s.cardDetail}>📅 {c.fecha_cancelacion}</Text>
+              <Text style={s.cardDetail}> {c.motivo_detallado ?? '—'}</Text>
+              <Text style={s.cardDetail}> Reubicados: {c.pasajeros_reubicados ?? 0} pasajeros</Text>
+              <Text style={s.cardDetail}> {c.fecha_cancelacion}</Text>
             </DataCard>
           )}
         />
@@ -163,7 +163,7 @@ export default function Mod05() {
       return (
         <FlatList data={data} keyExtractor={i => String(i.id_incidente_vuelo)}
           contentContainerStyle={{ padding: 14, paddingBottom: 24, flexGrow: 1 }}
-          ListEmptyComponent={<EmptyState icon="⚠️" text="Sin incidentes registrados" />}
+          ListEmptyComponent={<EmptyState icon="" text="Sin incidentes registrados" />}
           renderItem={({ item: i }) => (
             <DataCard
               title={`Vuelo #${i.id_vuelo} — ${i.tipo_incidente}`}
@@ -173,8 +173,8 @@ export default function Mod05() {
               accentColor={i.gravedad === 'ALTA' || i.gravedad === 'CRITICA' ? C.danger : C.warning}
               onDelete={() => setIncidentes(d => d.filter(x => x.id_incidente_vuelo !== i.id_incidente_vuelo))}
             >
-              <Text style={s.cardDetail}>🔧 Acciones: {i.acciones_tomadas ?? '—'}</Text>
-              <Text style={s.cardDetail}>👤 Reportado por: {i.reportado_por ?? '—'}</Text>
+              <Text style={s.cardDetail}> Acciones: {i.acciones_tomadas ?? '—'}</Text>
+              <Text style={s.cardDetail}> Reportado por: {i.reportado_por ?? '—'}</Text>
             </DataCard>
           )}
         />
@@ -225,10 +225,10 @@ export default function Mod05() {
       )}
 
       <StatsRow>
-        <StatCard label="En Vuelo"  value={stats.enVuelo}           color={C.success} bg={C.successBg} icon="✈️" />
-        <StatCard label="Demorados" value={stats.demorados}         color={C.warning} bg={C.warningBg} icon="⏱️" />
+        <StatCard label="En Vuelo"  value={stats.enVuelo}           color={C.success} bg={C.successBg} icon="" />
+        <StatCard label="Demorados" value={stats.demorados}         color={C.warning} bg={C.warningBg} icon="" />
         <StatCard label="Cancelados" value={stats.cancelados}       color={C.danger}  bg={C.dangerBg}  icon="❌" />
-        <StatCard label="Incidentes" value={incidentes.length}      color={C.orange}  bg={C.orangeBg}  icon="⚠️" />
+        <StatCard label="Incidentes" value={incidentes.length}      color={C.orange}  bg={C.orangeBg}  icon="" />
       </StatsRow>
       <SearchBar value={q} onChangeText={setQ} placeholder="Buscar en operaciones..." />
       {renderContent()}

@@ -10,9 +10,9 @@ import { useFlightStatus } from '@/hooks/useFlightStatus';
 const STATUS_CFG: Record<string, { color: string; bg: string; label: string; icon: string }> = {
   EN_VUELO:    { color: C.success, bg: C.successBg, label: 'En Vuelo',    icon: '🛫' },
   PROGRAMADO:  { color: C.info,    bg: C.infoBg,    label: 'Programado',  icon: '🕐' },
-  ATERRIZADO:  { color: C.gray,    bg: C.grayBg,    label: 'Aterrizado',  icon: '🛬' },
+  ATERRIZADO:  { color: C.gray,    bg: C.grayBg,    label: 'Aterrizado',  icon: '' },
   CANCELADO:   { color: C.danger,  bg: C.dangerBg,  label: 'Cancelado',   icon: '❌' },
-  DEMORADO:    { color: C.warning, bg: C.warningBg, label: 'Demorado',    icon: '⏱️' },
+  DEMORADO:    { color: C.warning, bg: C.warningBg, label: 'Demorado',    icon: '' },
   DESVIADO:    { color: C.orange,  bg: C.orangeBg,  label: 'Desviado',    icon: '↗️' },
 };
 
@@ -53,7 +53,7 @@ export default function VueloDetalle() {
     <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
       <ScreenHeader title="Detalle de Vuelo" subtitle="Vuelo no encontrado" />
       <View style={{ alignItems: 'center', paddingVertical: 80 }}>
-        <Text style={{ fontSize: 64, marginBottom: 16 }}>✈️</Text>
+        <Text style={{ fontSize: 64, marginBottom: 16 }}></Text>
         <Text style={{ fontSize: 18, fontWeight: '700', color: C.textSub }}>Vuelo no encontrado</Text>
         <Text style={{ fontSize: 13, color: C.muted, marginTop: 6 }}>ID: {id}</Text>
       </View>
@@ -93,7 +93,7 @@ export default function VueloDetalle() {
             </View>
             <View style={s.heroCenter}>
               <View style={s.heroLine} />
-              <Text style={s.heroPlane}>✈</Text>
+              <Text style={s.heroPlane}></Text>
               <View style={s.heroLine} />
             </View>
             <View style={[s.heroAirport, { alignItems: 'flex-end' }]}>
@@ -119,10 +119,10 @@ export default function VueloDetalle() {
 
         {/* KPI stats */}
         <View style={s.statsRow}>
-          <StatCard label="Ocupados"  value={vuelo.plazas_ocupadas ?? 0}  color={C.success} bg={C.successBg} icon="🧍" />
+          <StatCard label="Ocupados"  value={vuelo.plazas_ocupadas ?? 0}  color={C.success} bg={C.successBg} icon="" />
           <StatCard label="Vacíos"    value={vuelo.plazas_vacias ?? 0}    color={C.muted}   bg={C.grayBg}   icon="💺" />
-          <StatCard label="Retrasos"  value={retrasos.length}              color={retrasos.length > 0 ? C.warning : C.success} bg={retrasos.length > 0 ? C.warningBg : C.successBg} icon="⏱️" />
-          <StatCard label="Incidentes" value={incidentes.length}           color={incidentes.length > 0 ? C.danger : C.success} bg={incidentes.length > 0 ? C.dangerBg : C.successBg} icon="⚠️" />
+          <StatCard label="Retrasos"  value={retrasos.length}              color={retrasos.length > 0 ? C.warning : C.success} bg={retrasos.length > 0 ? C.warningBg : C.successBg} icon="" />
+          <StatCard label="Incidentes" value={incidentes.length}           color={incidentes.length > 0 ? C.danger : C.success} bg={incidentes.length > 0 ? C.dangerBg : C.successBg} icon="" />
         </View>
 
         {/* Ocupación visual */}
@@ -131,7 +131,7 @@ export default function VueloDetalle() {
             <ProgressBar value={vuelo.plazas_ocupadas ?? 0} max={vuelo.capacidad_total ?? 1}
               label={`${vuelo.plazas_ocupadas} de ${vuelo.capacidad_total} asientos · ${ocupacion}% lleno`} />
             <Text style={{ fontSize: 11, color: C.muted, marginTop: 8, textAlign: 'center' }}>
-              {ocupacion >= 90 ? '🔴 Vuelo casi lleno' : ocupacion >= 70 ? '🟡 Buena ocupación' : '🟢 Plazas disponibles'}
+              {ocupacion >= 90 ? '🔴 Vuelo casi lleno' : ocupacion >= 70 ? ' Buena ocupación' : ' Plazas disponibles'}
             </Text>
           </SectionCard>
         )}
@@ -169,7 +169,7 @@ export default function VueloDetalle() {
 
         {/* Retrasos */}
         {retrasos.length > 0 && (
-          <SectionCard title={`Retrasos (${retrasos.length})`} icon="⏱️">
+          <SectionCard title={`Retrasos (${retrasos.length})`} icon="">
             {retrasos.map((r, idx) => (
               <View key={r.id_retraso} style={[s.itemRow, idx < retrasos.length - 1 && s.itemBorder]}>
                 <View style={s.itemTop}>
@@ -181,13 +181,13 @@ export default function VueloDetalle() {
                 </View>
                 <Text style={s.itemDesc}>{r.causa ?? '—'}</Text>
                 {r.responsable && <Text style={s.itemMeta}>Responsable: {r.responsable}</Text>}
-                <Text style={s.itemMeta}>Compensación a pasajeros: {r.compensacion_pasajeros ? '✅ Sí' : '❌ No'}</Text>
+                <Text style={s.itemMeta}>Compensación a pasajeros: {r.compensacion_pasajeros ? ' Sí' : '❌ No'}</Text>
               </View>
             ))}
             {totalRetraso > 0 && (
               <View style={{ backgroundColor: C.warningBg, borderRadius: 8, padding: 10, marginTop: 4 }}>
                 <Text style={{ fontSize: 13, fontWeight: '700', color: C.warning, textAlign: 'center' }}>
-                  ⏱️ Total acumulado: {totalRetraso} minutos ({(totalRetraso / 60).toFixed(1)} horas)
+                   Total acumulado: {totalRetraso} minutos ({(totalRetraso / 60).toFixed(1)} horas)
                 </Text>
               </View>
             )}
@@ -196,7 +196,7 @@ export default function VueloDetalle() {
 
         {/* Incidentes */}
         {incidentes.length > 0 && (
-          <SectionCard title={`Incidentes (${incidentes.length})`} icon="⚠️">
+          <SectionCard title={`Incidentes (${incidentes.length})`} icon="">
             {incidentes.map((i, idx) => (
               <View key={i.id_incidente_vuelo} style={[s.itemRow, idx < incidentes.length - 1 && s.itemBorder]}>
                 <View style={s.itemTop}>

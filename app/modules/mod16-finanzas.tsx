@@ -34,7 +34,7 @@ export default function Screen() {
   // CUENTAS_BANCARIAS available from imports
 
   const handleSave = () => {
-    Alert.alert('✅ Guardado', 'Registro creado exitosamente.');
+    Alert.alert(' Guardado', 'Registro creado exitosamente.');
     setModal(false);
     setForm({});
   };
@@ -56,7 +56,7 @@ export default function Screen() {
             <ProgressBar value={p.monto_ejecutado} max={p.monto_asignado} />
           </DataCard>
         ))}
-        <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginTop:16,marginBottom:8}}>💰 Ingresos Recientes</Text>
+        <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginTop:16,marginBottom:8}}> Ingresos Recientes</Text>
         {INGRESOS_DATA.filter((i:any)=>JSON.stringify(i).toLowerCase().includes(q.toLowerCase())).map((i:any)=>(
           <DataCard key={i.id} title={i.concepto} subtitle={`${i.fecha} · ${i.comprobante??'—'}`}
             badge={<Badge value={i.tipo} />} meta={`Q ${i.monto.toLocaleString()}`} accentColor={C.success}>
@@ -73,17 +73,17 @@ export default function Screen() {
         <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginTop:16,marginBottom:8}}>🏭 Proveedores</Text>
         {PROVEEDORES_DATA.filter((p:any)=>JSON.stringify(p).toLowerCase().includes(q.toLowerCase())).map((p:any)=>(
           <DataCard key={p.id} title={p.nombre} subtitle={`NIT: ${p.nit??'—'} · ${p.contacto??'—'}`}
-            badge={<Badge value={p.tipo} />} meta={`${'⭐'.repeat(p.calificacion)}`} accentColor={C.orange}>
+            badge={<Badge value={p.tipo} />} meta={`${''.repeat(p.calificacion)}`} accentColor={C.orange}>
             <Text style={{fontSize:11,color:C.muted}}>📞 {p.telefono??'—'} · ✉️ {p.email??'—'}</Text>
           </DataCard>
         ))}
       </ScrollView>
       <FormModal visible={modal} title="Nuevo Registro" onClose={()=>setModal(false)} onSave={handleSave}>
         <>
-          <FormSection title="Tipo de registro" icon="💰" />
+          <FormSection title="Tipo de registro" icon="" />
           <FSelect label="Categoría" required value={form.categoria??''} onChange={set('categoria')}
           options={[{label:'Ingreso operacional',value:'OPERATIVO'},{label:'Ingreso por concesiones',value:'CONCESIONES'},{label:'Ingreso por tasas',value:'TASA_EMBARQUE'},{label:'Gasto operacional',value:'OPERATIVO_G'},{label:'Gasto de personal',value:'PERSONAL'},{label:'Gasto de mantenimiento',value:'MANTENIMIENTO'},{label:'Gasto de combustible',value:'COMBUSTIBLE'},{label:'Inversión en infraestructura',value:'INVERSION'}]} />
-          <FormSection title="Detalles financieros" icon="📊" />
+          <FormSection title="Detalles financieros" icon="" />
           <FF label="Descripción / Concepto" required value={form.descripcion??''} onChangeText={set('descripcion')} placeholder="Ej: Pago de proveedor combustible, Ingreso tiendas T2..." />
           <FF label="Monto (Q)" required value={String(form.monto??'')} onChangeText={set('monto')} keyboardType="decimal-pad" placeholder="Ej: 15000.00" />
           <FF label="Fecha" value={form.fecha??''} onChangeText={set('fecha')} placeholder="YYYY-MM-DD" />

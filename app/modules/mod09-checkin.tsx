@@ -25,15 +25,15 @@ export default function Screen() {
     <SafeAreaView style={{flex:1,backgroundColor:C.bg}}>
       <ScreenHeader title="Check-in y Abordaje" subtitle="Check-in digital y control de abordaje" onAdd={()=>{setForm({});setModal(true);}} />
       <StatsRow>
-        <StatCard label="Total" value={data.length} color={C.success} bg={C.successBg} icon="✅" />
+        <StatCard label="Total" value={data.length} color={C.success} bg={C.successBg} icon="" />
         <StatCard label="Abordajes" value={CONTROLES_ABORDAJE.length} color={C.purple} bg={C.purpleBg} icon="🚪" />
       </StatsRow>
       <SearchBar value={q} onChangeText={setQ} placeholder="Buscar..." />
       <FlatList data={filtered} keyExtractor={(m:any)=>String(m.id_checkin)} contentContainerStyle={{padding:14, paddingBottom:24, flexGrow:1}}
-        ListEmptyComponent={<EmptyState icon="✅" />}
+        ListEmptyComponent={<EmptyState icon="" />}
         renderItem={({item:m})=>(
           <DataCard title={`Check-in #${m.id_checkin} · Reserva ${m.id_reserva}`} subtitle={`${m.fecha_checkin?.split('T')[0] ?? '—'} · ${m.dispositivo ?? '—'}`}
-            badge={<Badge value={m.pase_abordaje_generado ? 'ACTIVO' : 'PENDIENTE'} />} meta={`Email: ${m.enviado_email?'✅':'❌'} · SMS: ${m.enviado_sms?'✅':'❌'}`}
+            badge={<Badge value={m.pase_abordaje_generado ? 'ACTIVO' : 'PENDIENTE'} />} meta={`Email: ${m.enviado_email?'':'❌'} · SMS: ${m.enviado_sms?'':'❌'}`}
             accentColor={C.success}
             onDelete={()=>setData(d=>d.filter((x:any)=>x!==m))}>
             <></>
