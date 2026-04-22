@@ -160,7 +160,7 @@ export function SesionProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // ── Derived ──────────────────────────────────────────────────────────────
-  const permisos = PERMISOS_POR_ROL[usuario?.rol ?? 'CLIENTE'];
+  const permisos = PERMISOS_POR_ROL[(usuario?.rol ?? 'CLIENTE') as RolUsuario];
 
   const puede = useCallback((key: keyof Permisos): boolean => {
     const val = permisos[key];
@@ -190,8 +190,8 @@ export function SesionProvider({ children }: { children: ReactNode }) {
       permisos, puede,
       esCliente:  !usuario || (usuario.jerarquia !== undefined ? usuario.jerarquia >= 4 : usuario.rol === 'CLIENTE'),
       esPersonal: !!usuario && (usuario.jerarquia !== undefined ? usuario.jerarquia <= 3 : usuario.rol !== 'CLIENTE' && usuario.rol !== 'ADMIN'),
-      esAdmin:    usuario?.jerarquia === 1 || usuario?.rol?.toUpperCase().includes('ADMIN'),
-      esSoloLectura: usuario?.jerarquia !== undefined ? usuario.jerarquia >= 3 : (!usuario?.rol?.toUpperCase().includes('ADMIN')),
+      esAdmin:    usuario?.jerarquia === 1 || (usuario?.rol?.toUpperCase().includes('ADMIN') ?? false),
+      esSoloLectura: usuario?.jerarquia !== undefined ? usuario.jerarquia >= 3 : (!(usuario?.rol?.toUpperCase().includes('ADMIN') ?? false)),
       misReservas, agregarReserva, registrarEvento,
     }}>
       {children}

@@ -31,7 +31,7 @@ export default function TabLayout() {
   const { usuario, esCliente } = useSesion();
   const { unreadCount }        = useNotifications();
   const rol      = usuario?.rol ?? 'CLIENTE';
-  const permisos = PERMISOS_POR_ROL[rol];
+  const permisos = PERMISOS_POR_ROL[rol as keyof typeof PERMISOS_POR_ROL];
 
   const showOps      = !esCliente && permisos.modulosOperativos.some((n: number) => [1,2,3,4,5,6,7,8,9].includes(n));
   const showServ     = !esCliente && permisos.modulosOperativos.some((n: number) => [10,11,12,13,14,15,16,18,19,20,27].includes(n));

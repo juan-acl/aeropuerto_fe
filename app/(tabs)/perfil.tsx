@@ -104,7 +104,7 @@ export default function PerfilTab() {
             <Text style={s.demoTitle}>Cuentas de demostración · contraseña: 1234</Text>
             <View style={s.demoGrid}>
               {DEMO_ACCOUNTS.map(a => {
-                const meta = ROL_META[a.datos.rol];
+                const meta = ROL_META[a.datos.rol as keyof typeof PERMISOS_POR_ROL] || ROL_META['CLIENTE'];
                 return (
                   <TouchableOpacity key={a.usuario}
                     style={[s.demoChip, { borderColor: meta.color + '40' }]}
@@ -125,8 +125,8 @@ export default function PerfilTab() {
   );
 
   // ── LOGGED IN ─────────────────────────────────────────────────────────────
-  const meta = ROL_META[usuario.rol];
-  const perms = PERMISOS_POR_ROL[usuario.rol];
+  const meta = ROL_META[usuario.rol as keyof typeof PERMISOS_POR_ROL] || ROL_META['CLIENTE'];
+  const perms = PERMISOS_POR_ROL[usuario.rol as keyof typeof PERMISOS_POR_ROL] || PERMISOS_POR_ROL['CLIENTE'];
   const secciones = perms.modulosOperativos;
 
   return (
@@ -223,7 +223,7 @@ export default function PerfilTab() {
                 </View>
               </View>
               <View style={s.modulesGrid}>
-                {secciones.map(n => {
+                {secciones.map((n: number) => {
                   const mc = MOD_COLORS[n];
                   return (
                     <View key={n} style={[s.moduleChip, { backgroundColor: mc?.bg ?? C.bgElevated, borderColor: (mc?.color ?? C.border) + '40' }]}>

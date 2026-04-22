@@ -27,6 +27,7 @@ interface UsuarioAdmin {
   creado_por: string;
   departamento: string;
   requiere_cambio_pass: boolean;
+  esSoloLectura?: boolean;
 }
 
 interface LogEntry {
@@ -58,32 +59,11 @@ const ROL_PERMISSIONS: Record<Rol, string[]> = {
   AUDITORIA:          ['Logs del sistema', 'Reportes', 'Todo (solo lectura)'],
 };
 
-const INIT_USUARIOS: UsuarioAdmin[] = [
-  { id: 1, nombre_usuario: 'admin',      nombre_completo: 'Administrador del Sistema', email: 'admin@aurora.aero',         rol: 'SUPERADMIN',         estado: 'ACTIVO',    intentos_fallidos: 0, ultima_sesion: '2024-05-15 14:32',  fecha_creacion: '2020-01-15', creado_por: 'Sistema',    departamento: 'TI',            requiere_cambio_pass: false },
-  { id: 2, nombre_usuario: 'c.mendez',   nombre_completo: 'Carlos Méndez García',      email: 'c.mendez@aurora.aero',      rol: 'JEFE_OPERACIONES',   estado: 'ACTIVO',    intentos_fallidos: 0, ultima_sesion: '2024-05-15 09:10',  fecha_creacion: '2021-03-01', creado_por: 'admin',      departamento: 'Operaciones',   requiere_cambio_pass: false },
-  { id: 3, nombre_usuario: 'm.lopez',    nombre_completo: 'María López Juárez',         email: 'm.lopez@aurora.aero',       rol: 'SEGURIDAD',          estado: 'ACTIVO',    intentos_fallidos: 1, ultima_sesion: '2024-05-14 16:55',  fecha_creacion: '2021-07-15', creado_por: 'admin',      departamento: 'Seguridad',     requiere_cambio_pass: false },
-  { id: 4, nombre_usuario: 'operador1',  nombre_completo: 'Pedro Hernández Vidal',      email: 'operador1@aurora.aero',     rol: 'AGENTE_OPERACIONES', estado: 'BLOQUEADO', intentos_fallidos: 5, ultima_sesion: '2024-05-10 08:20',  fecha_creacion: '2023-02-10', creado_por: 'c.mendez',   departamento: 'Operaciones',   requiere_cambio_pass: true  },
-  { id: 5, nombre_usuario: 'l.gonzalez', nombre_completo: 'Luis González Morales',      email: 'l.gonzalez@aurora.aero',    rol: 'FINANZAS',           estado: 'ACTIVO',    intentos_fallidos: 0, ultima_sesion: '2024-05-15 11:40',  fecha_creacion: '2021-05-15', creado_por: 'admin',      departamento: 'Finanzas',      requiere_cambio_pass: false },
-  { id: 6, nombre_usuario: 'auditoria1', nombre_completo: 'Auditor Externo GT',         email: 'auditoria@aurora.aero',     rol: 'AUDITORIA',          estado: 'PENDIENTE', intentos_fallidos: 0, ultima_sesion: null,                fecha_creacion: '2024-05-01', creado_por: 'admin',      departamento: 'Auditoría',     requiere_cambio_pass: true  },
-];
+const INIT_USUARIOS: UsuarioAdmin[] = [];
 
-const INIT_LOGS: LogEntry[] = [
-  { id: 1, timestamp: '2024-05-15 14:32:10', usuario: 'admin',      accion: 'LOGIN',             detalle: 'Sesión iniciada exitosamente',                      ip: '192.168.1.5',   exitoso: true  },
-  { id: 2, timestamp: '2024-05-15 11:40:22', usuario: 'l.gonzalez', accion: 'LOGIN',             detalle: 'Sesión iniciada exitosamente',                      ip: '192.168.1.12',  exitoso: true  },
-  { id: 3, timestamp: '2024-05-14 23:45:00', usuario: '(anónimo)',  accion: 'LOGIN_FALLIDO',     detalle: '15 intentos desde IP 181.45.22.15 — posible ataque de fuerza bruta', ip: '181.45.22.15', exitoso: false },
-  { id: 4, timestamp: '2024-05-14 16:55:30', usuario: 'm.lopez',    accion: 'LOGIN',             detalle: 'Sesión iniciada exitosamente',                      ip: '192.168.1.8',   exitoso: true  },
-  { id: 5, timestamp: '2024-05-13 14:30:00', usuario: 'operador1',  accion: 'ACCESO_DENEGADO',   detalle: 'Intento de acceso a Finanzas sin permisos',         ip: '192.168.1.20',  exitoso: false },
-  { id: 6, timestamp: '2024-05-13 09:00:00', usuario: 'admin',      accion: 'USUARIO_CREADO',    detalle: 'Creó cuenta: auditoria1 (rol AUDITORIA)',           ip: '192.168.1.5',   exitoso: true  },
-  { id: 7, timestamp: '2024-05-12 10:15:00', usuario: 'admin',      accion: 'USUARIO_BLOQUEADO', detalle: 'Bloqueó cuenta: operador1 por 5 intentos fallidos', ip: '192.168.1.5',   exitoso: true  },
-  { id: 8, timestamp: '2024-05-11 16:20:00', usuario: 'c.mendez',   accion: 'PERMISO_CAMBIADO',  detalle: 'Actualizó rol de agente_old → JEFE_OPERACIONES',   ip: '192.168.1.7',   exitoso: true  },
-];
+const INIT_LOGS: LogEntry[] = [];
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
-const CREDENCIALES: Record<string, { pass: string; id: number }> = {
-  'admin':      { pass: '1234',    id: 1 },
-  'c.mendez':   { pass: 'dir2024', id: 2 },
-  'l.gonzalez': { pass: 'fin2024', id: 5 },
-};
 
 const ROL_SECCIONES: Record<Rol, string[]> = {
   SUPERADMIN:         ['usuarios', 'roles', 'empleados', 'salarios', 'cuentas', 'presupuestos', 'prohibiciones', 'seginfo', 'alertas', 'logs'],
@@ -166,6 +146,14 @@ export default function AdminTab() {
       backendApi.vuelos.listar().then((d: any) => set_PROHIBICIONES(d)).catch(() => {});
       backendApi.mantenimiento.alertasTecnicas.listar().then((d: any) => set_ALERTAS_DATA(d)).catch(() => {});
       backendApi.vuelos.listar().then((d: any) => set_INCIDENTES_SEG(d)).catch(() => {});
+      axiosInstance.get('/logsacceso').then((res: any) => {
+         const logData = res.data.map((l: any, idx: number) => ({
+            id: l.idLogAcceso || idx, timestamp: l.fechaAcceso || new Date().toISOString(),
+            usuario: l.usuario || 'Sistema', accion: l.evento || 'INFO',
+            detalle: l.detalles || '', ip: l.direccionIp || '0.0.0.0', exitoso: l.exito === 1
+         }));
+         setLogs(logData);
+      }).catch(() => {});
   }, []);
 
   const { logout: globalLogout } = useSesion();
@@ -205,7 +193,7 @@ export default function AdminTab() {
      if (!rolForm.nombreRol.trim() || !rolForm.descripcion.trim()) return Alert.alert('Inválido', 'Llena todos los campos');
      setRolSaving(true);
      try {
-       const res = await axiosInstance.post('/AdminRoles', {
+       const res: any = await axiosInstance.post('/AdminRoles', {
          NombreRol: rolForm.nombreRol, Descripcion: rolForm.descripcion, NivelJerarquico: parseInt(rolForm.jerarquia)
        });
        setRoles(prev => [...prev, res.data.rol]);
@@ -216,28 +204,39 @@ export default function AdminTab() {
   };
 
   // ── Auth ──────────────────────────────────────────────────────────────────
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!userInput.trim() || !passInput.trim()) {
       Alert.alert('Campos requeridos', 'Ingresa usuario y contraseña.'); return;
     }
     setAuthLoading(true);
-    setTimeout(() => {
-      setAuthLoading(false);
-      const cred = CREDENCIALES[userInput.toLowerCase()];
-      if (cred && cred.pass === passInput) {
-        const u = INIT_USUARIOS.find(x => x.id === cred.id)!;
-        if (u.estado === 'BLOQUEADO') {
-          Alert.alert('Cuenta bloqueada', 'Tu cuenta está bloqueada. Contacta al administrador del sistema.');
-          return;
-        }
-        setSesion(u);
+    try {
+      const res = await axiosInstance.post<any>('/Auth/login', { usuario: userInput, password: passInput });
+      if (res.data && res.data.usuario) {
+        const u = res.data.usuario;
+        const loggedUser: UsuarioAdmin = {
+           id: u.id,
+           nombre_usuario: u.nombre,
+           nombre_completo: u.nombre_completo || u.nombre, 
+           email: u.email,
+           rol: u.rol || 'SUPERADMIN',
+           estado: 'ACTIVO',
+           intentos_fallidos: 0,
+           ultima_sesion: new Date().toISOString(),
+           fecha_creacion: new Date().toISOString(),
+           creado_por: 'Sistema',
+           departamento: u.departamento || 'General',
+           requiere_cambio_pass: false
+        };
+        setSesion(loggedUser);
         setLoggedIn(true);
         addLog('LOGIN', userInput, `Sesión iniciada correctamente`, '192.168.1.x', true);
-      } else {
-        Alert.alert('Acceso denegado', 'Usuario o contraseña incorrectos.');
-        addLog('LOGIN_FALLIDO', userInput || '(desconocido)', `Intento fallido de acceso`, '???', false);
       }
-    }, 900);
+    } catch (e: any) {
+      Alert.alert('Acceso denegado', 'Usuario o contraseña incorrectos.');
+      addLog('LOGIN_FALLIDO', userInput || '(desconocido)', `Intento fallido de acceso`, '???', false);
+    } finally {
+      setAuthLoading(false);
+    }
   };
 
   const handleLogout = () => {
@@ -410,25 +409,6 @@ export default function AdminTab() {
                   : <Text style={s.loginBtnT}>INGRESAR →</Text>}
               </TouchableOpacity>
 
-              {/* Demo credentials */}
-              <View style={s.demoBox}>
-                <Text style={s.demoTitle}>Accesos de demostración</Text>
-                {[
-                  { u: 'admin',      p: '1234',    r: 'Superadmin' },
-                  { u: 'c.mendez',   p: 'dir2024', r: 'Jefe Operaciones' },
-                  { u: 'l.gonzalez', p: 'fin2024', r: 'Finanzas' },
-                ].map(d => (
-                  <TouchableOpacity key={d.u} style={s.demoRow} onPress={() => { setUserInput(d.u); setPassInput(d.p); }} activeOpacity={0.7}>
-                    <View style={s.demoLeft}>
-                      <Text style={s.demoUser}>{d.u}</Text>
-                      <Text style={s.demoPass}>pass: {d.p}</Text>
-                    </View>
-                    <View style={s.demoRolPill}>
-                      <Text style={s.demoRolT}>{d.r}</Text>
-                    </View>
-                  </TouchableOpacity>
-                ))}
-              </View>
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
@@ -754,13 +734,13 @@ export default function AdminTab() {
                   <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 20 }}>
                      <View style={[sd.card, { backgroundColor: C.bgCard, padding: 20 }]}>
                          <Text style={{ fontSize: 18, color: C.electric, fontWeight: '800', marginBottom: 15 }}>Crea un Perfil de Acceso</Text>
-                         <Text style={sd.fieldLabel}>Nombre Rol (Ej: LECTURA_FINANZAS)</Text>
+                         <Text style={s.fieldLabel}>Nombre Rol (Ej: LECTURA_FINANZAS)</Text>
                          <View style={s.inputRow}><TextInput style={s.input} value={rolForm.nombreRol} onChangeText={t => setRolForm(f=>({...f, nombreRol: t.toUpperCase()}))} autoCapitalize="characters" /></View>
                          
-                         <Text style={[sd.fieldLabel, { marginTop: 15 }]}>Descripción</Text>
+                         <Text style={[s.fieldLabel, { marginTop: 15 }]}>Descripción</Text>
                          <View style={s.inputRow}><TextInput style={s.input} value={rolForm.descripcion} onChangeText={t => setRolForm(f=>({...f, descripcion: t}))} /></View>
 
-                         <Text style={[sd.fieldLabel, { marginTop: 15 }]}>Permisos sobre la Información</Text>
+                         <Text style={[s.fieldLabel, { marginTop: 15 }]}>Permisos sobre la Información</Text>
                          <View style={{ flexDirection: 'row', gap: 10, marginTop: 5 }}>
                              <TouchableOpacity onPress={()=>setRolForm(f=>({...f, jerarquia: '3'}))} style={[sd.permTag, rolForm.jerarquia === '3' ? {backgroundColor: C.electric} : {backgroundColor: C.bgElevated}]}>
                                 <Text style={{color: rolForm.jerarquia === '3' ? C.white : C.text, fontWeight: '800'}}>Solo Vistas (Lectura)</Text>
