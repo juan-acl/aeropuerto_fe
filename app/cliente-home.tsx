@@ -54,18 +54,18 @@ function QuickCard({
   );
 }
 const qa = StyleSheet.create({
-  card:     { backgroundColor: C.bgCard, borderRadius: 18, paddingVertical: 14, alignItems: 'center', gap: 6, borderWidth: 1, position: 'relative' },
+  card: { backgroundColor: C.bgCard, borderRadius: 18, paddingVertical: 14, alignItems: 'center', gap: 6, borderWidth: 1, position: 'relative' },
   iconWrap: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center', position: 'relative' },
-  badge:    { position: 'absolute', top: -4, right: -8, backgroundColor: C.danger, borderRadius: 99, minWidth: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3 },
-  badgeT:   { fontSize: 9, color: '#fff', fontWeight: '800' },
-  label:    { fontSize: 11, fontWeight: '700', textAlign: 'center' },
+  badge: { position: 'absolute', top: -4, right: -8, backgroundColor: C.danger, borderRadius: 99, minWidth: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3 },
+  badgeT: { fontSize: 9, color: '#fff', fontWeight: '800' },
+  label: { fontSize: 11, fontWeight: '700', textAlign: 'center' },
 });
 
 // ─── Source indicator chip ────────────────────────────────────────────────────
 function SourceChip({ isOnline }: { isOnline: boolean | null }) {
   const color = isOnline === true ? C.success : isOnline === false ? C.warning : C.muted;
-  const label = isOnline === true ? 'Oracle' : isOnline === false ? 'Demo' : 'Conectando';
-  const icon  = isOnline === true ? 'server-outline' : isOnline === false ? 'flask-outline' : 'sync-outline';
+  const label = isOnline === true ? 'Oracle' : isOnline === false ? 'Demo' : 'Conectandssssso';
+  const icon = isOnline === true ? 'server-outline' : isOnline === false ? 'flask-outline' : 'sync-outline';
   return (
     <View style={[sc.chip, { borderColor: color + '40' }]}>
       <Ionicons name={icon} size={12} color={color} />
@@ -75,32 +75,32 @@ function SourceChip({ isOnline }: { isOnline: boolean | null }) {
 }
 const sc = StyleSheet.create({
   chip: { flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: 99, paddingHorizontal: 10, paddingVertical: 4, borderWidth: 1, backgroundColor: 'rgba(0,0,0,0.3)' },
-  t:    { fontSize: 11, fontWeight: '700' },
+  t: { fontSize: 11, fontWeight: '700' },
 });
 
 // ─── Main screen ──────────────────────────────────────────────────────────────
 export default function ClienteHome() {
-  const router   = useRouter();
+  const router = useRouter();
   const { usuario } = useSesion();
-  const recs     = useRecommendations();
+  const recs = useRecommendations();
   const { track } = useAnalytics();
-  const backend  = useBackend();
+  const backend = useBackend();
   const { isOnline, aeropuertos } = backend;
   const { unreadCount } = useNotifications();
   const [refreshing, setRefreshing] = useState(false);
 
   // Hero fade-in on mount
   const heroOpacity = useRef(new Animated.Value(0)).current;
-  const heroSlide   = useRef(new Animated.Value(-20)).current;
+  const heroSlide = useRef(new Animated.Value(-20)).current;
 
   useEffect(() => {
     Animated.parallel([
       Animated.timing(heroOpacity, { toValue: 1, duration: 600, useNativeDriver: true }),
-      Animated.timing(heroSlide,   { toValue: 0, duration: 500, useNativeDriver: true }),
+      Animated.timing(heroSlide, { toValue: 0, duration: 500, useNativeDriver: true }),
     ]).start();
   }, []);
 
-  const hora   = new Date().getHours();
+  const hora = new Date().getHours();
   const saludo = hora < 12 ? 'Buenos días' : hora < 19 ? 'Buenas tardes' : 'Buenas noches';
   const nombre = usuario?.nombre ?? 'Viajero';
 
@@ -178,14 +178,14 @@ export default function ClienteHome() {
             <View style={s.healthRow}>
               <BackendStatus isOnline={isOnline} />
               <View style={s.healthChips}>
-                {(['develop','gerson','modulos'] as const).map(k => (
+                {(['develop', 'gerson', 'modulos'] as const).map(k => (
                   <View key={k} style={[s.hChip, {
                     backgroundColor: backend.health[k] === 'online' ? C.successBg :
-                                     backend.health[k] === 'offline' ? C.dangerBg : C.warningBg,
+                      backend.health[k] === 'offline' ? C.dangerBg : C.warningBg,
                   }]}>
                     <Text style={[s.hChipT, {
                       color: backend.health[k] === 'online' ? C.success :
-                             backend.health[k] === 'offline' ? C.danger : C.warning,
+                        backend.health[k] === 'offline' ? C.danger : C.warning,
                     }]}>
                       {k === 'develop' ? ':5087' : k === 'gerson' ? ':5088' : ':5089'}
                       {' '}{backend.health[k] === 'online' ? '●' : backend.health[k] === 'offline' ? '○' : '◌'}
@@ -279,29 +279,29 @@ export default function ClienteHome() {
 }
 
 const s = StyleSheet.create({
-  container:    { flex: 1, backgroundColor: C.bg },
-  hero:         { backgroundColor: C.navyL, paddingBottom: 20, overflow: 'hidden' },
-  orb1:         { position: 'absolute', top: -60, right: -30, width: 220, height: 220, borderRadius: 110, backgroundColor: C.electric, opacity: 0.04 },
-  orb2:         { position: 'absolute', top: 20, left: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: C.textSub, opacity: 0.02 },
-  orb3:         { position: 'absolute', bottom: 30, right: 40, width: 90, height: 90, borderRadius: 45, backgroundColor: C.electric, opacity: 0.03 },
-  heroContent:  { paddingTop: 14 },
-  heroTopRow:   { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingHorizontal: 20, paddingBottom: 10 },
-  heroGreet:    { fontSize: 13, color: C.muted, fontWeight: '500', marginBottom: 4 },
-  heroTitle:    { fontSize: 30, fontWeight: '900', color: C.text, letterSpacing: -1, lineHeight: 34 },
-  heroRight:    { alignItems: 'flex-end', gap: 8, paddingTop: 4 },
-  notifBtn:     { width: 40, height: 40, borderRadius: 12, backgroundColor: C.bgElevated, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border, position: 'relative' },
-  notifBadge:   { position: 'absolute', top: -3, right: -3, backgroundColor: C.danger, borderRadius: 99, minWidth: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3 },
-  notifBadgeT:  { fontSize: 9, color: '#fff', fontWeight: '800' },
-  healthRow:    { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 20, paddingBottom: 12 },
-  healthChips:  { flexDirection: 'row', gap: 4 },
-  hChip:        { borderRadius: 6, paddingHorizontal: 6, paddingVertical: 3 },
-  hChipT:       { fontSize: 9, fontWeight: '700' },
-  searchWrap:   { paddingHorizontal: 16 },
+  container: { flex: 1, backgroundColor: C.bg },
+  hero: { backgroundColor: C.navyL, paddingBottom: 20, overflow: 'hidden' },
+  orb1: { position: 'absolute', top: -60, right: -30, width: 220, height: 220, borderRadius: 110, backgroundColor: C.electric, opacity: 0.04 },
+  orb2: { position: 'absolute', top: 20, left: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: C.textSub, opacity: 0.02 },
+  orb3: { position: 'absolute', bottom: 30, right: 40, width: 90, height: 90, borderRadius: 45, backgroundColor: C.electric, opacity: 0.03 },
+  heroContent: { paddingTop: 14 },
+  heroTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingHorizontal: 20, paddingBottom: 10 },
+  heroGreet: { fontSize: 13, color: C.muted, fontWeight: '500', marginBottom: 4 },
+  heroTitle: { fontSize: 30, fontWeight: '900', color: C.text, letterSpacing: -1, lineHeight: 34 },
+  heroRight: { alignItems: 'flex-end', gap: 8, paddingTop: 4 },
+  notifBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: C.bgElevated, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border, position: 'relative' },
+  notifBadge: { position: 'absolute', top: -3, right: -3, backgroundColor: C.danger, borderRadius: 99, minWidth: 16, height: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 3 },
+  notifBadgeT: { fontSize: 9, color: '#fff', fontWeight: '800' },
+  healthRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 20, paddingBottom: 12 },
+  healthChips: { flexDirection: 'row', gap: 4 },
+  hChip: { borderRadius: 6, paddingHorizontal: 6, paddingVertical: 3 },
+  hChipT: { fontSize: 9, fontWeight: '700' },
+  searchWrap: { paddingHorizontal: 16 },
   sectionTitle: { fontSize: 16, fontWeight: '800', color: C.text, marginBottom: 12 },
   quickSection: { paddingHorizontal: 16, paddingTop: 20 },
-  quickRow:     { flexDirection: 'row', gap: 10 },
-  offlineBanner:{ flexDirection: 'row', alignItems: 'flex-start', gap: 12, margin: 16, backgroundColor: C.warningBg, borderRadius: 16, padding: 14, borderWidth: 1, borderColor: C.warningL },
+  quickRow: { flexDirection: 'row', gap: 10 },
+  offlineBanner: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, margin: 16, backgroundColor: C.warningBg, borderRadius: 16, padding: 14, borderWidth: 1, borderColor: C.warningL },
   offlineTitle: { fontSize: 13, fontWeight: '800', color: C.warning },
-  offlineSub:   { fontSize: 11, color: C.muted, marginTop: 2, lineHeight: 16 },
-  recsWrap:     { paddingTop: 24 },
+  offlineSub: { fontSize: 11, color: C.muted, marginTop: 2, lineHeight: 16 },
+  recsWrap: { paddingTop: 24 },
 });

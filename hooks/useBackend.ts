@@ -62,6 +62,12 @@ export function useBackend() {
     }
   }, []);
 
+  useEffect(() => {
+    checkHealth();
+    const id = setInterval(checkHealth, POLL_MS);
+    return () => clearInterval(id);
+  }, [checkHealth]);
+
 
   // ── Load resources — 100% Oracle, 0% mock ───────────────────────────
   // backendApi already normalizes PascalCase → snake_case, so we receive
