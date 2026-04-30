@@ -105,7 +105,7 @@ export function useBookingManager() {
     (async () => {
       try {
         const lealtad = await backendApi.lealtad.porPasajero(usuario.id);
-        setNivelLealtad((lealtad?.NivelMembresia as any) ?? 'BRONCE');
+        setNivelLealtad((lealtad?.nivel_membresia as any) ?? 'BRONCE');
       } catch { setNivelLealtad('BRONCE'); }
     })();
   }, [usuario?.id]);
@@ -115,21 +115,21 @@ export function useBookingManager() {
   // Ocupación para pricing dinámico
   const ocupacion = useMemo(() => {
     if (!vuelo) return 0.5;
-    const total = (vuelo.PlazasVacias ?? 30) + (vuelo.PlazasOcupadas ?? 100);
-    return total > 0 ? (vuelo.PlazasOcupadas ?? 100) / total : 0.5;
+    const total = (vuelo.plazas_vacias ?? 30) + (vuelo.plazas_ocupadas ?? 100);
+    return total > 0 ? (vuelo.plazas_ocupadas ?? 100) / total : 0.5;
   }, [vuelo]);
 
   // Anticipación en días
   const diasAnticipacion = useMemo(() => {
-    if (!vuelo?.FechaVuelo) return 7;
-    const diff = (new Date(vuelo.FechaVuelo).getTime() - Date.now()) / 86400000;
+    if (!vuelo?.fecha_vuelo) return 7;
+    const diff = (new Date(vuelo.fecha_vuelo).getTime() - Date.now()) / 86400000;
     return Math.max(0, Math.floor(diff));
   }, [vuelo]);
 
   // ── Precio dinámico calculado en tiempo real ─────────────────────────────
   const pricing = useMemo((): PricingResult | null => {
     if (!vuelo) return null;
-    const base = 180 + (vuelo.IdVuelo * 47) % 400;
+    const base = 180 + (vuelo.id_vuelo * 47) % 400;
     return calcularPrecio({
       precioBase:       base,
       ocupacion,
@@ -225,7 +225,7 @@ export function useBookingManager() {
 
     try {
       const payload = {
-        IdVuelo:         vuelo.IdVuelo,
+        IdVuelo:         vuelo.id_vuelo,
         IdPasajero:      usuario?.id ?? 0,
         NumeroAsiento:   asiento,
         ClaseServicio:   clase,
@@ -239,7 +239,7 @@ export function useBookingManager() {
 
       setReservaConf(resultado);
       track('BOOKING_COMPLETE', {
-        id_vuelo: vuelo.IdVuelo,
+        id_vuelo: vuelo.id_vuelo,
         precio: totalFinal,
         puntos: puntosGanados,
       });
@@ -247,7 +247,7 @@ export function useBookingManager() {
       notificationStore.add(
         NotificationFactory.reservaConfirmada(
           (resultado as any).CodigoReserva ?? `RES-${Date.now()}`,
-          vuelo.AeropuertoDestino ?? '—'
+          vuelo.aeropuerto_destino ?? '—'
         )
       );
       if (puntosGanados > 0) {

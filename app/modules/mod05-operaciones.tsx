@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { View, Text, FlatList, SafeAreaView, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import { backendApi } from '@/services/backendApi';
 import { ScreenHeader, SearchBar, DataCard, Badge, StatCard, FormModal, FF, EmptyState, ProgressBar, TabBar, StatsRow, AlertBanner } from '@/components/shared';
@@ -23,23 +23,30 @@ export default function Mod05() {
   const [CANCELACIONES, set_CANCELACIONES] = useState<any[]>([]);
   const [INCIDENTES_VUELO, set_INCIDENTES_VUELO] = useState<any[]>([]);
   const [COMBUSTIBLES, set_COMBUSTIBLES] = useState<any[]>([]);
+
+  const [vuelos, setVuelos] = useState<any[]>([]);
+  const [retrasos, setRetrasos] = useState<any[]>([]);
+  const [cancelaciones, setCancelaciones] = useState<any[]>([]);
+  const [incidentes, setIncidentes] = useState<any[]>([]);
+  const [combustibles, setCombustibles] = useState<any[]>([]);
+
   useEffect(() => {
-      backendApi.vuelos.listar().then(d => set_VUELOS(d)).catch(() => {});
-      backendApi.retrasos.listar().then(d => set_RETRASOS(d)).catch(() => {});
-      backendApi.vuelos.listar().then(d => set_CANCELACIONES(d)).catch(() => {});
-      backendApi.incidentesVuelo.listar().then(d => set_INCIDENTES_VUELO(d)).catch(() => {});
-      backendApi.combustible.cargas.listar().then(d => set_COMBUSTIBLES(d)).catch(() => {});
+      backendApi.vuelos.listar().then(d => {
+        const data = d || [];
+        set_VUELOS(data);
+        setVuelos(data);
+        set_CANCELACIONES(data.filter((v: any) => v.estado_vuelo === 'CANCELADO'));
+        setCancelaciones(data.filter((v: any) => v.estado_vuelo === 'CANCELADO'));
+      }).catch(() => {});
+      backendApi.retrasos.listar().then(d => { set_RETRASOS(d || []); setRetrasos(d || []); }).catch(() => {});
+      backendApi.incidentesVuelo.listar().then(d => { set_INCIDENTES_VUELO(d || []); setIncidentes(d || []); }).catch(() => {});
+      backendApi.combustible.pedidos.listar().then(d => { set_COMBUSTIBLES(d || []); setCombustibles(d || []); }).catch(() => {});
   }, []);
 
   const [tab, setTab] = useState<Tab>('vuelos');
   const [q, setQ] = useState('');
   const [modal, setModal] = useState(false);
   const [form, setForm] = useState<any>({});
-  const [vuelos, setVuelos] = useState(VUELOS);
-  const [retrasos, setRetrasos] = useState(RETRASOS);
-  const [cancelaciones, setCancelaciones] = useState(CANCELACIONES);
-  const [incidentes, setIncidentes] = useState(INCIDENTES_VUELO);
-  const [combustibles, setCombustibles] = useState(COMBUSTIBLES);
 
   const stats = useMemo(() => ({
     enVuelo:    vuelos.filter(v => v.estado_vuelo === 'EN_VUELO').length,
@@ -144,15 +151,14 @@ export default function Mod05() {
           renderItem={({ item: c }) => (
             <DataCard
               title={`Vuelo #${c.id_vuelo} — Cancelado`}
-              subtitle={c.motivo_principal ?? '—'}
-              badge={<Badge value={c.notificado_a_pasajeros ? 'ACTIVO' : 'PENDIENTE'} />}
-              meta={c.costo_compensacion ? `Q ${(c.costo_compensacion).toLocaleString()}` : undefined}
+              subtitle={c.motivo_cancelacion ?? '—'}
+              badge={<Badge value="CANCELADO" />}
+              meta={c.fecha_vuelo?.split('T')[0]}
               accentColor={C.danger}
-              onDelete={() => setCancelaciones(d => d.filter(x => x.id_cancelacion !== c.id_cancelacion))}
+              onDelete={() => setCancelaciones(d => d.filter(x => x.id_vuelo !== c.id_vuelo))}
             >
-              <Text style={s.cardDetail}> {c.motivo_detallado ?? '—'}</Text>
-              <Text style={s.cardDetail}> Reubicados: {c.pasajeros_reubicados ?? 0} pasajeros</Text>
-              <Text style={s.cardDetail}> {c.fecha_cancelacion}</Text>
+              <Text style={s.cardDetail}> {c.observaciones_operativas ?? '—'}</Text>
+              <Text style={s.cardDetail}> {c.hora_salida_programada?.split('T')[1]?.substring(0,5)} → {c.hora_llegada_programada?.split('T')[1]?.substring(0,5)}</Text>
             </DataCard>
           )}
         />
@@ -189,16 +195,16 @@ export default function Mod05() {
         renderItem={({ item: c }) => (
           <DataCard
             title={`Vuelo #${c.id_vuelo} — ${c.tipo_combustible ?? 'JET-A1'}`}
-            subtitle={`Proveedor: ${c.proveedor ?? '—'}`}
+            subtitle={`Estado: ${c.estado_pedido ?? 'PENDIENTE'} · Prioridad: ${c.prioridad ?? 'NORMAL'}`}
             badge={<Badge value={c.tipo_combustible ?? 'JET_A1'} />}
-            meta={`Q ${(c.costo_total ?? 0).toLocaleString()}`}
+            meta={c.fecha_pedido?.split('T')[0]}
             accentColor={C.orange}
-            onDelete={() => setCombustibles(d => d.filter(x => x.id_combustible !== c.id_combustible))}
+            onDelete={() => setCombustibles(d => d.filter(x => x.id_pedido_combustible !== c.id_pedido_combustible))}
           >
             <ProgressBar
-              value={c.combustible_real_litros ?? 0}
-              max={c.combustible_planeado_litros ?? 1}
-              label={`${(c.combustible_real_litros ?? 0).toLocaleString()} / ${(c.combustible_planeado_litros ?? 0).toLocaleString()} L`}
+              value={c.cantidad_solicitada_litros ?? 0}
+              max={c.cantidad_solicitada_litros ?? 1}
+              label={`${(c.cantidad_solicitada_litros ?? 0).toLocaleString()} L`}
             />
           </DataCard>
         )}

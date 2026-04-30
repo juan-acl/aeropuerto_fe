@@ -25,8 +25,6 @@
 // ✅ Todos los módulos están unificados en aeropuerto_be-develop (:5087)
 const BE_UNIFIED = process.env.EXPO_PUBLIC_BE_URL ?? 'http://localhost:5087';
 const BE_DEVELOP = BE_UNIFIED;
-const BE_GERSON  = BE_UNIFIED;   // Ya no es un backend separado
-const BE_MODULOS = BE_UNIFIED;   // Ya no es un backend separado
 
 const TIMEOUT_MS = 8000;
 
@@ -70,32 +68,31 @@ const del  = (base: string, path: string) =>
 
 /** DDL: aeropuertos (codigo_aeropuerto PK natural) */
 export interface BE_Aeropuerto {
-  CodigoAeropuerto: string;
-  Nombre:           string;
-  Ciudad:           string;
-  Pais:             string;
-  Region?:          string;
-  Continente?:      string;
-  HusoHorario?:     string;
-  Latitud?:         number;
-  Longitud?:        number;
-  ElevacionMetros?: number;
-  Terminales?:      number;
-  PuertasAbordaje?: number;
-  Activo:           number;        // NUMBER(1) DEFAULT 1
-  FechaRegistro?:   string;
+  codigo_aeropuerto: string;
+  nombre:           string;
+  ciudad:           string;
+  pais:             string;
+  region?:          string;
+  continente?:      string;
+  huso_horario?:     string;
+  latitud?:         number;
+  longitud?:        number;
+  elevacion_metros?: number;
+  terminales?:      number;
+  puertas_abordaje?: number;
+  activo:           number;
+  fecha_registro?:   string;
 }
 
-/** DDL: puertas_embarque */
 export interface BE_PuertaEmbarque {
-  IdPuerta:         number;
-  CodigoAeropuerto: string;
-  NumeroPuerta:     string;
-  Terminal:         string;
-  TipoPuerta?:      string;        // NACIONAL | INTERNACIONAL | MIXTA
-  CapacidadMaxima?: number;
-  TienePasarela?:   number;
-  Activo:           number;
+  id_puerta:         number;
+  codigo_aeropuerto: string;
+  numero_puerta:     string;
+  terminal:         string;
+  tipo_puerta?:      string;
+  capacidad_maxima?: number;
+  tiene_pasarela?:   number;
+  activo:           number;
 }
 
 /** DDL: pistas_aterrizaje */
@@ -213,31 +210,30 @@ export interface BE_TemporadaVuelo {
  *  Tabla central de operaciones — referenciada por casi todos los módulos
  */
 export interface BE_Vuelo {
-  IdVuelo:                number;
-  IdPrograma:             number;
-  FechaVuelo?:            string;
-  HoraSalidaProgramada?:  string;
-  HoraLlegadaProgramada?: string;
-  HoraSalidaReal?:        string;
-  HoraLlegadaReal?:       string;
-  IdModeloAvion:          number;
-  MatriculaAvion?:        string;
-  PlazasVacias?:          number;
-  PlazasOcupadas?:        number;
-  CargaKg?:               number;
-  CombustibleLitros?:     number;
-  EstadoVuelo?:           string;  // PROGRAMADO|EN_VUELO|ATERRIZADO|CANCELADO|…
-  MotivoCancelacion?:     string;
-  IdPuertaSalida?:        number;
-  IdPuertaLlegada?:       number;
-  ObservacionesOperativas?: string;
-  // Derived from JOIN with programas_vuelo (some APIs include these)
-  NumeroVuelo?:           string;
-  AeropuertoOrigen?:      string;
-  AeropuertoDestino?:     string;
-  NombreAerolinea?:       string;
-  CodigoIata?:            string;
-  DuracionMinutos?:       number;
+  id_vuelo:                number;
+  id_programa:             number;
+  fecha_vuelo?:            string;
+  hora_salida_programada?:  string;
+  hora_llegada_programada?: string;
+  hora_salida_real?:        string;
+  hora_llegada_real?:       string;
+  id_modelo_avion:          number;
+  matricula_avion?:        string;
+  plazas_vacias?:          number;
+  plazas_ocupadas?:        number;
+  carga_kg?:               number;
+  combustible_litros?:     number;
+  estado_vuelo?:           string;
+  motivo_cancelacion?:     string;
+  id_puerta_salida?:        number;
+  id_puerta_llegada?:       number;
+  observaciones_operativas?: string;
+  numero_vuelo?:           string;
+  aeropuerto_origen?:      string;
+  aeropuerto_destino?:     string;
+  nombre_aerolinea?:       string;
+  codigo_iata?:            string;
+  duracion_minutos?:       number;
 }
 
 /** DDL: condiciones_meteorologicas */
@@ -971,6 +967,19 @@ export interface BE_CargaCombustible {
   Observaciones?:       string;
 }
 
+/** DDL: pedidos_combustible */
+export interface BE_PedidoCombustible {
+  IdPedidoCombustible:       number;
+  NumeroPedido:              string;
+  IdVuelo:                   number;
+  CantidadSolicitadaLitros?: number;
+  TipoCombustible?:          string;
+  FechaPedido?:              string;
+  FechaRequerida?:           string;
+  EstadoPedido?:             string;
+  Prioridad?:                string;
+}
+
 // ── MÓDULO 24: SEGURIDAD INFORMÁTICA ─────────────────────────────────────────
 
 /** DDL: usuarios_sistema */
@@ -1011,17 +1020,37 @@ export interface BE_CampanaMarketing {
   Activa:             number;
 }
 
-/** DDL: canjes_puntos */
-export interface BE_CanjePuntos {
-  IdCanjePuntos:     number;
-  IdPasajero:        number;
-  IdLealtad:         number;
-  FechaCanje?:       string;
-  PuntosUtilizados:  number;
-  TipoCanje?:        string;  // VUELO | UPGRADE | PRODUCTO | SERVICIO | EQUIPAJE_EXTRA
-  IdVuelo?:          number;
-  ValorMonetario?:   number;
-  EstadoCanje?:      string;  // PROCESADO | ENTREGADO | CANCELADO
+/** DDL: planes_emergencia */
+export interface BE_PlanEmergencia {
+  IdPlanEmergencia:       number;
+  CodigoPlan:             string;
+  NombrePlan:             string;
+  TipoEmergencia?:        string;
+  NivelActivacion?:       string;
+  ResponsableActivacion?: string;
+  Activo:                 number;
+}
+
+/** DDL: equipos_emergencia */
+export interface BE_EquipoEmergencia {
+  IdEquipoEmergencia:     number;
+  NombreEquipo:           string;
+  TipoEquipo?:            string;
+  UbicacionHabitual?:     string;
+  Estado:                 string;
+  FechaUltimaRevision?:   string;
+}
+
+/** DDL: activaciones_emergencia */
+export interface BE_ActivacionEmergencia {
+  IdActivacion:           number;
+  IdPlanEmergencia?:      number;
+  FechaHoraInicio:        string;
+  FechaHoraFin?:          string;
+  TipoEmergencia?:        string;
+  NivelActivacion?:       string;
+  Estado:                 string;
+  PersonasAfectadas?:     number;
 }
 
 // ── HEALTH CHECK ──────────────────────────────────────────────────────────────
@@ -1030,87 +1059,204 @@ export interface BE_HealthCheck { status: string; database: string; }
 // ═══════════════════════════════════════════════════════════════════════════════
 // NORMALIZERS — PascalCase → snake_case para consistencia interna del frontend
 // ═══════════════════════════════════════════════════════════════════════════════
-export const norm = {
-  aeropuerto: (a: BE_Aeropuerto) => ({
-    codigo_aeropuerto: a.CodigoAeropuerto, nombre: a.Nombre,
-    ciudad: a.Ciudad, pais: a.Pais, region: a.Region,
-    latitud: a.Latitud, longitud: a.Longitud,
-    terminales: a.Terminales, puertas_abordaje: a.PuertasAbordaje,
-    activo: a.Activo,
+export const NORM = {
+  aeropuerto: (a: any) => ({
+    codigo_aeropuerto: a.codigo_aeropuerto ?? a.CodigoAeropuerto,
+    nombre: a.nombre ?? a.Nombre,
+    ciudad: a.ciudad ?? a.Ciudad,
+    pais: a.pais ?? a.Pais,
+    region: a.region ?? a.Region,
+    latitud: a.latitud ?? a.Latitud,
+    longitud: a.longitud ?? a.Longitud,
+    terminales: a.terminales ?? a.Terminales,
+    puertas_abordaje: a.puertas_abordaje ?? a.PuertasAbordaje,
+    activo: a.activo ?? a.Activo,
   }),
-  aerolinea: (a: BE_Aerolinea) => ({
-    id_aerolinea: a.IdAerolinea, nombre_aerolinea: a.NombreAerolinea,
-    codigo_iata: a.CodigoIata, codigo_oaci: a.CodigoOaci,
-    pais_origen: a.PaisOrigen, flota_total: a.FlotaTotal,
-    alianza: a.Alianza, activo: a.Activo,
+  aerolinea: (a: any) => ({
+    id_aerolinea: a.id_aerolinea ?? a.IdAerolinea,
+    nombre_aerolinea: a.nombre_aerolinea ?? a.NombreAerolinea,
+    codigo_iata: a.codigo_iata ?? a.CodigoIata,
+    codigo_oaci: a.codigo_oaci ?? a.CodigoOaci,
+    pais_origen: a.pais_origen ?? a.PaisOrigen,
+    flota_total: a.flota_total ?? a.FlotaTotal,
+    alianza: a.alianza ?? a.Alianza,
+    activo: a.activo ?? a.Activo,
   }),
-  vuelo: (v: BE_Vuelo) => ({
-    id_vuelo: v.IdVuelo, id_programa: v.IdPrograma,
-    numero_vuelo: v.NumeroVuelo,
-    aeropuerto_origen: v.AeropuertoOrigen,
-    aeropuerto_destino: v.AeropuertoDestino,
-    hora_salida_programada: v.HoraSalidaProgramada,
-    hora_llegada_programada: v.HoraLlegadaProgramada,
-    hora_salida_real: v.HoraSalidaReal,
-    hora_llegada_real: v.HoraLlegadaReal,
-    plazas_vacias: v.PlazasVacias, plazas_ocupadas: v.PlazasOcupadas,
-    estado_vuelo: v.EstadoVuelo, matricula_avion: v.MatriculaAvion,
-    nombre_aerolinea: v.NombreAerolinea, codigo_iata: v.CodigoIata,
-    duracion_minutos: v.DuracionMinutos,
+  vuelo: (v: any) => ({
+    id_vuelo: v.id_vuelo ?? v.IdVuelo,
+    id_programa: v.id_programa ?? v.IdPrograma,
+    numero_vuelo: v.numero_vuelo ?? v.NumeroVuelo,
+    aeropuerto_origen: v.aeropuerto_origen ?? v.AeropuertoOrigen,
+    aeropuerto_destino: v.aeropuerto_destino ?? v.AeropuertoDestino,
+    hora_salida_programada: v.hora_salida_programada ?? v.HoraSalidaProgramada,
+    hora_llegada_programada: v.hora_llegada_programada ?? v.HoraLlegadaProgramada,
+    hora_salida_real: v.hora_salida_real ?? v.HoraSalidaReal,
+    hora_llegada_real: v.hora_llegada_real ?? v.HoraLlegadaReal,
+    plazas_vacias: v.plazas_vacias ?? v.PlazasVacias,
+    plazas_ocupadas: v.plazas_ocupadas ?? v.PlazasOcupadas,
+    estado_vuelo: v.estado_vuelo ?? v.EstadoVuelo,
+    matricula_avion: v.matricula_avion ?? v.MatriculaAvion,
+    nombre_aerolinea: v.nombre_aerolinea ?? v.NombreAerolinea,
+    codigo_iata: v.codigo_iata ?? v.CodigoIata,
+    duracion_minutos: v.duracion_minutos ?? v.DuracionMinutos,
   }),
-  pasajero: (p: BE_Pasajero) => ({
-    id_pasajero: p.IdPasajero, nombres: p.Nombres, apellidos: p.Apellidos,
-    tipo_documento: p.TipoDocumento, numero_documento: p.NumeroDocumento,
-    email: p.Email, telefono: p.Telefono, nacionalidad: p.Nacionalidad,
-    fecha_nacimiento: p.FechaNacimiento, genero: p.Genero,
+  retraso: (r: any) => ({
+    id_retraso: r.id_retraso ?? r.IdRetraso, id_vuelo: r.id_vuelo ?? r.IdVuelo,
+    tipo_retraso: r.tipo_retraso ?? r.TipoRetraso, causa: r.causa ?? r.Causa,
+    minutos_retraso: r.minutos_retraso ?? r.MinutosRetraso, responsable: r.responsable ?? r.Responsable,
+    compensacion_pasajeros: r.compensacion_pasajeros ?? r.CompensacionPasajeros,
   }),
-  reserva: (r: BE_Reserva) => ({
-    id_reserva: r.IdReserva, id_vuelo: r.IdVuelo, id_pasajero: r.IdPasajero,
-    codigo_reserva: r.CodigoReserva, estado_reserva: r.EstadoReserva,
-    precio_pagado: r.PrecioPagado, moneda: r.Moneda,
-    numero_asiento: r.NumeroAsiento, clase_servicio: r.ClaseServicio,
-    equipaje_facturado_kg: r.EquipajeFacturadoKg,
-    equipaje_mano_kg: r.EquipajeManoKg,
-    checkin_realizado: r.CheckinRealizado, fecha_checkin: r.FechaCheckin,
-    puerta_embarque_asignada: r.PuertaEmbarqueAsignada,
-    grupo_embarque: r.GrupoEmbarque,
+  incidenteVuelo: (i: any) => ({
+    id_incidente_vuelo: i.id_incidente_vuelo ?? i.IdIncidenteVuelo, id_vuelo: i.id_vuelo ?? i.IdVuelo,
+    tipo_incidente: i.tipo_incidente ?? i.TipoIncidente, descripcion: i.descripcion ?? i.Descripcion,
+    gravedad: i.gravedad ?? i.Gravedad, acciones_tomadas: i.acciones_tomadas ?? i.AccionesTomadas,
+    reportado_por: i.reportado_por ?? i.ReportadoPor, fecha_incidente: i.fecha_incidente ?? i.FechaIncidente,
   }),
-  lealtad: (l: BE_ProgramaLealtad) => ({
-    id_lealtad: l.IdLealtad, id_pasajero: l.IdPasajero,
-    nivel_membresia: l.NivelMembresia, puntos_acumulados: l.PuntosAcumulados,
-    puntos_canjeables: l.PuntosCanjeables, millas_acumuladas: l.MillasAcumuladas,
-    tarjeta_numero: l.TarjetaNumero, activo: l.Activo,
+  pedidoCombustible: (p: any) => ({
+    id_pedido_combustible: p.id_pedido_combustible ?? p.IdPedidoCombustible, id_vuelo: p.id_vuelo ?? p.IdVuelo,
+    id_tanque: p.id_tanque ?? p.IdTanque, cantidad_solicitada_litros: p.cantidad_solicitada_litros ?? p.CantidadSolicitadaLitros,
+    tipo_combustible: p.tipo_combustible ?? p.TipoCombustible, fecha_pedido: p.fecha_pedido ?? p.FechaPedido,
+    estado_pedido: p.estado_pedido ?? p.EstadoPedido, prioridad: p.prioridad ?? p.Prioridad,
   }),
-  hotel: (h: BE_HotelCercano) => ({
-    id_hotel: h.IdHotel, codigo_aeropuerto: h.CodigoAeropuerto,
-    nombre_hotel: h.NombreHotel, categoria: h.Categoria,
-    direccion: h.Direccion, distancia_km: h.DistanciaKm,
-    tarifa_noche_desde: h.TarifaNocheDesde,
-    tiene_shuttle: h.TieneShuttle, activo: h.Activo,
+  tanque: (t: any) => ({
+    id_tanque: t.id_tanque ?? t.IdTanque, codigo_tanque: t.codigo_tanque ?? t.CodigoTanque,
+    nombre_tanque: t.nombre_tanque ?? t.NombreTanque, tipo_combustible: t.tipo_combustible ?? t.TipoCombustible,
+    capacidad_litros: t.capacidad_litros ?? t.CapacidadLitros, nivel_actual_litros: t.nivel_actual_litros ?? t.NivelActualLitros,
+    porcentaje_llenado: t.porcentaje_llenado ?? t.PorcentajeLlenado, ubicacion: t.ubicacion ?? t.Ubicacion,
+    activo: t.activo ?? t.Activo,
   }),
-  empleado: (e: BE_Empleado) => ({
-    id_empleado: e.IdEmpleado, codigo: e.CodigoEmpleado,
-    nombres: e.Nombres, apellidos: e.Apellidos,
-    email: e.Email, telefono: e.Telefono,
-    departamento: e.Departamento, cargo: e.Cargo,
-    salario_base: e.SalarioBase, activo: e.Activo,
+  pasajero: (p: any) => ({
+    id_pasajero: p.id_pasajero ?? p.IdPasajero,
+    nombres: p.nombres ?? p.Nombres,
+    apellidos: p.apellidos ?? p.Apellidos,
+    tipo_documento: p.tipo_documento ?? p.TipoDocumento,
+    numero_documento: p.numero_documento ?? p.NumeroDocumento,
+    email: p.email ?? p.Email,
+    telefono: p.telefono ?? p.Telefono,
+    nacionalidad: p.nacionalidad ?? p.Nacionalidad,
+    fecha_nacimiento: p.fecha_nacimiento ?? p.FechaNacimiento,
+    genero: p.genero ?? p.Genero,
   }),
-  ingreso: (i: BE_Ingreso) => ({
-    id_ingreso: i.IdIngreso, fecha: i.Fecha,
-    concepto: i.Concepto, tipo_ingreso: i.TipoIngreso,
-    monto: i.Monto, moneda: i.Moneda, metodo_pago: i.MetodoPago,
+  reserva: (r: any) => ({
+    id_reserva: r.id_reserva ?? r.IdReserva, id_vuelo: r.id_vuelo ?? r.IdVuelo, id_pasajero: r.id_pasajero ?? r.IdPasajero,
+    codigo_reserva: r.codigo_reserva ?? r.CodigoReserva, estado_reserva: r.estado_reserva ?? r.EstadoReserva,
+    precio_pagado: r.precio_pagado ?? r.PrecioPagado, moneda: r.moneda ?? r.Moneda,
+    numero_asiento: r.numero_asiento ?? r.NumeroAsiento, clase_servicio: r.clase_servicio ?? r.ClaseServicio,
+    equipaje_facturado_kg: r.equipaje_facturado_kg ?? r.EquipajeFacturadoKg,
+    equipaje_mano_kg: r.equipaje_mano_kg ?? r.EquipajeManoKg,
+    checkin_realizado: r.checkin_realizado ?? r.CheckinRealizado, fecha_checkin: r.fecha_checkin ?? r.FechaCheckin,
+    puerta_embarque_asignada: r.puerta_embarque_asignada ?? r.PuertaEmbarqueAsignada,
+    grupo_embarque: r.grupo_embarque ?? r.GrupoEmbarque,
   }),
-  gasto: (g: BE_Gasto) => ({
-    id_gasto: g.IdGasto, fecha: g.Fecha,
-    concepto: g.Concepto, tipo_gasto: g.TipoGasto,
-    monto: g.Monto, proveedor: g.Proveedor,
+  lealtad: (l: any) => ({
+    id_lealtad: l.id_lealtad ?? l.IdLealtad, id_pasajero: l.id_pasajero ?? l.IdPasajero,
+    nivel_membresia: l.nivel_membresia ?? l.NivelMembresia, puntos_acumulados: l.puntos_acumulados ?? l.PuntosAcumulados,
+    puntos_canjeables: l.puntos_canjeables ?? l.PuntosCanjeables, millas_acumuladas: l.millas_acumuladas ?? l.MillasAcumuladas,
+    tarjeta_numero: l.tarjeta_numero ?? l.TarjetaNumero, activo: l.activo ?? l.Activo,
   }),
-  promocion: (p: BE_Promocion) => ({
-    id_promocion: p.IdPromocion, codigo: p.CodigoPromocion,
-    nombre: p.NombrePromocion, descripcion: p.DescripcionPromocion,
-    tipo_descuento: p.TipoDescuento, valor_descuento: p.ValorDescuento,
-    fecha_inicio: p.FechaInicio, fecha_fin: p.FechaFin,
-    usos_actuales: p.UsosActuales, uso_maximo: p.UsoMaximo, activa: p.Activa,
+  hotel: (h: any) => ({
+    id_hotel: h.id_hotel ?? h.IdHotel, codigo_aeropuerto: h.codigo_aeropuerto ?? h.CodigoAeropuerto,
+    nombre_hotel: h.nombre_hotel ?? h.NombreHotel, categoria: h.categoria ?? h.Categoria,
+    direccion: h.direccion ?? h.Direccion, distancia_km: h.distancia_km ?? h.DistanciaKm,
+    tarifa_noche_desde: h.tarifa_noche_desde ?? h.TarifaNocheDesde,
+    tiene_shuttle: h.tiene_shuttle ?? h.TieneShuttle, activo: h.activo ?? h.Activo,
+  }),
+  empleado: (e: any) => ({
+    id_empleado: e.id_empleado ?? e.IdEmpleado, codigo: e.codigo_empleado ?? e.CodigoEmpleado,
+    nombres: e.nombres ?? e.Nombres, apellidos: e.apellidos ?? e.Apellidos,
+    email: e.email ?? e.Email, telefono: e.telefono ?? e.Telefono,
+    departamento: e.departamento ?? e.Departamento, cargo: e.cargo ?? e.Cargo,
+    salario_base: e.salario_base ?? e.SalarioBase, activo: e.activo ?? e.Activo,
+  }),
+  ingreso: (i: any) => ({
+    id_ingreso: i.id_ingreso ?? i.IdIngreso, fecha: i.fecha ?? i.Fecha,
+    concepto: i.concepto ?? i.Concepto, tipo_ingreso: i.tipo_ingreso ?? i.TipoIngreso,
+    monto: i.monto ?? i.Monto, moneda: i.moneda ?? i.Moneda, metodo_pago: i.metodo_pago ?? i.MetodoPago,
+  }),
+  gasto: (g: any) => ({
+    id_gasto: g.id_gasto ?? g.IdGasto, fecha: g.fecha ?? g.Fecha,
+    concepto: g.concepto ?? g.Concepto, tipo_gasto: g.tipo_gasto ?? g.TipoGasto,
+    monto: g.monto ?? g.Monto, proveedor: g.proveedor ?? g.Proveedor,
+  }),
+  proveedor: (p: any) => ({
+    id_proveedor: p.id_proveedor ?? p.IdProveedor, nombre: p.nombre ?? p.Nombre,
+    nit: p.nit ?? p.Nit, contacto: p.contacto ?? p.Contacto,
+    telefono: p.telefono ?? p.Telefono, email: p.email ?? p.Email,
+    direccion: p.direccion ?? p.Direccion, tipo_proveedor: p.tipo_proveedor ?? p.TipoProveedor,
+    activo: p.activo ?? p.Activo,
+  }),
+  presupuesto: (p: any) => ({
+    id_presupuesto: p.id_presupuesto ?? p.IdPresupuesto, departamento: p.departamento ?? p.Departamento,
+    anio: p.anio ?? p.Anio, mes: p.mes ?? p.Mes,
+    monto_asignado: p.monto_asignado ?? p.MontoAsignado, monto_ejecutado: p.monto_ejecutado ?? p.MontoEjecutado,
+    concepto: p.concepto ?? p.Concepto, activo: p.activo ?? p.Activo,
+  }),
+  cuentaBancaria: (c: any) => ({
+    id_cuenta: c.id_cuenta ?? c.IdCuenta, nombre_banco: c.nombre_banco ?? c.NombreBanco,
+    numero_cuenta: c.numero_cuenta ?? c.NumeroCuenta, tipo_cuenta: c.tipo_cuenta ?? c.TipoCuenta,
+    saldo_actual: c.saldo_actual ?? c.SaldoActual, moneda: c.moneda ?? c.Moneda,
+    activa: c.activa ?? c.Activa,
+  }),
+  promocion: (p: any) => ({
+    id_promocion: p.id_promocion ?? p.IdPromocion, codigo: p.codigo_promocion ?? p.CodigoPromocion,
+    nombre: p.nombre_promocion ?? p.NombrePromocion, descripcion: p.descripcion_promocion ?? p.DescripcionPromocion,
+    tipo_descuento: p.tipo_descuento ?? p.TipoDescuento, valor_descuento: p.valor_descuento ?? p.ValorDescuento,
+    fecha_inicio: p.fecha_inicio ?? p.FechaInicio, fecha_fin: p.fecha_fin ?? p.FechaFin,
+    usos_actuales: p.usos_actuales ?? p.UsosActuales, uso_maximo: p.uso_maximo ?? p.UsoMaximo, activa: p.activa ?? p.Activa,
+  }),
+  usuarioSistema: (u: any) => ({
+    id_usuario_sistema: u.id_usuario_sistema ?? u.IdUsuarioSistema,
+    nombre_usuario: u.nombre_usuario ?? u.NombreUsuario,
+    email_institucional: u.email_institucional ?? u.EmailInstitucional,
+    activo: u.activo ?? u.Activo, bloqueado: u.bloqueado ?? u.Bloqueado,
+    fecha_ultimo_acceso: u.fecha_ultimo_acceso ?? u.FechaUltimoAcceso,
+    intentos_fallidos: u.intentos_fallidos ?? u.IntentosFallidos,
+  }),
+  rolSistema: (r: any) => ({
+    id_rol_sistema: r.id_rol_sistema ?? r.IdRolSistema,
+    nombre_rol: r.nombre_rol ?? r.NombreRol,
+    descripcion: r.descripcion ?? r.Descripcion,
+    nivel_jerarquico: r.nivel_jerarquico ?? r.NivelJerarquico,
+    activo: r.activo ?? r.Activo,
+  }),
+  incidenteSegInfo: (i: any) => ({
+    id_incidente_seguridad_info: i.id_incidente_seguridad_info ?? i.IdIncidenteSeguridadInfo,
+    tipo_incidente: i.tipo_incidente ?? i.TipoIncidente,
+    nivel_gravedad: i.nivel_gravedad ?? i.NivelGravedad,
+    fecha_deteccion: i.fecha_deteccion ?? i.FechaDeteccion,
+    estado: i.estado ?? i.Estado,
+  }),
+  planEmergencia: (p: any) => ({
+    id_plan_emergencia: p.id_plan_emergencia ?? p.IdPlanEmergencia,
+    codigo_plan: p.codigo_plan ?? p.CodigoPlan,
+    nombre_plan: p.nombre_plan ?? p.NombrePlan,
+    tipo_emergencia: p.tipo_emergencia ?? p.TipoEmergencia,
+    nivel_activacion: p.nivel_activacion ?? p.NivelActivacion,
+    responsable_activacion: p.responsable_activacion ?? p.ResponsableActivacion,
+    activo: p.activo ?? p.Activo,
+  }),
+  equipoEmergencia: (e: any) => ({
+    id_equipo_emergencia: e.id_equipo_emergencia ?? e.IdEquipoEmergencia,
+    codigo_equipo: e.codigo_equipo ?? e.CodigoEquipo,
+    nombre_equipo: e.nombre_equipo ?? e.NombreEquipo,
+    tipo_equipo: e.tipo_equipo ?? e.TipoEquipo,
+    ubicacion_habitual: e.ubicacion_habitual ?? e.UbicacionHabitual,
+    estado: e.estado ?? e.Estado,
+    activo: e.activo ?? e.Activo,
+  }),
+  activacionEmergencia: (a: any) => ({
+    id_activacion: a.id_activacion ?? a.IdActivacion,
+    tipo_emergencia: a.tipo_emergencia ?? a.TipoEmergencia,
+    id_plan_emergencia: a.id_plan_emergencia ?? a.IdPlanEmergencia,
+    nivel_activacion: a.nivel_activacion ?? a.NivelActivacion,
+    personas_afectadas: a.personas_afectadas ?? a.PersonasAfectadas,
+    estado: a.estado ?? a.Estado,
+  }),
+  queja: (q: any) => ({
+    id_queja: q.id_queja ?? q.IdQueja, id_pasajero: q.id_pasajero ?? q.IdPasajero,
+    tipo_contacto: q.tipo_contacto ?? q.TipoContacto, fecha_contacto: q.fecha_contacto ?? q.FechaContacto,
+    asunto: q.asunto ?? q.Asunto, descripcion: q.descripcion ?? q.Descripcion,
+    estado: q.estado ?? q.Estado, prioridad: q.prioridad ?? q.Prioridad,
   }),
 };
 
@@ -1124,7 +1270,7 @@ export const backendApi = {
   // Módulo 1
   health:       () => get<BE_HealthCheck>(BE_DEVELOP, '/api/test'),
   aeropuertos: {
-    listar:     () => get<BE_Aeropuerto[]>(BE_DEVELOP, '/api/aeropuertos'),
+    listar:     () => get<any[]>(BE_DEVELOP, '/api/aeropuertos').then(d => d.map(NORM.aeropuerto)),
     obtener:    (cod: string) => get<BE_Aeropuerto>(BE_DEVELOP, `/api/aeropuertos/${cod}`),
     crear:      (m: Omit<BE_Aeropuerto, 'FechaRegistro'>) => post(BE_DEVELOP, '/api/aeropuertos', m),
     actualizar: (cod: string, m: Partial<BE_Aeropuerto>) => put(BE_DEVELOP, `/api/aeropuertos/${cod}`, m),
@@ -1170,7 +1316,7 @@ export const backendApi = {
 
   // Módulo 3
   aerolineas: {
-    listar:     () => get<BE_Aerolinea[]>(BE_DEVELOP, '/api/aerolineas'),
+    listar:     () => get<any[]>(BE_DEVELOP, '/api/aerolineas').then(d => d.map(NORM.aerolinea)),
     obtener:    (id: number) => get<BE_Aerolinea>(BE_DEVELOP, `/api/aerolineas/${id}`),
     crear:      (m: Omit<BE_Aerolinea, 'IdAerolinea'>) => post(BE_DEVELOP, '/api/aerolineas', m),
     actualizar: (id: number, m: Partial<BE_Aerolinea>) => put(BE_DEVELOP, `/api/aerolineas/${id}`, m),
@@ -1214,7 +1360,7 @@ export const backendApi = {
 
   // Módulo 5
   vuelos: {
-    listar:     () => get<BE_Vuelo[]>(BE_DEVELOP, '/api/vuelos'),
+    listar:     () => get<any[]>(BE_DEVELOP, '/api/vuelos').then(d => d.map(NORM.vuelo)),
     obtener:    (id: number) => get<BE_Vuelo>(BE_DEVELOP, `/api/vuelos/${id}`),
     buscar:     (origen: string, destino: string, fecha: string) =>
       get<BE_Vuelo[]>(BE_DEVELOP, `/api/vuelos?origen=${origen}&destino=${destino}&fecha=${fecha}`),
@@ -1224,14 +1370,14 @@ export const backendApi = {
       put(BE_DEVELOP, `/api/vuelos/${id}/estado`, { EstadoVuelo: estado }),
   },
   incidentesVuelo: {
-    listar:     () => get<BE_IncidenteVuelo[]>(BE_DEVELOP, '/api/incidentesvuelo'),
-    porVuelo:   (id: number) => get<BE_IncidenteVuelo[]>(BE_DEVELOP, `/api/incidentesvuelo/vuelo/${id}`),
-    crear:      (m: Omit<BE_IncidenteVuelo, 'IdIncidenteVuelo'>) => post(BE_DEVELOP, '/api/incidentesvuelo', m),
+    listar:     () => get<any[]>(BE_DEVELOP, '/api/incidentesvuelo').then(d => d.map(NORM.incidenteVuelo)),
+    porVuelo:   (id: number) => get<any[]>(BE_DEVELOP, `/api/incidentesvuelo/vuelo/${id}`).then(d => d.map(NORM.incidenteVuelo)),
+    crear:      (m: any) => post(BE_DEVELOP, '/api/incidentesvuelo', m),
   },
   retrasos: {
-    listar:     () => get<BE_RetrasoVuelo[]>(BE_DEVELOP, '/api/retrasosvuelo'),
-    porVuelo:   (id: number) => get<BE_RetrasoVuelo[]>(BE_DEVELOP, `/api/retrasosvuelo/vuelo/${id}`),
-    crear:      (m: Omit<BE_RetrasoVuelo, 'IdRetraso'>) => post(BE_DEVELOP, '/api/retrasosvuelo', m),
+    listar:     () => get<any[]>(BE_DEVELOP, '/api/retrasosvuelo').then(d => d.map(NORM.retraso)),
+    porVuelo:   (id: number) => get<any[]>(BE_DEVELOP, `/api/retrasosvuelo/vuelo/${id}`).then(d => d.map(NORM.retraso)),
+    crear:      (m: any) => post(BE_DEVELOP, '/api/retrasosvuelo', m),
   },
   meteorologia: {
     listar:        () => get<BE_Meteorologia[]>(BE_DEVELOP, '/api/condicionesmeteorologicas'),
@@ -1310,268 +1456,304 @@ export const backendApi = {
 
   // Módulo 7
   pasajeros: {
-    listar:     () => get<BE_Pasajero[]>(BE_GERSON, '/api/pasajeros'),
-    obtener:    (id: number) => get<BE_Pasajero>(BE_GERSON, `/api/pasajeros/${id}`),
-    buscar:     (q: string) => get<BE_Pasajero[]>(BE_GERSON, `/api/pasajeros/buscar?q=${encodeURIComponent(q)}`),
-    crear:      (m: Omit<BE_Pasajero, 'IdPasajero'>) => post<{ IdGenerado: number }>(BE_GERSON, '/api/pasajeros', m),
-    actualizar: (id: number, m: Partial<BE_Pasajero>) => put(BE_GERSON, `/api/pasajeros/${id}`, m),
+    listar:     () => get<any[]>(BE_DEVELOP, '/api/pasajeros').then(d => d.map(NORM.pasajero)),
+    obtener:    (id: number) => get<any>(BE_DEVELOP, `/api/pasajeros/${id}`).then(NORM.pasajero),
+    buscar:     (q: string) => get<any[]>(BE_DEVELOP, `/api/pasajeros/buscar?q=${encodeURIComponent(q)}`).then(d => d.map(NORM.pasajero)),
+    crear:      (m: any) => post(BE_DEVELOP, '/api/pasajeros', m),
+    actualizar: (id: number, m: any) => put(BE_DEVELOP, `/api/pasajeros/${id}`, m),
   },
   perfilesViajero: {
-    porPasajero:(id: number) => get<BE_PerfilViajero>(BE_GERSON, `/api/perfilesviajero/pasajero/${id}`),
-    actualizar: (id: number, m: Partial<BE_PerfilViajero>) => put(BE_GERSON, `/api/perfilesviajero/${id}`, m),
+    porPasajero:(id: number) => get<BE_PerfilViajero>(BE_DEVELOP, `/api/perfilesviajero/pasajero/${id}`),
+    actualizar: (id: number, m: Partial<BE_PerfilViajero>) => put(BE_DEVELOP, `/api/perfilesviajero/${id}`, m),
   },
 
   // Módulo 8
   reservas: {
-    crear:       (m: Omit<BE_Reserva, 'IdReserva'>) =>
-      post<{ IdGenerado: number; CodigoReserva: string }>(BE_GERSON, '/api/reservas', m),
-    porPasajero: (id: number) => get<BE_Reserva[]>(BE_GERSON, `/api/reservas/pasajero/${id}`),
-    porCodigo:   (cod: string) => get<BE_Reserva>(BE_GERSON, `/api/reservas/${cod}`),
-    cancelar:    (id: number) => put(BE_GERSON, `/api/reservas/${id}/cancelar`, {}),
-    actualizar:  (id: number, m: Partial<BE_Reserva>) => put(BE_GERSON, `/api/reservas/${id}`, m),
+    crear:       (m: any) =>
+      post<{ IdGenerado: number; CodigoReserva: string }>(BE_DEVELOP, '/api/reservas', m),
+    porPasajero: (id: number) => get<any[]>(BE_DEVELOP, `/api/reservas/pasajero/${id}`).then(d => d.map(NORM.reserva)),
+    porCodigo:   (cod: string) => get<any>(BE_DEVELOP, `/api/reservas/${cod}`).then(NORM.reserva),
+    cancelar:    (id: number) => put(BE_DEVELOP, `/api/reservas/${id}/cancelar`, {}),
+    actualizar:  (id: number, m: any) => put(BE_DEVELOP, `/api/reservas/${id}`, m),
   },
   pagosReserva: {
     registrar:  (m: Omit<BE_ReservaPago, 'IdPago'>) =>
-      post<{ IdGenerado: number }>(BE_GERSON, '/api/reservaspagos', m),
-    porReserva: (id: number) => get<BE_ReservaPago[]>(BE_GERSON, `/api/reservaspagos/reserva/${id}`),
+      post<{ IdGenerado: number }>(BE_DEVELOP, '/api/reservaspagos', m),
+    porReserva: (id: number) => get<BE_ReservaPago[]>(BE_DEVELOP, `/api/reservaspagos/reserva/${id}`),
   },
   facturas: {
     porReserva: (idReserva: number) =>
-      get<BE_Factura>(BE_GERSON, `/api/facturas/reserva/${idReserva}`),
+      get<BE_Factura>(BE_DEVELOP, `/api/facturas/reserva/${idReserva}`),
   },
   metodosPago: {
-    listar:     () => get<BE_MetodoPago[]>(BE_GERSON, '/api/metodospago'),
+    listar:     () => get<BE_MetodoPago[]>(BE_DEVELOP, '/api/metodospago'),
   },
   promociones: {
-    listar:     () => get<BE_Promocion[]>(BE_GERSON, '/api/promociones'),
-    obtener:    (id: number) => get<BE_Promocion>(BE_GERSON, `/api/promociones/${id}`),
-    crear:      (m: Omit<BE_Promocion, 'IdPromocion'>) => post(BE_GERSON, '/api/promociones', m),
+    listar:     () => get<BE_Promocion[]>(BE_DEVELOP, '/api/promociones'),
+    obtener:    (id: number) => get<BE_Promocion>(BE_DEVELOP, `/api/promociones/${id}`),
+    crear:      (m: Omit<BE_Promocion, 'IdPromocion'>) => post(BE_DEVELOP, '/api/promociones', m),
     aplicar:    (idReserva: number, codigo: string) =>
-      post(BE_GERSON, '/api/promociones/aplicar', { IdReserva: idReserva, CodigoPromocion: codigo }),
+      post(BE_DEVELOP, '/api/promociones/aplicar', { IdReserva: idReserva, CodigoPromocion: codigo }),
   },
   solicitudesEspeciales: {
-    crear:       (m: Omit<BE_SolicitudEspecial, 'IdSolicitud'>) => post(BE_GERSON, '/api/solicitudesespeciales', m),
-    porReserva:  (id: number) => get<BE_SolicitudEspecial[]>(BE_GERSON, `/api/solicitudesespeciales/reserva/${id}`),
+    crear:       (m: Omit<BE_SolicitudEspecial, 'IdSolicitud'>) => post(BE_DEVELOP, '/api/solicitudesespeciales', m),
+    porReserva:  (id: number) => get<BE_SolicitudEspecial[]>(BE_DEVELOP, `/api/solicitudesespeciales/reserva/${id}`),
   },
 
   // Módulo 9
   checkin: {
-    registrar:  (m: Omit<BE_CheckinDigital, 'IdCheckin'>) => post(BE_GERSON, '/api/checkindigital', m),
-    obtener:    (idReserva: number) => get<BE_CheckinDigital>(BE_GERSON, `/api/checkindigital/${idReserva}`),
+    registrar:  (m: Omit<BE_CheckinDigital, 'IdCheckin'>) => post(BE_DEVELOP, '/api/checkindigital', m),
+    obtener:    (idReserva: number) => get<BE_CheckinDigital>(BE_DEVELOP, `/api/checkindigital/${idReserva}`),
   },
   pasesAbordaje: {
     generar:    (m: Omit<BE_PaseAbordaje, 'IdPaseAbordaje'>) =>
-      post<{ IdPase: number; CodigoBarras: string }>(BE_GERSON, '/api/pasesabordaje', m),
-    obtener:    (idReserva: number) => get<BE_PaseAbordaje>(BE_GERSON, `/api/pasesabordaje/${idReserva}`),
+      post<{ IdPase: number; CodigoBarras: string }>(BE_DEVELOP, '/api/pasesabordaje', m),
+    obtener:    (idReserva: number) => get<BE_PaseAbordaje>(BE_DEVELOP, `/api/pasesabordaje/${idReserva}`),
   },
   controlAbordaje: {
-    registrar:  (m: Omit<BE_ControlAbordaje, 'IdControlAbordaje'>) => post(BE_GERSON, '/api/controlabordaje', m),
-    porVuelo:   (id: number) => get<BE_ControlAbordaje[]>(BE_GERSON, `/api/controlabordaje/vuelo/${id}`),
+    registrar:  (m: Omit<BE_ControlAbordaje, 'IdControlAbordaje'>) => post(BE_DEVELOP, '/api/controlabordaje', m),
+    porVuelo:   (id: number) => get<BE_ControlAbordaje[]>(BE_DEVELOP, `/api/controlabordaje/vuelo/${id}`),
   },
 
   // Módulo 10
   incidentes: {
-    listar:     () => get<BE_Incidente[]>(BE_GERSON, '/api/incidentes'),
-    obtener:    (id: number) => get<BE_Incidente>(BE_GERSON, `/api/incidentes/${id}`),
-    crear:      (m: Omit<BE_Incidente, 'IdIncidente'>) => post(BE_GERSON, '/api/incidentes', m),
-    porPasajero:(id: number) => get<BE_Incidente[]>(BE_GERSON, `/api/incidentes/pasajero/${id}`),
+    listar:     () => get<BE_Incidente[]>(BE_DEVELOP, '/api/incidentes'),
+    obtener:    (id: number) => get<BE_Incidente>(BE_DEVELOP, `/api/incidentes/${id}`),
+    crear:      (m: Omit<BE_Incidente, 'IdIncidente'>) => post(BE_DEVELOP, '/api/incidentes', m),
+    porPasajero:(id: number) => get<BE_Incidente[]>(BE_DEVELOP, `/api/incidentes/pasajero/${id}`),
   },
   alertasSeguridad: {
-    listar:     () => get<BE_AlertaSeguridad[]>(BE_GERSON, '/api/alertasseguridad'),
-    activas:    () => get<BE_AlertaSeguridad[]>(BE_GERSON, '/api/alertasseguridad/activas'),
-    crear:      (m: Omit<BE_AlertaSeguridad, 'IdAlerta'>) => post(BE_GERSON, '/api/alertasseguridad', m),
+    listar:     () => get<BE_AlertaSeguridad[]>(BE_DEVELOP, '/api/alertasseguridad'),
+    activas:    () => get<BE_AlertaSeguridad[]>(BE_DEVELOP, '/api/alertasseguridad/activas'),
+    crear:      (m: Omit<BE_AlertaSeguridad, 'IdAlerta'>) => post(BE_DEVELOP, '/api/alertasseguridad', m),
   },
   prohibicionesVuelo: {
-    porPasajero:(id: number) => get<BE_ProhibicionVuelo[]>(BE_GERSON, `/api/prohibicionesvuelo/pasajero/${id}`),
-    crear:      (m: Omit<BE_ProhibicionVuelo, 'IdProhibicion'>) => post(BE_GERSON, '/api/prohibicionesvuelo', m),
+    porPasajero:(id: number) => get<BE_ProhibicionVuelo[]>(BE_DEVELOP, `/api/prohibicionesvuelo/pasajero/${id}`),
+    crear:      (m: Omit<BE_ProhibicionVuelo, 'IdProhibicion'>) => post(BE_DEVELOP, '/api/prohibicionesvuelo', m),
   },
 
   // Módulo 12
   objetosPerdidos: {
-    listar:     () => get<BE_ObjetoPerdido[]>(BE_GERSON, '/api/objetosperdidos'),
-    crear:      (m: Omit<BE_ObjetoPerdido, 'IdObjeto'>) => post(BE_GERSON, '/api/objetosperdidos', m),
+    listar:     () => get<BE_ObjetoPerdido[]>(BE_DEVELOP, '/api/objetosperdidos'),
+    crear:      (m: Omit<BE_ObjetoPerdido, 'IdObjeto'>) => post(BE_DEVELOP, '/api/objetosperdidos', m),
     entregar:   (id: number, idPasajero: number) =>
-      put(BE_GERSON, `/api/objetosperdidos/${id}/entregar`, { IdPasajero: idPasajero }),
+      put(BE_DEVELOP, `/api/objetosperdidos/${id}/entregar`, { IdPasajero: idPasajero }),
   },
 
   // Módulo 13
   concesiones: {
-    listar:     () => get<BE_Concesion[]>(BE_GERSON, '/api/concesionescomerciales'),
+    listar:     () => get<BE_Concesion[]>(BE_DEVELOP, '/api/concesionescomerciales'),
   },
   salonesVip: {
-    listar:     () => get<BE_SalonVip[]>(BE_GERSON, '/api/salonesvip'),
+    listar:     () => get<BE_SalonVip[]>(BE_DEVELOP, '/api/salonesvip'),
     acceder:    (idSalon: number, idPasajero: number, idVuelo: number) =>
-      post(BE_GERSON, '/api/salonesvip/acceso', { IdSalon: idSalon, IdPasajero: idPasajero, IdVuelo: idVuelo }),
+      post(BE_DEVELOP, '/api/salonesvip/acceso', { IdSalon: idSalon, IdPasajero: idPasajero, IdVuelo: idVuelo }),
   },
 
   // Módulo 14
   hoteles: {
-    listar:       () => get<BE_HotelCercano[]>(BE_GERSON, '/api/hotelescercanos'),
+    listar:       () => get<any[]>(BE_DEVELOP, '/api/hotelescercanos').then(d => d.map(NORM.hotel)),
     porAeropuerto:(cod: string) =>
-      get<BE_HotelCercano[]>(BE_GERSON, `/api/hotelescercanos/aeropuerto/${cod}`),
-    registrar:    (m: Omit<BE_HotelCercano, 'IdHotel'>) => post(BE_GERSON, '/api/hotelescercanos', m),
+      get<any[]>(BE_DEVELOP, `/api/hotelescercanos/aeropuerto/${cod}`).then(d => d.map(NORM.hotel)),
+    registrar:    (m: any) => post(BE_DEVELOP, '/api/hotelescercanos', m),
   },
   transporte: {
-    listar:       () => get<BE_TransporteTerresre[]>(BE_GERSON, '/api/transporteterrestre'),
+    listar:       () => get<BE_TransporteTerresre[]>(BE_DEVELOP, '/api/transporteterrestre'),
     reservar:     (m: Omit<BE_ReservaTransporte, 'IdReservaTransporte'>) =>
-      post<{ IdGenerado: number }>(BE_GERSON, '/api/reservastransporte', m),
+      post<{ IdGenerado: number }>(BE_DEVELOP, '/api/reservastransporte', m),
     misReservas:  (idPasajero: number) =>
-      get<BE_ReservaTransporte[]>(BE_GERSON, `/api/reservastransporte/pasajero/${idPasajero}`),
-    empresas:     () => get<BE_EmpresaTransporte[]>(BE_GERSON, '/api/empresastransporte'),
+      get<BE_ReservaTransporte[]>(BE_DEVELOP, `/api/reservastransporte/pasajero/${idPasajero}`),
+    empresas:     () => get<BE_EmpresaTransporte[]>(BE_DEVELOP, '/api/empresastransporte'),
     conveniosHotel:(idHotel: number) =>
-      get<BE_ConvenioHotelTransporte[]>(BE_GERSON, `/api/conveniostransporte/hotel/${idHotel}`),
+      get<BE_ConvenioHotelTransporte[]>(BE_DEVELOP, `/api/conveniostransporte/hotel/${idHotel}`),
   },
   serviciosAeropuerto: {
-    listar:       () => get<BE_ServicioAeropuerto[]>(BE_GERSON, '/api/serviciosaeropuerto'),
+    listar:       () => get<BE_ServicioAeropuerto[]>(BE_DEVELOP, '/api/serviciosaeropuerto'),
     porAeropuerto:(cod: string) =>
-      get<BE_ServicioAeropuerto[]>(BE_GERSON, `/api/serviciosaeropuerto/aeropuerto/${cod}`),
+      get<BE_ServicioAeropuerto[]>(BE_DEVELOP, `/api/serviciosaeropuerto/aeropuerto/${cod}`),
   },
   lealtad: {
-    listar:     ()                             => get<BE_ProgramaLealtad[]>(BE_GERSON, '/api/programalealtad'),
-    registrar:  (m: Omit<BE_ProgramaLealtad, 'IdLealtad'>) =>
-      post<{ IdGenerado: number }>(BE_GERSON, '/api/programalealtad', m),
-    porPasajero:(id: number) => get<BE_ProgramaLealtad>(BE_GERSON, `/api/programalealtad/pasajero/${id}`),
-    actualizar: (id: number, m: Partial<BE_ProgramaLealtad>) => put(BE_GERSON, `/api/programalealtad/${id}`, m),
+    listar:     ()                             => get<any[]>(BE_DEVELOP, '/api/programalealtad').then(d => d.map(NORM.lealtad)),
+    registrar:  (m: any)                       => post(BE_DEVELOP, '/api/programalealtad', m),
+    porPasajero:(id: number)                   => get<any>(BE_DEVELOP, `/api/programalealtad/pasajero/${id}`).then(NORM.lealtad),
+    actualizar: (id: number, m: any)           => put(BE_DEVELOP, `/api/programalealtad/${id}`, m),
   },
   quejas: {
-    crear:      (m: Omit<BE_QuejaSugerencia, 'IdQueja'>) => post(BE_GERSON, '/api/quejassugerencias', m),
-    porPasajero:(id: number) => get<BE_QuejaSugerencia[]>(BE_GERSON, `/api/quejassugerencias/pasajero/${id}`),
+    listar:     ()                             => get<any[]>(BE_DEVELOP, '/api/quejassugerencias').then(d => d.map(NORM.queja)),
+    crear:      (m: any)                       => post(BE_DEVELOP, '/api/quejassugerencias', m),
+    porPasajero:(id: number)                   => get<any[]>(BE_DEVELOP, `/api/quejassugerencias/pasajero/${id}`).then(d => d.map(NORM.queja)),
   },
   encuestas: {
-    crear:      (m: Omit<BE_Encuesta, 'IdEncuesta'>) => post(BE_GERSON, '/api/encuestassatisfaccion', m),
-    porVuelo:   (id: number) => get<BE_Encuesta[]>(BE_GERSON, `/api/encuestassatisfaccion/vuelo/${id}`),
+    crear:      (m: Omit<BE_Encuesta, 'IdEncuesta'>) => post(BE_DEVELOP, '/api/encuestassatisfaccion', m),
+    porVuelo:   (id: number) => get<BE_Encuesta[]>(BE_DEVELOP, `/api/encuestassatisfaccion/vuelo/${id}`),
   },
   atencionEspecial: {
-    crear:      (m: Omit<BE_AtencionEspecial, 'IdAtencion'>) => post(BE_GERSON, '/api/atencionespecial', m),
-    porPasajero:(id: number) => get<BE_AtencionEspecial[]>(BE_GERSON, `/api/atencionespecial/pasajero/${id}`),
+    crear:      (m: Omit<BE_AtencionEspecial, 'IdAtencion'>) => post(BE_DEVELOP, '/api/atencionespecial', m),
+    porPasajero:(id: number) => get<BE_AtencionEspecial[]>(BE_DEVELOP, `/api/atencionespecial/pasajero/${id}`),
   },
   historialReservas: {
     registrar:  (m: { IdReserva: number; CampoModificado: string; ValorAnterior: string; ValorNuevo: string; MotivoCambio?: string }) =>
-      post(BE_GERSON, '/api/historialreservas', m),
+      post(BE_DEVELOP, '/api/historialreservas', m),
   },
 
   // ── MODULOS BACKEND (:5089) — Módulos 15-20 ──────────────────────────────
 
   // Módulo 15
   empleados: {
-    listar:     () => get<BE_Empleado[]>(BE_MODULOS, '/api/empleado'),
-    obtener:    (id: number) => get<BE_Empleado>(BE_MODULOS, `/api/empleado/${id}`),
-    crear:      (m: Omit<BE_Empleado, 'IdEmpleado'>) => post(BE_MODULOS, '/api/empleado', m),
-    actualizar: (id: number, m: Partial<BE_Empleado>) => put(BE_MODULOS, `/api/empleado/${id}`, m),
+    listar:     () => get<any[]>(BE_DEVELOP, '/api/empleado').then(d => d.map(NORM.empleado)),
+    obtener:    (id: number) => get<BE_Empleado>(BE_DEVELOP, `/api/empleado/${id}`),
+    crear:      (m: Omit<BE_Empleado, 'IdEmpleado'>) => post(BE_DEVELOP, '/api/empleado', m),
+    actualizar: (id: number, m: Partial<BE_Empleado>) => put(BE_DEVELOP, `/api/empleado/${id}`, m),
   },
   departamentos: {
-    listar:     () => get<BE_Departamento[]>(BE_MODULOS, '/api/departamento'),
-    crear:      (m: Omit<BE_Departamento, 'IdDepartamento'>) => post(BE_MODULOS, '/api/departamento', m),
+    listar:     () => get<BE_Departamento[]>(BE_DEVELOP, '/api/departamento'),
+    crear:      (m: Omit<BE_Departamento, 'IdDepartamento'>) => post(BE_DEVELOP, '/api/departamento', m),
   },
   evaluaciones: {
-    listar:     () => get<BE_Evaluacion[]>(BE_MODULOS, '/api/evaluaciondesempeno'),
-    porEmpleado:(id: number) => get<BE_Evaluacion[]>(BE_MODULOS, `/api/evaluaciondesempeno/empleado/${id}`),
-    crear:      (m: Omit<BE_Evaluacion, 'IdEvaluacion'>) => post(BE_MODULOS, '/api/evaluaciondesempeno', m),
+    listar:     () => get<BE_Evaluacion[]>(BE_DEVELOP, '/api/evaluacion'),
+    porEmpleado:(id: number) => get<BE_Evaluacion[]>(BE_DEVELOP, `/api/evaluacion/empleado/${id}`),
+    crear:      (m: Omit<BE_Evaluacion, 'IdEvaluacion'>) => post(BE_DEVELOP, '/api/evaluacion', m),
   },
   vacaciones: {
-    listar:     () => get<BE_VacacionPermiso[]>(BE_MODULOS, '/api/vacacionespermiso'),
-    porEmpleado:(id: number) => get<BE_VacacionPermiso[]>(BE_MODULOS, `/api/vacacionespermiso/empleado/${id}`),
-    crear:      (m: Omit<BE_VacacionPermiso, 'IdSolicitud'>) => post(BE_MODULOS, '/api/vacacionespermiso', m),
+    listar:     () => get<BE_VacacionPermiso[]>(BE_DEVELOP, '/api/vacaciones'),
+    porEmpleado:(id: number) => get<BE_VacacionPermiso[]>(BE_DEVELOP, `/api/vacaciones/empleado/${id}`),
+    crear:      (m: Omit<BE_VacacionPermiso, 'IdSolicitud'>) => post(BE_DEVELOP, '/api/vacaciones', m),
     aprobar:    (id: number, por: number) =>
-      put(BE_MODULOS, `/api/vacacionespermiso/${id}/aprobar`, { AutorizadoPor: por }),
+      put(BE_DEVELOP, `/api/vacaciones/${id}/aprobar`, { AutorizadoPor: por }),
   },
 
   // Módulo 16
   ingresos: {
-    listar:     () => get<BE_Ingreso[]>(BE_MODULOS, '/api/ingreso'),
-    crear:      (m: Omit<BE_Ingreso, 'IdIngreso'>) => post(BE_MODULOS, '/api/ingreso', m),
+    listar:     () => get<any[]>(BE_DEVELOP, '/api/ingreso').then(d => d.map(NORM.ingreso)),
+    crear:      (m: any) => post(BE_DEVELOP, '/api/ingreso', m),
   },
   gastos: {
-    listar:     () => get<BE_Gasto[]>(BE_MODULOS, '/api/gasto'),
-    crear:      (m: Omit<BE_Gasto, 'IdGasto'>) => post(BE_MODULOS, '/api/gasto', m),
+    listar:     () => get<any[]>(BE_DEVELOP, '/api/gasto').then(d => d.map(NORM.gasto)),
+    crear:      (m: any) => post(BE_DEVELOP, '/api/gasto', m),
   },
   proveedores: {
-    listar:     () => get<BE_Proveedor[]>(BE_MODULOS, '/api/proveedor'),
-    crear:      (m: Omit<BE_Proveedor, 'IdProveedor'>) => post(BE_MODULOS, '/api/proveedor', m),
+    listar:     () => get<any[]>(BE_DEVELOP, '/api/proveedor').then(d => d.map(NORM.proveedor)),
+    crear:      (m: any) => post(BE_DEVELOP, '/api/proveedor', m),
   },
   tasas: {
-    listar:     () => get<BE_TasaAeroportuaria[]>(BE_MODULOS, '/api/tasaaeropuertaria'),
-    crear:      (m: Omit<BE_TasaAeroportuaria, 'IdTasa'>) => post(BE_MODULOS, '/api/tasaaeropuertaria', m),
+    listar:     () => get<any[]>(BE_DEVELOP, '/api/tasaaeropuertaria'),
+    crear:      (m: any) => post(BE_DEVELOP, '/api/tasaaeropuertaria', m),
   },
   cuentasBancarias: {
-    listar:     () => get<BE_CuentaBancaria[]>(BE_MODULOS, '/api/cuentabancaria'),
-    crear:      (m: Omit<BE_CuentaBancaria, 'IdCuenta'>) => post(BE_MODULOS, '/api/cuentabancaria', m),
+    listar:     () => get<any[]>(BE_DEVELOP, '/api/cuentabancaria').then(d => d.map(NORM.cuentaBancaria)),
+    crear:      (m: any) => post(BE_DEVELOP, '/api/cuentabancaria', m),
   },
   movimientosBancarios: {
-    listar:     () => get<BE_MovimientoBancario[]>(BE_MODULOS, '/api/movimientobancario'),
-    crear:      (m: Omit<BE_MovimientoBancario, 'IdMovimiento'>) => post(BE_MODULOS, '/api/movimientobancario', m),
+    listar:     () => get<any[]>(BE_DEVELOP, '/api/movimientobancario'),
+    crear:      (m: any) => post(BE_DEVELOP, '/api/movimientobancario', m),
   },
   finanzas: {
-    presupuestos:{ listar: () => get(BE_MODULOS, '/api/presupuesto'),
-                   crear:  (m: any) => post(BE_MODULOS, '/api/presupuesto', m) },
+    presupuestos:{ 
+      listar: () => get<any[]>(BE_DEVELOP, '/api/presupuesto').then(d => d.map(NORM.presupuesto)),
+      crear:  (m: any) => post(BE_DEVELOP, '/api/presupuesto', m) 
+    },
   },
 
   // Módulo 18
   menores: {
-    listar:     () => get<BE_MenorNoAcompanado[]>(BE_MODULOS, '/api/menoresnoacompanados'),
-    obtener:    (id: number) => get<BE_MenorNoAcompanado>(BE_MODULOS, `/api/menoresnoacompanados/${id}`),
-    crear:      (m: Omit<BE_MenorNoAcompanado, 'IdMenor'>) => post(BE_MODULOS, '/api/menoresnoacompanados', m),
+    listar:     () => get<BE_MenorNoAcompanado[]>(BE_DEVELOP, '/api/menoresnoacompanados'),
+    obtener:    (id: number) => get<BE_MenorNoAcompanado>(BE_DEVELOP, `/api/menoresnoacompanados/${id}`),
+    crear:      (m: Omit<BE_MenorNoAcompanado, 'IdMenor'>) => post(BE_DEVELOP, '/api/menoresnoacompanados', m),
     autorizaciones:{
-      listar: () => get(BE_MODULOS, '/api/autorizacionmenor'),
-      crear:  (m: any) => post(BE_MODULOS, '/api/autorizacionmenor', m),
+      listar: () => get(BE_DEVELOP, '/api/autorizacionmenor'),
+      crear:  (m: any) => post(BE_DEVELOP, '/api/autorizacionmenor', m),
     },
   },
 
   // Módulo 19
   carga: {
     envios: {
-      listar:     () => get<BE_EnvioCarga[]>(BE_MODULOS, '/api/enviocarga'),
-      obtener:    (id: number) => get<BE_EnvioCarga>(BE_MODULOS, `/api/enviocarga/${id}`),
+      listar:     () => get<BE_EnvioCarga[]>(BE_DEVELOP, '/api/enviocarga'),
+      obtener:    (id: number) => get<BE_EnvioCarga>(BE_DEVELOP, `/api/enviocarga/${id}`),
       buscar:     (codigo: string) =>
-        get<BE_EnvioCarga>(BE_MODULOS, `/api/enviocarga/codigo/${codigo}`),
-      crear:      (m: Omit<BE_EnvioCarga, 'IdEnvio'>) => post(BE_MODULOS, '/api/enviocarga', m),
+        get<BE_EnvioCarga>(BE_DEVELOP, `/api/enviocarga/codigo/${codigo}`),
+      crear:      (m: Omit<BE_EnvioCarga, 'IdEnvio'>) => post(BE_DEVELOP, '/api/enviocarga', m),
     },
     manifiestos: {
-      listar:     () => get<BE_ManifiestoCarga[]>(BE_MODULOS, '/api/manifiestocarga'),
-      porVuelo:   (id: number) => get<BE_ManifiestoCarga[]>(BE_MODULOS, `/api/manifiestocarga/vuelo/${id}`),
-      crear:      (m: Omit<BE_ManifiestoCarga, 'IdManifiesto'>) => post(BE_MODULOS, '/api/manifiestocarga', m),
+      listar:     () => get<BE_ManifiestoCarga[]>(BE_DEVELOP, '/api/manifiestocarga'),
+      porVuelo:   (id: number) => get<BE_ManifiestoCarga[]>(BE_DEVELOP, `/api/manifiestocarga/vuelo/${id}`),
+      crear:      (m: Omit<BE_ManifiestoCarga, 'IdManifiesto'>) => post(BE_DEVELOP, '/api/manifiestocarga', m),
     },
     seguimiento: {
-      porEnvio:   (id: number) => get<BE_SeguimientoCarga[]>(BE_MODULOS, `/api/seguimientocarga/envio/${id}`),
-      crear:      (m: Omit<BE_SeguimientoCarga, 'IdSeguimiento'>) => post(BE_MODULOS, '/api/seguimientocarga', m),
+      porEnvio:   (id: number) => get<BE_SeguimientoCarga[]>(BE_DEVELOP, `/api/seguimientocarga/envio/${id}`),
+      crear:      (m: Omit<BE_SeguimientoCarga, 'IdSeguimiento'>) => post(BE_DEVELOP, '/api/seguimientocarga', m),
     },
   },
 
   // Módulo 20
   mantenimiento: {
     ordenes: {
-      listar:     () => get<BE_OrdenMantenimiento[]>(BE_MODULOS, '/api/ordenmantenimientopredictivo'),
+      listar:     () => get<BE_OrdenMantenimiento[]>(BE_DEVELOP, '/api/ordenmantenimientopredictivo'),
       crear:      (m: Omit<BE_OrdenMantenimiento, 'IdOrdenMp'>) =>
-        post(BE_MODULOS, '/api/ordenmantenimientopredictivo', m),
+        post(BE_DEVELOP, '/api/ordenmantenimientopredictivo', m),
       actualizar: (id: number, m: Partial<BE_OrdenMantenimiento>) =>
-        put(BE_MODULOS, `/api/ordenmantenimientopredictivo/${id}`, m),
+        put(BE_DEVELOP, `/api/ordenmantenimientopredictivo/${id}`, m),
     },
     alertasTecnicas: {
-      listar:     () => get<BE_AlertaTecnica[]>(BE_MODULOS, '/api/alertastecnicas'),
-      sinAtender: () => get<BE_AlertaTecnica[]>(BE_MODULOS, '/api/alertastecnicas/pendientes'),
-      crear:      (m: Omit<BE_AlertaTecnica, 'IdAlertaTecnica'>) => post(BE_MODULOS, '/api/alertastecnicas', m),
+      listar:     () => get<BE_AlertaTecnica[]>(BE_DEVELOP, '/api/alertastecnicas'),
+      sinAtender: () => get<BE_AlertaTecnica[]>(BE_DEVELOP, '/api/alertastecnicas/pendientes'),
+      crear:      (m: Omit<BE_AlertaTecnica, 'IdAlertaTecnica'>) => post(BE_DEVELOP, '/api/alertastecnicas', m),
     },
     checklists: {
-      listar:     () => get(BE_MODULOS, '/api/checklistmantenimiento'),
-      crear:      (m: any) => post(BE_MODULOS, '/api/checklistmantenimiento', m),
+      listar:     () => get(BE_DEVELOP, '/api/checklistmantenimiento'),
+      crear:      (m: any) => post(BE_DEVELOP, '/api/checklistmantenimiento', m),
     },
     piezas: {
-      listar:     () => get<BE_PiezaReemplazo[]>(BE_MODULOS, '/api/piezareemplazo'),
-      stockBajo:  () => get<BE_PiezaReemplazo[]>(BE_MODULOS, '/api/piezareemplazo/stockbajo'),
-      crear:      (m: Omit<BE_PiezaReemplazo, 'IdPieza'>) => post(BE_MODULOS, '/api/piezareemplazo', m),
+      listar:     () => get<BE_PiezaReemplazo[]>(BE_DEVELOP, '/api/piezareemplazo'),
+      stockBajo:  () => get<BE_PiezaReemplazo[]>(BE_DEVELOP, '/api/piezareemplazo/stockbajo'),
+      crear:      (m: Omit<BE_PiezaReemplazo, 'IdPieza'>) => post(BE_DEVELOP, '/api/piezareemplazo', m),
     },
   },
 
   // Módulo 22
   combustible: {
     tanques: {
-      listar:     () => get<BE_TanqueCombustible[]>(BE_MODULOS, '/api/tanquecombustible'),
-      crear:      (m: Omit<BE_TanqueCombustible, 'IdTanque'>) => post(BE_MODULOS, '/api/tanquecombustible', m),
+      listar:     () => get<any[]>(BE_DEVELOP, '/api/tanquecombustible').then(d => d.map(NORM.tanque)),
+      crear:      (m: any) => post(BE_DEVELOP, '/api/tanquecombustible', m),
     },
     cargas: {
-      listar:     () => get<BE_CargaCombustible[]>(BE_MODULOS, '/api/cargacombustible'),
+      listar:     () => get<BE_CargaCombustible[]>(BE_DEVELOP, '/api/cargacombustible'),
       crear:      (m: Omit<BE_CargaCombustible, 'IdCargaCombustible'>) =>
-        post(BE_MODULOS, '/api/cargacombustible', m),
+        post(BE_DEVELOP, '/api/cargacombustible', m),
+    },
+    pedidos: {
+      listar:     () => get<any[]>(BE_DEVELOP, '/api/pedidoscombustible').then(d => d.map(NORM.pedidoCombustible)),
+      crear:      (m: any) => post(BE_DEVELOP, '/api/pedidoscombustible', m),
+    },
+  },
+
+  // Módulo 24
+  usuariosSistema: {
+    listar:     () => get<any[]>(BE_DEVELOP, '/api/usuariosistema'),
+  },
+  rolesSistema: {
+    listar:     () => get<any[]>(BE_DEVELOP, '/api/rolsistema'),
+  },
+  incidentesSeguridadInfo: {
+    listar:     () => get<any[]>(BE_DEVELOP, '/api/incidenteseguridadinformatica'),
+  },
+  marketing: {
+    campanas: {
+      listar: () => get<any[]>(BE_DEVELOP, '/api/campanamarketing'),
+    },
+    segmentos: {
+      listar: () => get<any[]>(BE_DEVELOP, '/api/segmentocliente'),
+    },
+  },
+  emergencias: {
+    planes: {
+      listar: () => get<BE_PlanEmergencia[]>(BE_DEVELOP, '/api/planemergencia'),
+    },
+    equipos: {
+      listar: () => get<BE_EquipoEmergencia[]>(BE_DEVELOP, '/api/equipoemergencia'),
+    },
+    activaciones: {
+      listar: () => get<BE_ActivacionEmergencia[]>(BE_DEVELOP, '/api/activacionemergencia'),
     },
   },
 };

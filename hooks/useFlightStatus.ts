@@ -29,17 +29,17 @@ function calcNewTime(hhmm: string, addMin: number): string {
   return `${String(Math.floor(total / 60) % 24).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
 }
 
-function mapToFlightStatus(v: BE_Vuelo): FlightStatusUpdate {
-  const estado = (v.EstadoVuelo ?? 'PROGRAMADO') as EstadoVuelo;
-  const horaSalida = v.HoraSalidaProgramada
-    ? new Date(v.HoraSalidaProgramada).toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit', hour12: false })
+function mapToFlightStatus(v: any): FlightStatusUpdate {
+  const estado = (v.estado_vuelo ?? 'PROGRAMADO') as EstadoVuelo;
+  const horaSalida = v.hora_salida_programada
+    ? new Date(v.hora_salida_programada).toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit', hour12: false })
     : null;
 
   return {
-    id_vuelo: v.IdVuelo,
-    numero_vuelo: v.NumeroVuelo ?? `FL-${v.IdVuelo}`,
+    id_vuelo: v.id_vuelo,
+    numero_vuelo: v.numero_vuelo ?? `FL-${v.id_vuelo}`,
     estado_vuelo: estado,
-    puerta: v.IdPuertaSalida ?? null,
+    puerta: v.id_puerta_salida ?? null,
     hora_salida_real: horaSalida,
     retraso_min: 0,
     ultima_actualizacion: new Date().toISOString(),
@@ -67,7 +67,7 @@ export function useFlightStatusList() {
           if (u.estado_vuelo === 'CANCELADO') {
             notificationStore.add(NotificationFactory.vuleloCancelado({
               numero_vuelo: u.numero_vuelo,
-              destino: raw.find(v => v.IdVuelo === u.id_vuelo)?.AeropuertoDestino ?? '—',
+              destino: raw.find(v => v.id_vuelo === u.id_vuelo)?.aeropuerto_destino ?? '—',
             }));
           } else if (u.estado_vuelo === 'DEMORADO' && u.retraso_min > 0) {
             notificationStore.add(NotificationFactory.vueloRetrasado({

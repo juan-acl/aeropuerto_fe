@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Analytics Dashboard — Admin only
  * Charts: Line (ventas), Bar (destinos), Pie (tipos usuario), KPIs avanzados
  * Implemented with pure React Native (no external charting dependency)
@@ -353,7 +353,7 @@ export default function AnalyticsDashboard() {
                 }]} />
               </View>
               <View style={s.funnelRight}>
-                <Text style={[s.funnelN, { color: step.color }]}>{step.n.toLocaleString()}</Text>
+                <Text style={[s.funnelN, { color: step.color }]}>{step.n?.toLocaleString()}</Text>
                 <Text style={s.funnelPct}>{step.pct}%</Text>
               </View>
             </View>

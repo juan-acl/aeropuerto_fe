@@ -43,28 +43,28 @@ const AMENIDADES_POOL = [
 ];
 
 // ── Normalizar hotel desde backend (PascalCase → snake_case) ──────────────────
-function normalizeHotel(h: BE_HotelCercano, index: number): HotelResult {
-  const estrellas = Number((h.Categoria ?? '3*').charAt(0)) || 3;
-  const dist      = h.DistanciaKm ?? (2 + index * 1.5);
-  const precio    = h.TarifaNocheDesde ?? (120 + index * 35);
+function normalizeHotel(h: any, index: number): HotelResult {
+  const estrellas = Number((h.categoria ?? '3*').charAt(0)) || 3;
+  const dist      = h.distancia_km ?? (2 + index * 1.5);
+  const precio    = h.tarifa_noche_desde ?? (120 + index * 35);
   // Rating generado localmente a partir de categoría (sin endpoint dedicado)
   const ratingBase = estrellas >= 5 ? 9.0 : estrellas >= 4 ? 8.0 : 7.0;
   const rating     = Math.min(10, ratingBase - (index % 3) * 0.3);
   return {
-    id_hotel:          h.IdHotel,
-    nombre:            h.NombreHotel,
+    id_hotel:          h.id_hotel,
+    nombre:            h.nombre_hotel,
     ciudad:            'Guatemala',          // default: aeropuerto La Aurora
-    categoria:         h.Categoria ?? `${estrellas}*`,
+    categoria:         h.categoria ?? `${estrellas}*`,
     estrellas,
     distancia_km:      dist,
     precio_noche:      precio,
-    shuttle:           h.TieneShuttle === 1,
+    shuttle:           h.tiene_shuttle === 1,
     rating:            Math.round(rating * 10) / 10,
     reviews:           80 + index * 23,
     amenidades:        AMENIDADES_POOL[index % AMENIDADES_POOL.length],
     imagen_emoji:      EMOJIS[index % EMOJIS.length],
-    disponible:        h.Activo !== 0,
-    codigo_aeropuerto: h.CodigoAeropuerto,
+    disponible:        h.activo !== 0,
+    codigo_aeropuerto: h.codigo_aeropuerto,
   };
 }
 
@@ -86,7 +86,7 @@ export function useHotels() {
     setError(null);
 
     try {
-      let raw: BE_HotelCercano[];
+      let raw: any[];
 
       // Si hay código de aeropuerto de 3 letras, buscar por aeropuerto
       if (destino && destino.length === 3) {
@@ -101,7 +101,7 @@ export function useHotels() {
       }
 
       const data = raw
-        .filter(h => h.Activo !== 0)
+        .filter(h => h.activo !== 0)
         .map((h, i) => normalizeHotel(h, i));
 
       setResults(data);

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { C } from '@/constants/theme';
@@ -66,12 +66,12 @@ export default function LealtadScreen() {
           </View>
           <View style={s.heroStats}>
             <View style={s.heroStat}>
-              <Text style={[s.heroStatN, { color: nc.color }]}>{puntos.toLocaleString('es-GT')}</Text>
+              <Text style={[s.heroStatN, { color: nc.color }]}>{puntos?.toLocaleString('es-GT')}</Text>
               <Text style={s.heroStatL}>PUNTOS</Text>
             </View>
             <View style={[s.heroStatDiv]} />
             <View style={s.heroStat}>
-              <Text style={[s.heroStatN, { color: nc.color }]}>{millas.toLocaleString('es-GT')}</Text>
+              <Text style={[s.heroStatN, { color: nc.color }]}>{millas?.toLocaleString('es-GT')}</Text>
               <Text style={s.heroStatL}>MILLAS</Text>
             </View>
           </View>
@@ -85,7 +85,7 @@ export default function LealtadScreen() {
                 <View style={[s.progressFill, { width: `${pct}%` as any, backgroundColor: nc.color }]} />
               </View>
               <Text style={s.progressSub}>
-                Faltan {(next.min - puntos).toLocaleString('es-GT')} puntos para {next.icon} {next.key}
+                Faltan {((next.min - puntos)||0).toLocaleString('es-GT')} puntos para {next.icon} {next.key}
               </Text>
             </View>
           )}
@@ -122,7 +122,7 @@ export default function LealtadScreen() {
                     </View>}
                   </View>
                   <Text style={s.nivelCardDesc}>{n.desc}</Text>
-                  <Text style={s.nivelCardRange}>{n.min.toLocaleString()} – {n.max.toLocaleString()} puntos</Text>
+                  <Text style={s.nivelCardRange}>{n.min?.toLocaleString()} – {n.max?.toLocaleString()} puntos</Text>
                 </View>
                 {alcanzado && <Text style={[s.nivelCheck, { color: n.color }]}>✓</Text>}
               </View>
@@ -138,7 +138,7 @@ export default function LealtadScreen() {
                 <View style={{ flex: 1 }}>
                   <Text style={s.canjeDesc}>{c.desc}</Text>
                   <Text style={[s.canjePts, { color: puedo ? nc.color : C.muted }]}>
-                    {c.pts.toLocaleString()} puntos
+                    {c.pts?.toLocaleString()} puntos
                   </Text>
                 </View>
                 <TouchableOpacity
@@ -147,12 +147,12 @@ export default function LealtadScreen() {
                     : { backgroundColor: C.bgElevated, borderColor: C.border }]}
                   onPress={() => puedo
                     ? require('react-native').Alert.alert('¡Canje solicitado!', 'Tu canje de "' + c.desc + '" está siendo procesado.')
-                    : require('react-native').Alert.alert('Puntos insuficientes', 'Necesitas ' + (c.pts - puntos).toLocaleString() + ' puntos más.')
+                    : require('react-native').Alert.alert('Puntos insuficientes', 'Necesitas ' + ((c.pts - puntos)||0).toLocaleString() + ' puntos más.')
                   }
                   activeOpacity={0.85}
                 >
                   <Text style={[s.canjeBtnT, { color: puedo ? C.white : C.muted }]}>
-                    {puedo ? 'Canjear' : 'Faltan ' + (c.pts - puntos).toLocaleString()}
+                    {puedo ? 'Canjear' : 'Faltan ' + ((c.pts - puntos)||0).toLocaleString()}
                   </Text>
                 </TouchableOpacity>
               </View>

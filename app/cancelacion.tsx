@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Cancelaciones inteligentes — detecta cancelación/retraso y ofrece:
  * 1. Vuelos alternativos al mismo destino
  * 2. Hotel para la noche (hoteles_cercanos)

@@ -44,26 +44,26 @@ export function useOverbooking() {
       const detectados: OverbookingCase[] = [];
 
       for (const v of vuelos) {
-        const capacidad = (v.PlazasVacias ?? 0) + (v.PlazasOcupadas ?? 0);
+        const capacidad = (v.plazas_vacias ?? 0) + (v.plazas_ocupadas ?? 0);
         if (capacidad <= 0) continue;
 
-        const exceso = (v.PlazasOcupadas ?? 0) - capacidad;
+        const exceso = (v.plazas_ocupadas ?? 0) - capacidad;
         if (exceso > 0) {
           const altVuelo = vuelos.find(alt =>
-            alt.IdVuelo !== v.IdVuelo &&
-            alt.AeropuertoDestino === v.AeropuertoDestino &&
-            alt.EstadoVuelo === 'PROGRAMADO' &&
-            (alt.PlazasVacias ?? 0) >= exceso
+            alt.id_vuelo !== v.id_vuelo &&
+            alt.aeropuerto_destino === v.aeropuerto_destino &&
+            alt.estado_vuelo === 'PROGRAMADO' &&
+            (alt.plazas_vacias ?? 0) >= exceso
           );
 
           detectados.push({
-            id_vuelo:          v.IdVuelo,
-            numero_vuelo:      v.NumeroVuelo ?? `FL-${v.IdVuelo}`,
-            destino:           v.AeropuertoDestino ?? '—',
+            id_vuelo:          v.id_vuelo,
+            numero_vuelo:      v.numero_vuelo ?? `FL-${v.id_vuelo}`,
+            destino:           v.aeropuerto_destino ?? '—',
             exceso,
             pasajerosAfectados:[],
             accion:            altVuelo ? 'REASIGNADO' : 'COMPENSACION',
-            vuelo_alternativo: altVuelo?.IdVuelo,
+            vuelo_alternativo: altVuelo?.id_vuelo,
             compensacion:      altVuelo ? undefined : 300,
           });
         }

@@ -11,7 +11,7 @@ import { Alert } from 'react-native';
  * http profile: http://localhost:5087
  * https profile: https://localhost:7114
  */
-const BASE_URL = process.env.EXPO_PUBLIC_BE_URL ?? 'http://localhost:5087';
+const BASE_URL = process.env.EXPO_PUBLIC_BE_URL ?? 'http://localhost:5087/api';
 
 // Simple fetch-based client (no axios dep needed, works on all platforms)
 class ApiClient {

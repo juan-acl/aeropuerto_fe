@@ -1,6 +1,6 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, ScrollView, SafeAreaView, Alert, TouchableOpacity } from 'react-native';
-import { backendApi } from '@/services/backendApi';
+import { backendApi, NORM } from '@/services/backendApi';
 import {Badge, DataCard, EmptyState, FF, FSelect, FToggle, FormModal, FormSection, InfoRow, ProgressBar, ScoreBar, ScreenHeader, SearchBar, StatCard, StatsRow, TabBar} from '@/components/shared';
 import { C } from '@/constants/theme';
 
@@ -9,18 +9,24 @@ export default function Screen() {
   const [ROLES, set_ROLES] = useState<any[]>([]);
   const [INCIDENTES_SEG, set_INCIDENTES_SEG] = useState<any[]>([]);
   useEffect(() => {
-      backendApi.vuelos.listar().then(d => set_USUARIOS(d)).catch(() => {});
-      backendApi.vuelos.listar().then(d => set_ROLES(d)).catch(() => {});
-      backendApi.vuelos.listar().then(d => set_INCIDENTES_SEG(d)).catch(() => {});
+      backendApi.usuariosSistema?.listar().then(d => set_USUARIOS((d||[]).map(NORM.usuarioSistema))).catch(() => {});
+      backendApi.rolesSistema?.listar().then(d => set_ROLES((d||[]).map(NORM.rolSistema))).catch(() => {});
+      backendApi.incidentesSeguridadInfo?.listar().then(d => set_INCIDENTES_SEG((d||[]).map(NORM.incidenteSegInfo))).catch(() => {});
   }, []);
 
   const [q, setQ] = useState('');
   const [modal, setModal] = useState(false);
   const [form, setForm] = useState<any>({});
-  // Initialize all module data
-  // USUARIOS available from imports
-  // ROLES available from imports
-  // INCIDENTES_SEG available from imports
+
+  const getIncidenteIcon = (t: string) => {
+    if (!t) return '🚨';
+    const tipo = t.toLowerCase();
+    if (tipo.includes('acceso') || tipo.includes('auth')) return '🔓';
+    if (tipo.includes('virus') || tipo.includes('malware')) return '🦠';
+    if (tipo.includes('red') || tipo.includes('ddos')) return '🌐';
+    if (tipo.includes('data') || tipo.includes('fuga')) return '💾';
+    return '🚨';
+  };
 
   return (
     <SafeAreaView style={{flex:1,backgroundColor:C.bg}}>
@@ -29,34 +35,33 @@ export default function Screen() {
       <ScrollView style={{flex:1}} contentContainerStyle={{padding:14, paddingBottom:24, flexGrow:1}}>
         
         <View style={{flexDirection:'row',gap:8,marginBottom:12}}>
-          <StatCard label="Usuarios" value={USUARIOS.filter((u:any)=>u.activo).length} color={C.red} bg={C.redBg} icon="" />
+          <StatCard label="Usuarios" value={USUARIOS.filter((u:any)=>u.activo).length} color={C.red} bg={C.redBg} icon="👤" />
           <StatCard label="Roles" value={ROLES.length} color={C.purple} bg={C.purpleBg} icon="🔑" />
           <StatCard label="Incidentes" value={INCIDENTES_SEG.length} color={C.danger} bg={C.dangerBg} icon="🚨" />
         </View>
         <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginBottom:8}}> Usuarios del Sistema</Text>
         {USUARIOS.filter((u:any)=>JSON.stringify(u).toLowerCase().includes(q.toLowerCase())).map((u:any)=>(
-          <DataCard key={u.id_usuario_sistema} title={u.nombre_usuario}
-            subtitle={`${u.email_institucional??'—'} · Creado: ${u.fecha_creacion??'—'}`}
-            badge={<Badge value={u.activo&&!u.bloqueado?'ACTIVO':u.bloqueado?'RECHAZADO':'INACTIVO'} />}
-            accentColor={u.bloqueado?C.danger:C.red}>
-            <Text style={{fontSize:11,color:C.muted}}>Intentos fallidos: {u.intentos_fallidos}</Text>
+          <DataCard key={u.id_usuario_sistema} title={u.nombre_usuario || 'Usuario'}
+            subtitle={u.email_institucional || 'Sin contacto'}
+            badge={<Badge value={u.activo&&!u.bloqueado?'ACTIVO':u.bloqueado?'BLOQUEADO':'INACTIVO'} />}
+            meta={`ID: ${u.id_usuario_sistema}`} accentColor={u.bloqueado?C.danger:C.red}>
+            <InfoRow label="Último Acceso" value={u.fecha_ultimo_acceso ? new Date(u.fecha_ultimo_acceso).toLocaleString() : 'Nunca'} />
+            <Text style={{fontSize:11,color:C.muted}}>Intentos fallidos: {u.intentos_fallidos ?? 0}</Text>
           </DataCard>
         ))}
         <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginTop:16,marginBottom:8}}>🔑 Roles del Sistema</Text>
         {ROLES.filter((r:any)=>JSON.stringify(r).toLowerCase().includes(q.toLowerCase())).map((r:any)=>(
-          <DataCard key={r.id_rol_sistema} title={r.nombre_rol}
+          <DataCard key={r.id_rol_sistema} title={r.nombre_rol || 'Rol'}
             subtitle={r.descripcion??'—'}
             badge={<Badge value={r.activo?'ACTIVO':'INACTIVO'} />}
-            meta={`Nivel ${r.nivel_jerarquico??'—'}`} accentColor={C.purple}>
-            <></>
-          </DataCard>
+            meta={`Nivel ${r.nivel_jerarquico??'—'}`} accentColor={C.purple} />
         ))}
         <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginTop:16,marginBottom:8}}>🚨 Incidentes de Seguridad</Text>
         {INCIDENTES_SEG.filter((i:any)=>JSON.stringify(i).toLowerCase().includes(q.toLowerCase())).map((i:any)=>(
-          <DataCard key={i.id_incidente_seguridad_info} title={i.tipo_incidente.replace(/_/g,' ')}
-            subtitle={i.descripcion}
+          <DataCard key={i.id_incidente_seguridad_info} title={`${getIncidenteIcon(i.tipo_incidente)} Incidente #${i.id_incidente_seguridad_info||i.id||''}`}
+            subtitle={(i.tipo_incidente || '').replace(/_/g,' ')?.substring(0,35) + '...'}
             badge={<Badge value={i.nivel_gravedad} />}
-            meta={i.fecha_deteccion?.split(' ')[0]} accentColor={i.nivel_gravedad==='ALTO'||i.nivel_gravedad==='CRITICO'?C.danger:C.warning}>
+            meta={i.fecha_deteccion?.split('T')[0] ?? i.fecha_deteccion?.split(' ')[0]} accentColor={i.nivel_gravedad==='ALTO'||i.nivel_gravedad==='CRITICO'?C.danger:C.warning}>
             <Badge value={i.estado} />
           </DataCard>
         ))}

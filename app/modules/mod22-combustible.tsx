@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, ScrollView, SafeAreaView, Alert, TouchableOpacity } from 'react-native';
 import { backendApi } from '@/services/backendApi';
 import {Badge, DataCard, EmptyState, FF, FSelect, FToggle, FormModal, FormSection, InfoRow, ProgressBar, ScoreBar, ScreenHeader, SearchBar, StatCard, StatsRow, TabBar} from '@/components/shared';
@@ -8,8 +8,8 @@ export default function Screen() {
   const [TANQUES, set_TANQUES] = useState<any[]>([]);
   const [PEDIDOS_COMB, set_PEDIDOS_COMB] = useState<any[]>([]);
   useEffect(() => {
-      backendApi.combustible.tanques.listar().then(d => set_TANQUES(d)).catch(() => {});
-      backendApi.vuelos.listar().then(d => set_PEDIDOS_COMB(d)).catch(() => {});
+      backendApi.combustible.tanques.listar().then(d => set_TANQUES(d || [])).catch(() => {});
+      backendApi.combustible.pedidos.listar().then(d => set_PEDIDOS_COMB(d || [])).catch(() => {});
   }, []);
 
   const [q, setQ] = useState('');
@@ -39,20 +39,20 @@ export default function Screen() {
         </View>
         <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginBottom:8}}>🛢️ Tanques de Combustible</Text>
         {TANQUES.filter((t:any)=>JSON.stringify(t).toLowerCase().includes(q.toLowerCase())).map((t:any)=>(
-          <DataCard key={t.id_tanque} title={t.nombre_tanque??t.codigo_tanque}
-            subtitle={`${t.tipo_combustible??'—'} · ${t.ubicacion??'—'}`}
-            badge={<Badge value={t.activo?'ACTIVO':'INACTIVO'} />}
-            meta={`${t.porcentaje_llenado?.toFixed(0)}% lleno`} accentColor={C.orange}>
-            <ProgressBar value={t.nivel_actual_litros??0} max={t.capacidad_litros} />
-            <Text style={{fontSize:11,color:C.muted,marginTop:4}}>{(t.nivel_actual_litros??0).toLocaleString()} / {t.capacidad_litros.toLocaleString()} L</Text>
+          <DataCard key={t.id_tanque} title={t.nombre_tanque || t.codigo_tanque || 'Tanque'}
+            subtitle={`${t.tipo_combustible ?? '—'} · ${t.ubicacion ?? '—'}`}
+            badge={<Badge value={t.activo ? 'ACTIVO' : 'INACTIVO'} color={t.activo ? C.success : C.muted} />}
+            meta={`${(t.porcentaje_llenado ?? 0).toFixed(0)}% lleno`} accentColor={C.orange}>
+            <ProgressBar value={t.nivel_actual_litros ?? 0} max={t.capacidad_litros ?? 1} />
+            <Text style={{fontSize:11,color:C.muted,marginTop:4}}>{(t.nivel_actual_litros ?? 0).toLocaleString()} / {(t.capacidad_litros ?? 0).toLocaleString()} L</Text>
           </DataCard>
         ))}
         <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginTop:16,marginBottom:8}}>📋 Pedidos de Combustible</Text>
-        {PEDIDOS_COMB.filter((p:any)=>JSON.stringify(p).toLowerCase().includes(q.toLowerCase())).map((p:any)=>(
-          <DataCard key={p.id_pedido_combustible} title={p.numero_pedido}
-            subtitle={`Vuelo ${p.id_vuelo} · ${p.cantidad_solicitada_litros.toLocaleString()} L`}
+        {PEDIDOS_COMB.filter((p:any)=>p && JSON.stringify(p).toLowerCase().includes(q.toLowerCase())).map((p:any)=>(
+          <DataCard key={p.id_pedido_combustible} title={p.numero_pedido || 'Pedido'}
+            subtitle={`Vuelo ${p.id_vuelo ?? '—'} · ${(p.cantidad_solicitada_litros ?? 0).toLocaleString()} L`}
             badge={<Badge value={p.estado_pedido} />}
-            meta={p.prioridad??'NORMAL'} accentColor={p.prioridad==='EMERGENCIA'?C.danger:p.prioridad==='ALTA'?C.warning:C.orange}>
+            meta={p.prioridad ?? 'NORMAL'} accentColor={p.prioridad==='EMERGENCIA'?C.danger:p.prioridad==='ALTA'?C.warning:C.orange}>
             <></>
           </DataCard>
         ))}

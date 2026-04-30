@@ -14,6 +14,11 @@ const STATUS: Record<EstadoVuelo, { color: string; bg: string; label: string; do
   REPROGRAMADO:{ color: C.purple,   bg: C.purpleBg,   label: 'Reprogr.',    dot: '#A855F7' },
 };
 
+// Helper: backend may return PascalCase or snake_case depending on context
+function g(v: any, pascal: string, snake: string) {
+  return v[pascal] ?? v[snake];
+}
+
 interface FlightCardProps {
   retraso_min?: number;  // from real-time polling
   vuelo: any;
@@ -22,11 +27,24 @@ interface FlightCardProps {
 }
 
 export function FlightCard({ vuelo, onPress, modoPublico = false, retraso_min }: FlightCardProps) {
-  const dep = vuelo.hora_salida_programada?.split('T')[1]?.slice(0,5) ?? '--:--';
-  const arr = vuelo.hora_llegada_programada?.split('T')[1]?.slice(0,5) ?? '--:--';
-  const cfg = STATUS[vuelo.estado_vuelo as EstadoVuelo] ?? STATUS.PROGRAMADO;
-  const pct = vuelo.plazas_ocupadas && vuelo.capacidad_total
-    ? Math.round((vuelo.plazas_ocupadas / vuelo.capacidad_total) * 100) : null;
+  const depRaw = g(vuelo, 'HoraSalidaProgramada', 'hora_salida_programada');
+  const arrRaw = g(vuelo, 'HoraLlegadaProgramada', 'hora_llegada_programada');
+  const dep = depRaw?.split('T')[1]?.slice(0,5) ?? '--:--';
+  const arr = arrRaw?.split('T')[1]?.slice(0,5) ?? '--:--';
+
+  const estado = g(vuelo, 'EstadoVuelo', 'estado_vuelo') ?? 'PROGRAMADO';
+  const cfg = STATUS[estado as EstadoVuelo] ?? STATUS.PROGRAMADO;
+
+  const ocupadas = g(vuelo, 'PlazasOcupadas', 'plazas_ocupadas') ?? 0;
+  const vacias = g(vuelo, 'PlazasVacias', 'plazas_vacias') ?? 0;
+  const capacidad = ocupadas + vacias;
+  const pct = capacidad > 0 ? Math.round((ocupadas / capacidad) * 100) : 0;
+
+  const flightNum = g(vuelo, 'NumeroVuelo', 'numero_vuelo') ?? `FL-${g(vuelo, 'IdVuelo', 'id_vuelo')}`;
+  const origen = g(vuelo, 'AeropuertoOrigen', 'aeropuerto_origen') ?? 'GUA';
+  const destino = g(vuelo, 'AeropuertoDestino', 'aeropuerto_destino') ?? '—';
+  const matricula = g(vuelo, 'MatriculaAvion', 'matricula_avion');
+  const puerta = g(vuelo, 'IdPuertaSalida', 'id_puerta_salida');
 
   return (
     <TouchableOpacity
@@ -40,9 +58,9 @@ export function FlightCard({ vuelo, onPress, modoPublico = false, retraso_min }:
         {/* Top row */}
         <View style={s.topRow}>
           <View>
-            <Text style={s.flightNum}>{vuelo.numero_vuelo ?? `FL-${vuelo.id_vuelo}`}</Text>
-            {!modoPublico && vuelo.matricula_avion && (
-              <Text style={s.matricula}>{vuelo.matricula_avion}</Text>
+            <Text style={s.flightNum}>{flightNum}</Text>
+            {!modoPublico && matricula && (
+              <Text style={s.matricula}>{matricula}</Text>
             )}
           </View>
           <View style={[s.statusPill, { backgroundColor: cfg.bg, borderColor: cfg.color + '40' }]}>
@@ -54,7 +72,7 @@ export function FlightCard({ vuelo, onPress, modoPublico = false, retraso_min }:
         {/* Route */}
         <View style={s.routeRow}>
           <View style={s.endpoint}>
-            <Text style={s.airportCode}>{vuelo.aeropuerto_origen ?? 'GUA'}</Text>
+            <Text style={s.airportCode}>{origen}</Text>
             <Text style={s.time}>{dep}</Text>
           </View>
 
@@ -62,19 +80,19 @@ export function FlightCard({ vuelo, onPress, modoPublico = false, retraso_min }:
             <View style={[s.routeDot, { backgroundColor: cfg.dot }]} />
             <View style={[s.routeTrack, { backgroundColor: cfg.dot + '30' }]}>
               <View style={[s.routeProgress, { backgroundColor: cfg.dot,
-                width: vuelo.estado_vuelo === 'EN_VUELO' ? '55%'
-                  : vuelo.estado_vuelo === 'ATERRIZADO' ? '100%' : '0%' }]} />
+                width: estado === 'EN_VUELO' ? '55%'
+                  : estado === 'ATERRIZADO' ? '100%' : '0%' }]} />
             </View>
-            <Text style={[s.planeTxt, { color: cfg.dot }]}></Text>
+            <Text style={[s.planeTxt, { color: cfg.dot }]}>✈</Text>
             <View style={[s.routeTrack, { backgroundColor: cfg.dot + '30' }]}>
               <View style={[s.routeProgress, { backgroundColor: cfg.dot,
-                width: vuelo.estado_vuelo === 'ATERRIZADO' ? '100%' : '0%' }]} />
+                width: estado === 'ATERRIZADO' ? '100%' : '0%' }]} />
             </View>
             <View style={[s.routeDot, { backgroundColor: cfg.dot }]} />
           </View>
 
           <View style={[s.endpoint, { alignItems: 'flex-end' }]}>
-            <Text style={s.airportCode}>{vuelo.aeropuerto_destino ?? '—'}</Text>
+            <Text style={s.airportCode}>{destino}</Text>
             <Text style={s.time}>{arr}</Text>
           </View>
         </View>
@@ -82,7 +100,7 @@ export function FlightCard({ vuelo, onPress, modoPublico = false, retraso_min }:
         {/* RT delay badge */}
       {retraso_min != null && retraso_min > 0 && (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: C.warningBg, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3, marginHorizontal: 16, borderWidth: 1, borderColor: C.warningL }}>
-          <Text style={{ fontSize: 11 }}></Text>
+          <Text style={{ fontSize: 11 }}>⏱</Text>
           <Text style={{ fontSize: 11, fontWeight: '700', color: C.warning }}>
             Retraso de {retraso_min} min
           </Text>
@@ -92,7 +110,7 @@ export function FlightCard({ vuelo, onPress, modoPublico = false, retraso_min }:
         <View style={s.footer}>
           <View style={s.footerChip}>
             <Text style={s.footerIcon}>🚪</Text>
-            <Text style={s.footerVal}>Puerta {vuelo.id_puerta_salida ?? '—'}</Text>
+            <Text style={s.footerVal}>Puerta {puerta ?? '—'}</Text>
           </View>
           {!modoPublico && pct != null && (
             <View style={s.footerChip}>

@@ -134,10 +134,10 @@ export default function Confirmacion() {
               <Text style={{ fontSize: 28 }}>🏆</Text>
               <View>
                 <Text style={s.puntosTitle}>
-                  +{puntosGanados.toLocaleString('es-GT')} puntos ganados
+                  +{puntosGanados?.toLocaleString('es-GT')} puntos ganados
                 </Text>
                 <Text style={s.puntosTotal}>
-                  Total: {puntosActuales.toLocaleString('es-GT')} pts · Nivel {nivelActual}
+                  Total: {puntosActuales?.toLocaleString('es-GT')} pts · Nivel {nivelActual}
                 </Text>
               </View>
             </View>

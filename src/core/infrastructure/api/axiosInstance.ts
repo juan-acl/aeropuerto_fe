@@ -142,6 +142,6 @@ class ApiClient {
   }
 }
 
-const BASE_URL = (process.env.EXPO_PUBLIC_API_URL as string) ?? 'https://api.aurora-airport.gt/v1';
+const BASE_URL = (process.env.EXPO_PUBLIC_API_URL as string) ?? 'http://localhost:5087/api';
 export const axiosInstance = new ApiClient(BASE_URL);
 export default axiosInstance;
