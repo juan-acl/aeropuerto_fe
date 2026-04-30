@@ -25,6 +25,8 @@
 // ✅ Todos los módulos están unificados en aeropuerto_be-develop (:5087)
 const BE_UNIFIED = process.env.EXPO_PUBLIC_BE_URL ?? "http://localhost:5087";
 const BE_DEVELOP = BE_UNIFIED;
+const BE_GERSON = BE_UNIFIED; // Antes :5088 — ahora unificado en :5087
+const BE_MODULOS = BE_UNIFIED; // Antes :5089 — ahora unificado en :5087
 
 const TIMEOUT_MS = 8000;
 
@@ -1035,6 +1037,37 @@ export interface BE_CanjePuntos {
   IdVuelo?: number;
   ValorMonetario?: number;
   EstadoCanje?: string; // PROCESADO | ENTREGADO | CANCELADO
+}
+
+// ── MÓDULO 28: EMERGENCIAS ────────────────────────────────────────────────────
+
+export interface BE_PlanEmergencia {
+  IdPlanEmergencia: number;
+  CodigoPlan?: string;
+  NombrePlan: string;
+  TipoEmergencia?: string; // INCENDIO | MEDICA | BOMBA | CLIMATICO | EVACUACION | …
+  NivelActivacion?: string; // NIVEL_1 | NIVEL_2 | NIVEL_3
+  ResponsableActivacion?: string;
+  Activo: number;
+}
+
+export interface BE_EquipoEmergencia {
+  IdEquipoEmergencia: number;
+  CodigoEquipo?: string;
+  NombreEquipo: string;
+  TipoEquipo?: string; // BOMBEROS | MEDICO | SEGURIDAD | EVACUACION | …
+  UbicacionHabitual?: string;
+  Estado?: string; // DISPONIBLE | EN_USO | EN_MANTENIMIENTO | FUERA_DE_SERVICIO
+  Activo: number;
+}
+
+export interface BE_ActivacionEmergencia {
+  IdActivacion: number;
+  TipoEmergencia?: string;
+  IdPlanEmergencia?: number;
+  NivelActivacion?: string;
+  PersonasAfectadas?: number;
+  Estado?: string; // ACTIVA | CONTROLADA | FINALIZADA
 }
 
 // ── TIPOS REQUEST — Stored Procedures (lógica de negocio) ────────────────────
