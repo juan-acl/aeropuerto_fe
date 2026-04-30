@@ -172,65 +172,72 @@ export default function CheckinScreen() {
     if (!codigo.trim()) { Alert.alert('Requerido', 'Ingresa el código de tu reserva.'); return; }
     setStep('VALIDANDO');
 
-    await new Promise(r => setTimeout(r, 1200)); // simulate processing
+    try {
+      // Buscar la reserva en el backend
+      const reserva = await backendApi.reservas.porCodigo(codigo.toUpperCase().trim()).catch(() => null)
+        ?? (RESERVAS as any[]).find(r => r.codigo_reserva === codigo.toUpperCase().trim());
 
-    // Find reservation
-    const reserva = (RESERVAS as any[]).find(r =>
-      r.codigo_reserva === codigo.toUpperCase().trim()
-    );
+      if (!reserva) {
+        setMensaje('No encontramos una reserva con ese código. Verifica e intenta de nuevo.');
+        setStep('ERROR'); return;
+      }
 
-    if (!reserva) {
-      setMensaje('No encontramos una reserva con ese código. Verifica e intenta de nuevo.');
-      setStep('ERROR'); return;
+      if (reserva.EstadoReserva === 'CANCELADA' || reserva.estado_reserva === 'CANCELADA') {
+        setMensaje('Esta reserva está cancelada. No puedes realizar check-in.');
+        setStep('ERROR'); return;
+      }
+
+      const numDoc = (usuario as any)?.numero_documento ?? (usuario as any)?.NumeroDocumento ?? '';
+      const numAsiento = reserva.NumeroAsiento ?? reserva.numero_asiento ?? '15C';
+
+      // Llamar al SP de check-in en línea
+      const respSP = await backendApi.reservas.checkIn({
+        CodigoReserva:   codigo.toUpperCase().trim(),
+        NumeroDocumento: numDoc,
+        NumeroAsiento:   numAsiento,
+      }).catch((e: any) => {
+        // Si el SP falla con error de negocio (ej: fuera de tiempo) lo mostramos
+        if (e.message && !e.message.includes('TIMEOUT') && !e.message.includes('fetch')) {
+          throw e;
+        }
+        // Si backend no disponible, continuamos con datos locales
+        return null;
+      });
+
+      const vuelo = (VUELOS as any[]).find(v =>
+        v.id_vuelo === (reserva.IdVuelo ?? reserva.id_vuelo)
+      );
+
+      const salida  = vuelo?.hora_salida_programada?.split('T')[1]?.slice(0,5) ?? '09:00';
+      const fecha   = vuelo?.fecha_vuelo?.split('T')[0] ?? new Date().toISOString().split('T')[0];
+      const asiento = numAsiento;
+      const clase   = reserva.ClaseServicio ?? reserva.clase_servicio ?? 'ECONOMICA';
+
+      const nuevoPase: PaseAbordaje = {
+        numero_pase:    respSP?.qr_provisional ?? `PA-${codigo}-${Date.now().toString().slice(-4)}`,
+        codigo_reserva: codigo.toUpperCase(),
+        numero_vuelo:   vuelo?.numero_vuelo ?? `FL-${reserva.IdVuelo ?? reserva.id_vuelo}`,
+        origen:         vuelo?.aeropuerto_origen ?? 'GUA',
+        destino:        vuelo?.aeropuerto_destino ?? '—',
+        fecha,
+        salida,
+        asiento,
+        clase,
+        puerta:         String(vuelo?.id_puerta_salida ?? Math.floor(Math.random() * 14) + 1),
+        grupo:          calcGrupoEmbarque(asiento, clase),
+        hora_embarque:  calcHoraEmbarque(salida),
+        pasajero_nombre:`${usuario?.nombre ?? 'Pasajero'} ${usuario?.apellido ?? ''}`.trim(),
+        qr:             `QR:${codigo}:${reserva.IdVuelo ?? reserva.id_vuelo}`,
+      };
+
+      setPase(nuevoPase);
+      setStep('PASE');
+      notificationStore.add(NotificationFactory.checkinDisponible(nuevoPase.numero_vuelo, 2));
+    } catch (e: any) {
+      setMensaje(e.message ?? 'No se pudo completar el check-in. Intenta de nuevo.');
+      setStep('ERROR');
     }
-
-    if (reserva.estado_reserva === 'CANCELADA') {
-      setMensaje('Esta reserva está cancelada. No puedes realizar check-in.');
-      setStep('ERROR'); return;
-    }
-
-    if (reserva.checkin_realizado) {
-      setMensaje('El check-in ya fue realizado para esta reserva.');
-      setStep('ERROR'); return;
-    }
-
-    // Find flight
-    const vuelo = (VUELOS as any[]).find(v => v.id_vuelo === reserva.id_vuelo);
-    if (!vuelo) {
-      setMensaje('No se encontró información del vuelo.');
-      setStep('ERROR'); return;
-    }
-
-    // Time window validation (24h before – 45min before)
-    // In demo: always allow
-    const salida = vuelo.hora_salida_programada?.split('T')[1]?.slice(0,5) ?? '09:00';
-    const fecha  = vuelo.fecha_vuelo?.split('T')[0] ?? new Date().toISOString().split('T')[0];
-    const asiento = reserva.numero_asiento ?? '15C';
-    const clase   = reserva.clase_servicio ?? 'ECONOMICA';
-
-    const nuevoPase: PaseAbordaje = {
-      numero_pase:    `PA-${codigo}-${Date.now().toString().slice(-4)}`,
-      codigo_reserva: codigo.toUpperCase(),
-      numero_vuelo:   vuelo.numero_vuelo ?? `FL-${vuelo.id_vuelo}`,
-      origen:         vuelo.aeropuerto_origen ?? 'GUA',
-      destino:        vuelo.aeropuerto_destino ?? '—',
-      fecha,
-      salida,
-      asiento,
-      clase,
-      puerta:         String(vuelo.id_puerta_salida ?? Math.floor(Math.random() * 14) + 1),
-      grupo:          calcGrupoEmbarque(asiento, clase),
-      hora_embarque:  calcHoraEmbarque(salida),
-      pasajero_nombre:`${usuario?.nombre ?? reserva.nombres ?? 'Pasajero'} ${usuario?.apellido ?? reserva.apellidos ?? ''}`,
-      qr:             `QR:${codigo}:${vuelo.id_vuelo}`,
-    };
-
-    setPase(nuevoPase);
-    setStep('PASE');
-
-    // Fire notification
-    notificationStore.add(NotificationFactory.checkinDisponible(vuelo.numero_vuelo, 2));
-  }, [codigo, usuario]);
+  }, [codigo, usuario, RESERVAS, VUELOS]);
 
   return (
     <SafeAreaView style={s.container}>

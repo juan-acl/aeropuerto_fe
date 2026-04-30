@@ -217,6 +217,11 @@ export function useBookingManager() {
     }
   }, [pricing]);
 
+  // Mapeo método de pago (string UI) → IdMetodoPago en Oracle
+  const METODO_ID: Record<string, number> = {
+    TARJETA: 1, EFECTIVO: 3, TRANSFERENCIA: 4, PUNTOS: 5,
+  };
+
   const confirmarPago = useCallback(async (metodoPago: string, referencia: string) => {
     if (!vuelo || !asiento || !pasajero || !pricing) {
       setError('Datos incompletos.'); return null;
@@ -224,18 +229,40 @@ export function useBookingManager() {
     setLoading(true); setError(null);
 
     try {
-      const payload = {
-        IdVuelo:         vuelo.IdVuelo,
-        IdPasajero:      usuario?.id ?? 0,
-        NumeroAsiento:   asiento,
-        ClaseServicio:   clase,
-        PrecioPagado:    totalFinal,
-        Moneda:          'USD',
-        MetodoPago:      metodoPago,
-        ReferenciaPago:  referencia,
-      };
+      // Paso 1: crear reserva PENDIENTE via SP (valida reglas de negocio)
+      await backendApi.reservas.crearReserva({
+        IdVuelo:        vuelo.IdVuelo,
+        IdPasajero:     usuario?.id ?? 0,
+        ClaseServicio:  clase,
+        NumeroAsiento:  asiento,
+        TipoTarifa:     clase === 'PRIMERA_CLASE' ? 'FLEX' : clase === 'EJECUTIVA' ? 'SEMI_FLEX' : 'BASICA',
+        Precio:         totalFinal,
+        Moneda:         'USD',
+      });
 
-      const resultado = await backendApi.reservas.crear(payload as any);
+      // Paso 2: obtener IdReserva de la reserva recién creada (PENDIENTE para este vuelo)
+      let idReserva = 0;
+      let codigoReserva = `RES-${Date.now().toString().slice(-6)}`;
+      try {
+        const reservasList = await backendApi.reservas.porPasajero(usuario?.id ?? 0);
+        const pendiente = reservasList
+          .filter((r: any) => r.IdVuelo === vuelo.IdVuelo && r.EstadoReserva === 'PENDIENTE')
+          .sort((a: any, b: any) => b.IdReserva - a.IdReserva)[0];
+        if (pendiente) { idReserva = pendiente.IdReserva; codigoReserva = pendiente.CodigoReserva; }
+      } catch { /* usa fallback */ }
+
+      // Paso 3: pagar via SP → cambia estado a CONFIRMADA
+      if (idReserva > 0) {
+        await backendApi.reservas.pagar({
+          IdReserva:          idReserva,
+          IdMetodoPago:       METODO_ID[metodoPago] ?? 1,
+          Monto:              totalFinal,
+          Moneda:             'USD',
+          CodigoTransaccion:  referencia || `TXN-${Date.now()}`,
+        });
+      }
+
+      const resultado = { IdGenerado: idReserva, CodigoReserva: codigoReserva };
 
       setReservaConf(resultado);
       track('BOOKING_COMPLETE', {

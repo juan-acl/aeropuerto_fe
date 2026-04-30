@@ -1024,6 +1024,62 @@ export interface BE_CanjePuntos {
   EstadoCanje?:      string;  // PROCESADO | ENTREGADO | CANCELADO
 }
 
+// ── TIPOS REQUEST — Stored Procedures (lógica de negocio) ────────────────────
+
+export interface BE_CrearReservaRequest {
+  IdVuelo: number; IdPasajero: number; ClaseServicio: string;
+  NumeroAsiento: string; TipoTarifa: string; Precio: number; Moneda: string;
+}
+
+export interface BE_CheckInRequest {
+  CodigoReserva: string; NumeroDocumento: string; NumeroAsiento: string;
+}
+
+export interface BE_CheckInMostradorRequest {
+  CodigoReserva: string; NumeroDocumento: string; NumeroAsiento: string;
+  EquipajeFacturado: number; EquipajeMano: number; TipoVuelo: string; VisaValida: number;
+}
+
+export interface BE_EmbarqueRequest {
+  CodigoReserva: string; NumeroDocumento: string; PuertaEmbarque: string;
+}
+
+export interface BE_PagoBoletoRequest {
+  IdReserva: number; IdMetodoPago: number; Monto: number;
+  Moneda: string; CodigoTransaccion: string; Comprobante?: string;
+}
+
+export interface BE_AsignarPuertaRequest {
+  IdVuelo: number; IdPuerta: number; TipoVuelo: string;
+}
+
+export interface BE_CancelarVueloRequest {
+  IdVuelo: number; MotivoCancelacion: string;
+}
+
+export interface BE_CrearVueloRequest {
+  IdPrograma: number; FechaVuelo: string; HoraSalida: string;
+  HoraLlegada: string; IdModeloAvion: number; MatriculaAvion: string;
+}
+
+export interface BE_ReprogramarVueloRequest {
+  IdVuelo: number; NuevaFecha: string; NuevaHoraSalida: string; NuevaHoraLlegada: string;
+}
+
+export interface BE_RegistrarAerolineaRequest {
+  Nombre: string; CodigoIata: string; CodigoOaci: string; PaisOrigen: string; Contacto: string;
+}
+
+export interface BE_RegistrarAeronaveRequest {
+  Matricula: string; CodigoIcaoTipo: string; IdAerolinea: number;
+  NombreAeronave?: string; Configuracion: string; NumeroMotores: number; AnioFabricacion: number;
+}
+
+export interface BE_RegistrarPasajeroRequest {
+  Nombre: string; Apellidos: string; NumeroDocumento: string;
+  Nacionalidad: string; FechaNacimiento: string; Email?: string;
+}
+
 // ── HEALTH CHECK ──────────────────────────────────────────────────────────────
 export interface BE_HealthCheck { status: string; database: string; }
 
@@ -1170,11 +1226,15 @@ export const backendApi = {
 
   // Módulo 3
   aerolineas: {
-    listar:     () => get<BE_Aerolinea[]>(BE_DEVELOP, '/api/aerolineas'),
-    obtener:    (id: number) => get<BE_Aerolinea>(BE_DEVELOP, `/api/aerolineas/${id}`),
-    crear:      (m: Omit<BE_Aerolinea, 'IdAerolinea'>) => post(BE_DEVELOP, '/api/aerolineas', m),
-    actualizar: (id: number, m: Partial<BE_Aerolinea>) => put(BE_DEVELOP, `/api/aerolineas/${id}`, m),
-    eliminar:   (id: number) => del(BE_DEVELOP, `/api/aerolineas/${id}`),
+    listar:           () => get<BE_Aerolinea[]>(BE_DEVELOP, '/api/aerolineas'),
+    obtener:          (id: number) => get<BE_Aerolinea>(BE_DEVELOP, `/api/aerolineas/${id}`),
+    crear:            (m: Omit<BE_Aerolinea, 'IdAerolinea'>) => post(BE_DEVELOP, '/api/aerolineas', m),
+    actualizar:       (id: number, m: Partial<BE_Aerolinea>) => put(BE_DEVELOP, `/api/aerolineas/${id}`, m),
+    eliminar:         (id: number) => del(BE_DEVELOP, `/api/aerolineas/${id}`),
+    registrar:        (m: BE_RegistrarAerolineaRequest) =>
+      post<{ mensaje: string }>(BE_DEVELOP, '/api/aerolineas/registrar', m),
+    registrarAeronave:(m: BE_RegistrarAeronaveRequest) =>
+      post<{ mensaje: string }>(BE_DEVELOP, '/api/aerolineas/registrar_aeronave', m),
   },
   tiposAerolinea: {
     listar:     () => get<BE_TipoAerolinea[]>(BE_DEVELOP, '/api/tiposaerolinea'),
@@ -1214,14 +1274,24 @@ export const backendApi = {
 
   // Módulo 5
   vuelos: {
-    listar:     () => get<BE_Vuelo[]>(BE_DEVELOP, '/api/vuelos'),
-    obtener:    (id: number) => get<BE_Vuelo>(BE_DEVELOP, `/api/vuelos/${id}`),
-    buscar:     (origen: string, destino: string, fecha: string) =>
+    listar:          () => get<BE_Vuelo[]>(BE_DEVELOP, '/api/vuelos'),
+    obtener:         (id: number) => get<BE_Vuelo>(BE_DEVELOP, `/api/vuelos/${id}`),
+    buscar:          (origen: string, destino: string, fecha: string) =>
       get<BE_Vuelo[]>(BE_DEVELOP, `/api/vuelos?origen=${origen}&destino=${destino}&fecha=${fecha}`),
-    crear:      (m: Omit<BE_Vuelo, 'IdVuelo'>) => post<{ IdGenerado: number }>(BE_DEVELOP, '/api/vuelos', m),
-    actualizar: (id: number, m: Partial<BE_Vuelo>) => put(BE_DEVELOP, `/api/vuelos/${id}`, m),
+    crear:           (m: Omit<BE_Vuelo, 'IdVuelo'>) => post<{ IdGenerado: number }>(BE_DEVELOP, '/api/vuelos', m),
+    actualizar:      (id: number, m: Partial<BE_Vuelo>) => put(BE_DEVELOP, `/api/vuelos/${id}`, m),
     actualizarEstado:(id: number, estado: string) =>
       put(BE_DEVELOP, `/api/vuelos/${id}/estado`, { EstadoVuelo: estado }),
+    crearVuelo:      (m: BE_CrearVueloRequest) =>
+      post<{ mensaje: string }>(BE_DEVELOP, '/api/vuelos/crear-vuelo', m),
+    reprogramar:     (m: BE_ReprogramarVueloRequest) =>
+      put<{ mensaje: string }>(BE_DEVELOP, '/api/vuelos/reprogramar', m),
+    asignarPuerta:   (m: BE_AsignarPuertaRequest) =>
+      post<{ mensaje: string }>(BE_DEVELOP, '/api/vuelos/asignar-puerta', m),
+    cancelar:        (m: BE_CancelarVueloRequest) =>
+      post<{ mensaje: string }>(BE_DEVELOP, '/api/vuelos/cancelar', m),
+    cerrarEmbarque:  (idVuelo: number) =>
+      post<{ mensaje: string }>(BE_DEVELOP, `/api/vuelos/${idVuelo}/cerrar-embarque`, {}),
   },
   incidentesVuelo: {
     listar:     () => get<BE_IncidenteVuelo[]>(BE_DEVELOP, '/api/incidentesvuelo'),
@@ -1315,6 +1385,8 @@ export const backendApi = {
     buscar:     (q: string) => get<BE_Pasajero[]>(BE_GERSON, `/api/pasajeros/buscar?q=${encodeURIComponent(q)}`),
     crear:      (m: Omit<BE_Pasajero, 'IdPasajero'>) => post<{ IdGenerado: number }>(BE_GERSON, '/api/pasajeros', m),
     actualizar: (id: number, m: Partial<BE_Pasajero>) => put(BE_GERSON, `/api/pasajeros/${id}`, m),
+    registrar:  (m: BE_RegistrarPasajeroRequest) =>
+      post<{ mensaje: string }>(BE_GERSON, '/api/pasajeros/registrar', m),
   },
   perfilesViajero: {
     porPasajero:(id: number) => get<BE_PerfilViajero>(BE_GERSON, `/api/perfilesviajero/pasajero/${id}`),
@@ -1323,12 +1395,22 @@ export const backendApi = {
 
   // Módulo 8
   reservas: {
-    crear:       (m: Omit<BE_Reserva, 'IdReserva'>) =>
+    crear:                (m: Omit<BE_Reserva, 'IdReserva'>) =>
       post<{ IdGenerado: number; CodigoReserva: string }>(BE_GERSON, '/api/reservas', m),
-    porPasajero: (id: number) => get<BE_Reserva[]>(BE_GERSON, `/api/reservas/pasajero/${id}`),
-    porCodigo:   (cod: string) => get<BE_Reserva>(BE_GERSON, `/api/reservas/${cod}`),
-    cancelar:    (id: number) => put(BE_GERSON, `/api/reservas/${id}/cancelar`, {}),
-    actualizar:  (id: number, m: Partial<BE_Reserva>) => put(BE_GERSON, `/api/reservas/${id}`, m),
+    porPasajero:          (id: number) => get<BE_Reserva[]>(BE_GERSON, `/api/reservas/pasajero/${id}`),
+    porCodigo:            (cod: string) => get<BE_Reserva>(BE_GERSON, `/api/reservas/${cod}`),
+    cancelar:             (id: number) => put(BE_GERSON, `/api/reservas/${id}/cancelar`, {}),
+    actualizar:           (id: number, m: Partial<BE_Reserva>) => put(BE_GERSON, `/api/reservas/${id}`, m),
+    crearReserva:         (m: BE_CrearReservaRequest) =>
+      post<{ mensaje: string }>(BE_GERSON, '/api/reservas/crear-reserva', m),
+    checkIn:              (m: BE_CheckInRequest) =>
+      post<{ mensaje: string; qr_provisional: string }>(BE_GERSON, '/api/reservas/check-in', m),
+    checkInMostrador:     (m: BE_CheckInMostradorRequest) =>
+      post<{ mensaje: string; detalle: string }>(BE_GERSON, '/api/reservas/check-in-mostrador', m),
+    registrarAbordaje:    (m: BE_EmbarqueRequest) =>
+      post<{ mensaje: string }>(BE_GERSON, '/api/reservas/registrar-abordaje', m),
+    pagar:                (m: BE_PagoBoletoRequest) =>
+      post<{ mensaje: string }>(BE_GERSON, '/api/reservas/pagar', m),
   },
   pagosReserva: {
     registrar:  (m: Omit<BE_ReservaPago, 'IdPago'>) =>

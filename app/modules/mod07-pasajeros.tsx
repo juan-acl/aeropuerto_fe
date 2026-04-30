@@ -32,20 +32,56 @@ export default function Pasajeros() {
   const openNew = () => { setEditItem(null); setForm({ tipo_documento: 'PASAPORTE', genero: 'M' }); setModal(true); };
   const openEdit = (item: any) => { setEditItem(item); setForm({ ...item }); setModal(true); };
 
-  const handleSave = () => {
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
     if (tab === 'pasajeros') {
       if (!form.nombres?.trim() || !form.numero_documento?.trim()) { Alert.alert('Campos requeridos', 'Nombres y número de documento son obligatorios.'); return; }
       if (!form.tipo_documento) { Alert.alert('Campo requerido', 'Selecciona el tipo de documento.'); return; }
       if (form.email && !/\S+@\S+\.\S+/.test(form.email)) { Alert.alert('Email inválido', 'Ingresa un correo electrónico válido.'); return; }
-      const entry: Pasajero = { id_pasajero: editItem?.id_pasajero ?? Date.now(), nombres: form.nombres.trim(), apellidos: form.apellidos?.trim() ?? '', tipo_documento: form.tipo_documento, numero_documento: form.numero_documento.trim(), nacionalidad: form.nacionalidad ?? '', fecha_nacimiento: form.fecha_nacimiento ?? '', genero: form.genero ?? 'O', telefono: form.telefono ?? '', email: form.email ?? '', ciudad_residencia: form.ciudad_residencia ?? '', pais_residencia: form.pais_residencia ?? '' };
-      if (editItem) setPasajeros(d => d.map(x => x.id_pasajero === editItem.id_pasajero ? entry : x));
-      else {
-        if (pasajeros.find(p => p.numero_documento === form.numero_documento)) { Alert.alert('Documento duplicado', 'Ya existe un pasajero con ese número de documento.'); return; }
-        setPasajeros(d => [...d, entry]);
+
+      const entry: Pasajero = {
+        id_pasajero: editItem?.id_pasajero ?? Date.now(),
+        nombres: form.nombres.trim(), apellidos: form.apellidos?.trim() ?? '',
+        tipo_documento: form.tipo_documento, numero_documento: form.numero_documento.trim(),
+        nacionalidad: form.nacionalidad ?? '', fecha_nacimiento: form.fecha_nacimiento ?? '',
+        genero: form.genero ?? 'O', telefono: form.telefono ?? '', email: form.email ?? '',
+        ciudad_residencia: form.ciudad_residencia ?? '', pais_residencia: form.pais_residencia ?? '',
+      };
+
+      if (!editItem) {
+        if (pasajeros.find(p => p.numero_documento === form.numero_documento)) {
+          Alert.alert('Documento duplicado', 'Ya existe un pasajero con ese número de documento.'); return;
+        }
+        // Registrar en backend via SP (valida email, fecha y documento único)
+        setSaving(true);
+        try {
+          await backendApi.pasajeros.registrar({
+            Nombre:          form.nombres.trim(),
+            Apellidos:       form.apellidos?.trim() ?? '',
+            NumeroDocumento: form.numero_documento.trim(),
+            Nacionalidad:    form.nacionalidad ?? '',
+            FechaNacimiento: form.fecha_nacimiento ?? new Date().toISOString().split('T')[0],
+            Email:           form.email?.trim() || undefined,
+          });
+          // Refrescar lista desde backend
+          const lista = await backendApi.pasajeros.listar().catch(() => null);
+          if (lista) setPasajeros(lista as any[]);
+          else setPasajeros(d => [...d, entry]);
+        } catch (e: any) {
+          Alert.alert('Error al registrar', e.message ?? 'No se pudo registrar el pasajero.'); setSaving(false); return;
+        } finally { setSaving(false); }
+      } else {
+        setPasajeros(d => d.map(x => x.id_pasajero === editItem.id_pasajero ? entry : x));
       }
     } else {
       if (!form.id_pasajero || !form.tipo_perfil) { Alert.alert('Campos requeridos', 'Pasajero y tipo de perfil son obligatorios.'); return; }
-      const entry: PerfilViajero = { id_perfil: editItem?.id_perfil ?? Date.now(), id_pasajero: Number(form.id_pasajero), tipo_perfil: form.tipo_perfil, numero_programa: form.numero_programa ?? `PRG-${Date.now().toString().slice(-6)}`, puntos_acumulados: Number(form.puntos_acumulados) || 0, categoria: form.categoria ?? 'BRONCE' };
+      const entry: PerfilViajero = {
+        id_perfil: editItem?.id_perfil ?? Date.now(),
+        id_pasajero: Number(form.id_pasajero), tipo_perfil: form.tipo_perfil,
+        numero_programa: form.numero_programa ?? `PRG-${Date.now().toString().slice(-6)}`,
+        puntos_acumulados: Number(form.puntos_acumulados) || 0, categoria: form.categoria ?? 'BRONCE',
+      };
       if (editItem) setPerfiles(d => d.map(x => x.id_perfil === editItem.id_perfil ? entry : x));
       else setPerfiles(d => [...d, entry]);
     }

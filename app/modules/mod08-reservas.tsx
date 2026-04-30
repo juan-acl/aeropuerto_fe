@@ -77,12 +77,39 @@ export default function Mod08() {
       </StatsRow>
       <SearchBar value={q} onChangeText={setQ} placeholder="Buscar reserva, factura..." />
       {renderContent()}
-      <FormModal visible={modal} title="Nueva Reserva" onClose={()=>setModal(false)} onSave={()=>{Alert.alert('OK','Use el sistema de reservas del backend');setModal(false);}}>
-        <FF label="Código Reserva" value={form.codigo??''} onChangeText={(t:string)=>setForm((f:any)=>({...f,codigo:t}))} />
-        <FF label="ID Vuelo" value={String(form.id_vuelo??'')} onChangeText={(t:string)=>setForm((f:any)=>({...f,id_vuelo:t}))} keyboardType="numeric" />
-        <FF label="ID Pasajero" value={String(form.id_pasajero??'')} onChangeText={(t:string)=>setForm((f:any)=>({...f,id_pasajero:t}))} keyboardType="numeric" />
-        <FF label="Clase Servicio" value={form.clase??''} onChangeText={(t:string)=>setForm((f:any)=>({...f,clase:t}))} />
-        <FF label="Precio (USD)" value={String(form.precio??'')} onChangeText={(t:string)=>setForm((f:any)=>({...f,precio:t}))} keyboardType="decimal-pad" />
+      <FormModal visible={modal} title="Nueva Reserva" onClose={()=>setModal(false)} onSave={async ()=>{
+        if (!form.id_vuelo || !form.id_pasajero || !form.numero_asiento || !form.precio) {
+          Alert.alert('Campos requeridos','ID Vuelo, ID Pasajero, Asiento y Precio son obligatorios.'); return;
+        }
+        try {
+          await backendApi.reservas.crearReserva({
+            IdVuelo:       Number(form.id_vuelo),
+            IdPasajero:    Number(form.id_pasajero),
+            ClaseServicio: form.clase ?? 'ECONOMICA',
+            NumeroAsiento: form.numero_asiento.trim().toUpperCase(),
+            TipoTarifa:    form.tarifa ?? 'BASICA',
+            Precio:        Number(form.precio),
+            Moneda:        form.moneda ?? 'USD',
+          });
+          Alert.alert('Reserva creada','Reserva en estado PENDIENTE. El pasajero tiene 15 min para pagar.');
+          setModal(false); setForm({});
+          backendApi.reservas.porPasajero(Number(form.id_pasajero)).then(d=>set_RESERVAS(d)).catch(()=>{});
+        } catch (e:any) {
+          Alert.alert('Error',e.message??'No se pudo crear la reserva.');
+        }
+      }}>
+        <FormSection title="Vuelo y pasajero" icon="" />
+        <FF label="ID Vuelo" required value={String(form.id_vuelo??'')} onChangeText={(t:string)=>setForm((f:any)=>({...f,id_vuelo:t}))} keyboardType="numeric" hint="ID del vuelo a reservar" />
+        <FF label="ID Pasajero" required value={String(form.id_pasajero??'')} onChangeText={(t:string)=>setForm((f:any)=>({...f,id_pasajero:t}))} keyboardType="numeric" />
+        <FF label="Número de asiento" required value={form.numero_asiento??''} onChangeText={(t:string)=>setForm((f:any)=>({...f,numero_asiento:t}))} autoCapitalize="characters" placeholder="Ej: 14C" />
+        <FormSection title="Tarifa" icon="💳" />
+        <FSelect label="Clase de servicio" value={form.clase??'ECONOMICA'} onChange={(v:string)=>setForm((f:any)=>({...f,clase:v}))}
+          options={[{label:'Económica',value:'ECONOMICA'},{label:'Ejecutiva',value:'EJECUTIVA'},{label:'Primera clase',value:'PRIMERA_CLASE'}]} />
+        <FSelect label="Tipo de tarifa" value={form.tarifa??'BASICA'} onChange={(v:string)=>setForm((f:any)=>({...f,tarifa:v}))}
+          options={[{label:'Básica (no reembolsable)',value:'BASICA'},{label:'Semi-flex',value:'SEMI_FLEX'},{label:'Flex (reembolsable)',value:'FLEX'}]} />
+        <FF label="Precio" required value={String(form.precio??'')} onChangeText={(t:string)=>setForm((f:any)=>({...f,precio:t}))} keyboardType="decimal-pad" placeholder="285.00" />
+        <FSelect label="Moneda" value={form.moneda??'USD'} onChange={(v:string)=>setForm((f:any)=>({...f,moneda:v}))}
+          options={[{label:'USD — Dólar',value:'USD'},{label:'GTQ — Quetzal',value:'GTQ'}]} />
       </FormModal>
     </SafeAreaView>
   );
