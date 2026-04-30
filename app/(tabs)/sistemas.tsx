@@ -12,7 +12,7 @@ export default function SistemasTab() {
   const { usuario } = useSesion();
   const [q, setQ] = useState('');
 
-  const permisos = PERMISOS_POR_ROL[usuario?.rol ?? 'CLIENTE'].modulosOperativos;
+  const permisos = PERMISOS_POR_ROL[(usuario?.rol as keyof typeof PERMISOS_POR_ROL) ?? 'CLIENTE'].modulosOperativos;
   const grupos = GRUPOS
     .map(g => ({ ...g, items: g.items.filter((i: any) => permisos.includes(i.mod)) }))
     .filter(g => g.items.length > 0);

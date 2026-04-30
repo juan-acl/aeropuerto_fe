@@ -119,7 +119,7 @@ const BADGE_MAP: Record<string, { bg: string; text: string; label: string }> = {
 };
 const FALLBACK = {bg:C.grayBg,text:C.gray};
 
-export function Badge({value}:{value:string|number|undefined}) {
+export function Badge({value, color}:{value:string|number|undefined; color?:string}) {
   if (value==null) return null;
   const k = String(value).toUpperCase().replace(/ /g,'_');
   const cfg = BADGE_MAP[k]??{...FALLBACK,label:String(value).replace(/_/g,' ')};

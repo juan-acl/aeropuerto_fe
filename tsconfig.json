@@ -4,6 +4,8 @@
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "baseUrl": ".",
     "paths": {
       "@/*": [

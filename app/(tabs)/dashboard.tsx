@@ -210,7 +210,7 @@ function DashboardEmpleado({ VUELOS, ALERTAS_DATA }: { VUELOS: any[]; ALERTAS_DA
 
   const alertas = (ALERTAS_DATA as any[]).filter((a: any) => !a.Atendida && !a.atendida).slice(0, 4);
   const vuelosHoy = VUELOS.slice(0, 6);
-  const permisos = PERMISOS_POR_ROL[usuario?.rol ?? 'OPERACIONES'];
+  const permisos = PERMISOS_POR_ROL[(usuario?.rol as keyof typeof PERMISOS_POR_ROL) ?? 'OPERACIONES'];
 
   const STATUS_COLOR: Record<string, string> = {
     EN_VUELO: C.success, PROGRAMADO: C.electric, DEMORADO: C.warning,
