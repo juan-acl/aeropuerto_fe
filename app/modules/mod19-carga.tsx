@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, ScrollView, SafeAreaView, Alert, TouchableOpacity } from 'react-native';
 import { backendApi } from '@/services/backendApi';
 import {Badge, DataCard, EmptyState, FF, FSelect, FToggle, FormModal, FormSection, InfoRow, ProgressBar, ScoreBar, ScreenHeader, SearchBar, StatCard, StatsRow, TabBar} from '@/components/shared';
@@ -44,7 +44,7 @@ export default function Screen() {
         <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginBottom:8}}>📦 Envíos de Carga</Text>
         {ENVIOS_DATA.filter((e:any)=>JSON.stringify(e).toLowerCase().includes(q.toLowerCase())).map((e:any)=>(
           <DataCard key={e.id} title={e.codigo} subtitle={`Vuelo ${e.vuelo} · ${e.bultos} bultos · ${e.peso_kg}kg`}
-            badge={<Badge value={e.estado} />} meta={`Q ${e.valor.toLocaleString()}`} accentColor={C.orange}>
+            badge={<Badge value={e.estado} />} meta={`Q ${e.valor?.toLocaleString()}`} accentColor={C.orange}>
             <Text style={{fontSize:11,color:C.muted}}>📤 {e.consignador} → 📥 {e.consignatario}</Text>
             <Badge value={e.tipo} />
           </DataCard>

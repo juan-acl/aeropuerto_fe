@@ -188,10 +188,10 @@ export function SesionProvider({ children }: { children: ReactNode }) {
       usuario, token, loading, initialized,
       login, loginDemo, logout, sessionKey,
       permisos, puede,
-      esCliente:  !usuario || (usuario.jerarquia !== undefined ? usuario.jerarquia >= 4 : usuario.rol === 'CLIENTE'),
-      esPersonal: !!usuario && (usuario.jerarquia !== undefined ? usuario.jerarquia <= 3 : usuario.rol !== 'CLIENTE' && usuario.rol !== 'ADMIN'),
-      esAdmin:    usuario?.jerarquia === 1 || (usuario?.rol?.toUpperCase().includes('ADMIN') ?? false),
-      esSoloLectura: usuario?.jerarquia !== undefined ? usuario.jerarquia >= 3 : (!(usuario?.rol?.toUpperCase().includes('ADMIN') ?? false)),
+      esCliente:  !usuario || (usuario.jerarquia !== undefined ? usuario.jerarquia <= 1 : usuario.rol === 'CLIENTE'),
+      esPersonal: !!usuario && (usuario.jerarquia !== undefined ? usuario.jerarquia >= 2 : usuario.rol !== 'CLIENTE'),
+      esAdmin:    (usuario?.jerarquia !== undefined ? usuario.jerarquia >= 4 : false) || (usuario?.rol?.toUpperCase().includes('ADMIN') ?? false),
+      esSoloLectura: usuario?.jerarquia !== undefined ? usuario.jerarquia <= 1 : (!(usuario?.rol?.toUpperCase().includes('ADMIN') ?? false)),
       misReservas, agregarReserva, registrarEvento,
     }}>
       {children}

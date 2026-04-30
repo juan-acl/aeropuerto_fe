@@ -163,7 +163,7 @@ function BookingBar({ flight, clase, onBook }: {
         <Text style={bb.route}>{flight.origen} → {flight.destino}</Text>
       </View>
       <View style={bb.right}>
-        <Text style={bb.price}>USD {precio.toLocaleString()}</Text>
+        <Text style={bb.price}>USD {precio?.toLocaleString()}</Text>
         <TouchableOpacity style={bb.btn} onPress={onBook} activeOpacity={0.88}>
           <Text style={bb.btnT}>Reservar →</Text>
         </TouchableOpacity>

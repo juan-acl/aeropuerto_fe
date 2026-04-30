@@ -210,7 +210,7 @@ function DashboardEmpleado({ VUELOS, ALERTAS_DATA }: { VUELOS: any[]; ALERTAS_DA
 
   const alertas = (ALERTAS_DATA as any[]).filter((a: any) => !a.Atendida && !a.atendida).slice(0, 4);
   const vuelosHoy = VUELOS.slice(0, 6);
-  const permisos = PERMISOS_POR_ROL[usuario?.rol ?? 'OPERACIONES'];
+  const permisos = PERMISOS_POR_ROL[(usuario?.rol as keyof typeof PERMISOS_POR_ROL) ?? 'OPERACIONES'];
 
   const STATUS_COLOR: Record<string, string> = {
     EN_VUELO: C.success, PROGRAMADO: C.electric, DEMORADO: C.warning,
@@ -283,20 +283,22 @@ function DashboardEmpleado({ VUELOS, ALERTAS_DATA }: { VUELOS: any[]; ALERTAS_DA
           onAction={() => router.push('/(tabs)' as any)} />
         {vuelosHoy.map(v => {
           const dep = (v.HoraSalidaProgramada ?? v.hora_salida_programada)?.split('T')[1]?.slice(0, 5) ?? '--:--';
-          const sc  = STATUS_COLOR[(v.EstadoVuelo ?? v.estado_vuelo)] ?? C.gray;
+          const estado = v.EstadoVuelo ?? v.estado_vuelo;
+          const sc  = STATUS_COLOR[estado] ?? C.gray;
+          const idV = v.IdVuelo ?? v.id_vuelo;
           return (
-            <TouchableOpacity key={v.id_vuelo} style={s.vueloRow}
-              onPress={() => router.push(('/modules/vuelo-detalle?id=' + v.id_vuelo) as any)}
+            <TouchableOpacity key={idV} style={s.vueloRow}
+              onPress={() => router.push(('/modules/vuelo-detalle?id=' + idV) as any)}
               activeOpacity={0.82}
             >
               <View style={[s.vuDot, { backgroundColor: sc }]} />
               <View style={{ flex: 1 }}>
-                <Text style={s.vuNum}>{v.NumeroVuelo ?? v.numero_vuelo ?? 'FL-' + v.id_vuelo}</Text>
-                <Text style={s.vuRuta}>{v.AeropuertoOrigen ?? v.aeropuerto_origen} → {v.AeropuertoDestino ?? v.aeropuerto_destino}</Text>
+                <Text style={s.vuNum}>{v.NumeroVuelo ?? v.numero_vuelo ?? 'FL-' + idV}</Text>
+                <Text style={s.vuRuta}>{v.AeropuertoOrigen ?? v.aeropuerto_origen ?? '—'} → {v.AeropuertoDestino ?? v.aeropuerto_destino ?? '—'}</Text>
               </View>
               <Text style={s.vuHora}>{dep}</Text>
               <View style={[s.vuEstado, { backgroundColor: sc + '20', borderColor: sc + '40' }]}>
-                <Text style={[s.vuEstadoT, { color: sc }]}>{v.EstadoVuelo ?? v.estado_vuelo}</Text>
+                <Text style={[s.vuEstadoT, { color: sc }]}>{estado}</Text>
               </View>
             </TouchableOpacity>
           );
@@ -309,7 +311,7 @@ function DashboardEmpleado({ VUELOS, ALERTAS_DATA }: { VUELOS: any[]; ALERTAS_DA
             const mc  = MOD_COLORS[n];
             if (!acc) return null;
             return (
-              <TouchableOpacity key={n}
+              <TouchableOpacity key={`mod-${n}`}
                 style={[s.moduloBtn, { borderColor: (mc?.color ?? C.border) + '30' }]}
                 onPress={() => router.push(acc.route as any)} activeOpacity={0.8}
               >

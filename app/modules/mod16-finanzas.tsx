@@ -4,20 +4,35 @@ import { backendApi } from '@/services/backendApi';
 import {Badge, DataCard, EmptyState, FF, FSelect, FToggle, FormModal, FormSection, InfoRow, ProgressBar, ScoreBar, ScreenHeader, SearchBar, StatCard, StatsRow, TabBar} from '@/components/shared';
 import { C } from '@/constants/theme';
 
-export default function Screen() {
+export default function Mod16() {
   const [PRESUPUESTOS_DATA, set_PRESUPUESTOS_DATA] = useState<any[]>([]);
   const [INGRESOS_DATA, set_INGRESOS_DATA] = useState<any[]>([]);
   const [GASTOS_DATA, set_GASTOS_DATA] = useState<any[]>([]);
   const [PROVEEDORES_DATA, set_PROVEEDORES_DATA] = useState<any[]>([]);
-  const [ORDENES_COMPRA, set_ORDENES_COMPRA] = useState<any[]>([]);
-  const [CUENTAS_BANCARIAS, set_CUENTAS_BANCARIAS] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchAll = async () => {
+      setLoading(true);
+      try {
+          const [p, i, g, pr] = await Promise.all([
+              backendApi.finanzas.presupuestos.listar(),
+              backendApi.ingresos.listar(),
+              backendApi.gastos.listar(),
+              backendApi.proveedores.listar()
+          ]);
+          set_PRESUPUESTOS_DATA(p || []);
+          set_INGRESOS_DATA(i || []);
+          set_GASTOS_DATA(g || []);
+          set_PROVEEDORES_DATA(pr || []);
+      } catch (e) {
+          console.error("Error fetching mod16 data:", e);
+      } finally {
+          setLoading(false);
+      }
+  };
+
   useEffect(() => {
-      backendApi.finanzas.presupuestos.listar().then((d: any) => set_PRESUPUESTOS_DATA(d)).catch(() => {});
-      backendApi.ingresos.listar().then((d: any) => set_INGRESOS_DATA(d)).catch(() => {});
-      backendApi.gastos.listar().then((d: any) => set_GASTOS_DATA(d)).catch(() => {});
-      backendApi.vuelos.listar().then((d: any) => set_PROVEEDORES_DATA(d)).catch(() => {});
-      backendApi.vuelos.listar().then((d: any) => set_ORDENES_COMPRA(d)).catch(() => {});
-      backendApi.cuentasBancarias.listar().then((d: any) => set_CUENTAS_BANCARIAS(d)).catch(() => {});
+      fetchAll();
   }, []);
 
   const [q, setQ] = useState('');
@@ -25,19 +40,15 @@ export default function Screen() {
   const [form, setForm] = useState<any>({});
 
   const set = (k: string) => (v: any) => setForm((f: any) => ({ ...f, [k]: v }));
-  // Initialize all module data
-  // PRESUPUESTOS_DATA available from imports
-  // INGRESOS_DATA available from imports
-  // GASTOS_DATA available from imports
-  // PROVEEDORES_DATA available from imports
-  // ORDENES_COMPRA available from imports
-  // CUENTAS_BANCARIAS available from imports
 
   const handleSave = () => {
     Alert.alert(' Guardado', 'Registro creado exitosamente.');
     setModal(false);
     setForm({});
   };
+
+  const totalIngresos = INGRESOS_DATA.reduce((s, i) => s + (i.monto ?? 0), 0);
+  const totalGastos = GASTOS_DATA.reduce((s, g) => s + (g.monto ?? 0), 0);
 
   return (
     <SafeAreaView style={{flex:1,backgroundColor:C.bg}}>
@@ -46,35 +57,35 @@ export default function Screen() {
       <ScrollView style={{flex:1}} contentContainerStyle={{padding:14, paddingBottom:24, flexGrow:1}}>
         
         <View style={{flexDirection:'row',gap:8,marginBottom:12}}>
-          <StatCard label="Ingresos" value={`Q ${(INGRESOS_DATA.reduce((s:number,i:any)=>s+i.monto,0)/1000).toFixed(0)}K`} color={C.success} bg={C.successBg} icon="📈" />
-          <StatCard label="Gastos" value={`Q ${(GASTOS_DATA.reduce((s:number,g:any)=>s+g.monto,0)/1000).toFixed(0)}K`} color={C.danger} bg={C.dangerBg} icon="📉" />
+          <StatCard label="Ingresos" value={`Q ${(totalIngresos/1000).toFixed(1)}K`} color={C.success} bg={C.successBg} icon="📈" />
+          <StatCard label="Gastos" value={`Q ${(totalGastos/1000).toFixed(1)}K`} color={C.danger} bg={C.dangerBg} icon="📉" />
         </View>
+        
         <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginBottom:8}}>📋 Presupuestos</Text>
         {PRESUPUESTOS_DATA.filter((p:any)=>JSON.stringify(p).toLowerCase().includes(q.toLowerCase())).map((p:any)=>(
-          <DataCard key={p.id} title={p.concepto} subtitle={`${p.departamento} · ${['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][p.mes]} ${p.anio}`}
-            badge={<Badge value={p.tipo} />} accentColor={C.green}>
+          <DataCard key={p.id_presupuesto} title={p.concepto} subtitle={`${p.departamento} · Mes ${p.mes} / ${p.anio}`}
+            badge={<Badge value={p.activo ? 'ACTIVO' : 'INACTIVO'} color={p.activo ? C.success : C.muted} />} accentColor={C.green}>
             <ProgressBar value={p.monto_ejecutado} max={p.monto_asignado} />
           </DataCard>
         ))}
-        <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginTop:16,marginBottom:8}}> Ingresos Recientes</Text>
+
+        <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginTop:16,marginBottom:8}}>💰 Ingresos Recientes</Text>
         {INGRESOS_DATA.filter((i:any)=>JSON.stringify(i).toLowerCase().includes(q.toLowerCase())).map((i:any)=>(
-          <DataCard key={i.id} title={i.concepto} subtitle={`${i.fecha} · ${i.comprobante??'—'}`}
-            badge={<Badge value={i.tipo} />} meta={`Q ${i.monto.toLocaleString()}`} accentColor={C.success}>
-            <></>
-          </DataCard>
+          <DataCard key={i.id_ingreso} title={i.concepto} subtitle={`${i.fecha?.split('T')[0] ?? '—'} · ${i.tipo_ingreso ?? '—'}`}
+            badge={<Badge value={i.moneda ?? 'Q'} />} meta={`Q ${(i.monto ?? 0).toLocaleString()}`} accentColor={C.success} />
         ))}
+
         <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginTop:16,marginBottom:8}}>💸 Gastos Recientes</Text>
         {GASTOS_DATA.filter((g:any)=>JSON.stringify(g).toLowerCase().includes(q.toLowerCase())).map((g:any)=>(
-          <DataCard key={g.id} title={g.concepto} subtitle={`${g.proveedor??'—'} · ${g.factura??'—'}`}
-            badge={<Badge value={g.tipo} />} meta={`Q ${g.monto.toLocaleString()}`} accentColor={C.danger}>
-            <></>
-          </DataCard>
+          <DataCard key={g.id_gasto} title={g.concepto} subtitle={`${g.proveedor ?? '—'} · ${g.tipo_gasto ?? '—'}`}
+            badge={<Badge value={g.moneda ?? 'Q'} />} meta={`Q ${(g.monto ?? 0).toLocaleString()}`} accentColor={C.danger} />
         ))}
+
         <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginTop:16,marginBottom:8}}>🏭 Proveedores</Text>
         {PROVEEDORES_DATA.filter((p:any)=>JSON.stringify(p).toLowerCase().includes(q.toLowerCase())).map((p:any)=>(
-          <DataCard key={p.id} title={p.nombre} subtitle={`NIT: ${p.nit??'—'} · ${p.contacto??'—'}`}
-            badge={<Badge value={p.tipo} />} meta={`${''.repeat(p.calificacion)}`} accentColor={C.orange}>
-            <Text style={{fontSize:11,color:C.muted}}>📞 {p.telefono??'—'} · ✉️ {p.email??'—'}</Text>
+          <DataCard key={p.id_proveedor} title={p.nombre} subtitle={`NIT: ${p.nit ?? '—'} · ${p.contacto ?? '—'}`}
+            badge={<Badge value={p.activo ? 'ACTIVO' : 'INACTIVO'} color={p.activo ? C.success : C.muted} />} accentColor={C.orange}>
+            <Text style={{fontSize:11,color:C.muted}}>📞 {p.telefono ?? '—'} · ✉️ {p.email ?? '—'}</Text>
           </DataCard>
         ))}
       </ScrollView>
@@ -97,5 +108,3 @@ export default function Screen() {
     </SafeAreaView>
   );
 }
-
-

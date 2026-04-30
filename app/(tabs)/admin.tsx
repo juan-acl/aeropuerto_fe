@@ -870,8 +870,8 @@ export default function AdminTab() {
                       <View style={{ height: 8, width: `${Math.min(pct, 100)}%` as any, backgroundColor: color, borderRadius: 4 }} />
                     </View>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                      <Text style={sd.cardMeta}>Asignado: Q {p.monto_asignado.toLocaleString()}</Text>
-                      <Text style={[sd.cardMeta, { color }]}>Ejecutado: Q {p.monto_ejecutado.toLocaleString()}</Text>
+                      <Text style={sd.cardMeta}>Asignado: Q {p.monto_asignado?.toLocaleString()}</Text>
+                      <Text style={[sd.cardMeta, { color }]}>Ejecutado: Q {p.monto_ejecutado?.toLocaleString()}</Text>
                     </View>
                   </View>
                 );

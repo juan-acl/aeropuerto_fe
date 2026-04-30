@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, ScrollView, SafeAreaView, Alert, TouchableOpacity } from 'react-native';
 import { backendApi } from '@/services/backendApi';
 import {Badge, DataCard, EmptyState, FF, FSelect, FToggle, FormModal, FormSection, InfoRow, ProgressBar, ScoreBar, ScreenHeader, SearchBar, StatCard, StatsRow, TabBar} from '@/components/shared';
@@ -11,11 +11,10 @@ export default function Screen() {
   const [EVALUACIONES_DATA, set_EVALUACIONES_DATA] = useState<any[]>([]);
   const [CAPACITACIONES_DATA, set_CAPACITACIONES_DATA] = useState<any[]>([]);
   useEffect(() => {
-      backendApi.empleados.listar().then(d => set_EMPLEADOS(d)).catch(() => {});
-      backendApi.empleados.listar().then(d => set_DEPARTAMENTOS(d)).catch(() => {});
-      backendApi.empleados.listar().then(d => set_VACACIONES_DATA(d)).catch(() => {});
-      backendApi.empleados.listar().then(d => set_EVALUACIONES_DATA(d)).catch(() => {});
-      backendApi.empleados.listar().then(d => set_CAPACITACIONES_DATA(d)).catch(() => {});
+      backendApi.empleados.listar().then(d => set_EMPLEADOS(d||[])).catch(() => {});
+      backendApi.departamentos?.listar().then(d => set_DEPARTAMENTOS(d||[])).catch(() => {});
+      backendApi.vacaciones?.listar().then(d => set_VACACIONES_DATA(d||[])).catch(() => {});
+      backendApi.evaluaciones?.listar().then(d => set_EVALUACIONES_DATA(d||[])).catch(() => {});
   }, []);
 
   const [q, setQ] = useState('');
@@ -48,8 +47,8 @@ export default function Screen() {
         </View>
         <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginBottom:8}}>👥 Empleados</Text>
         {EMPLEADOS.filter((e:any)=>JSON.stringify(e).toLowerCase().includes(q.toLowerCase())).map((e:any)=>(
-          <DataCard key={e.id} title={`${e.nombres} ${e.apellidos}`}
-            subtitle={`${e.codigo} · ${e.cargo} · ${e.departamento}`}
+          <DataCard key={e.id_empleado||e.id} title={`${e.nombres} ${e.apellidos}`}
+            subtitle={`${e.codigo_empleado} · ${e.cargo} · ${e.departamento}`}
             badge={<Badge value={e.tipo_contrato} />} meta={`Q ${e.salario_base?.toLocaleString()}`}
             accentColor={e.activo?C.navy:C.light}
             onDelete={()=>alert('Eliminar empleado')}>
@@ -58,20 +57,21 @@ export default function Screen() {
         ))}
         <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginTop:16,marginBottom:8}}> Evaluaciones Recientes</Text>
         {EVALUACIONES_DATA.filter((e:any)=>JSON.stringify(e).toLowerCase().includes(q.toLowerCase())).map((e:any)=>(
-          <DataCard key={e.id} title={e.empleado} subtitle={`${e.evaluador} · ${e.periodo}`}
+          <DataCard key={e.id_evaluacion||e.id} title={`Empleado ID: ${e.id_empleado}`} subtitle={`Evaluador ID: ${e.evaluador_id} · ${e.periodo_evaluado}`}
             badge={<Badge value={e.puntuacion_total>=4?'COMPLETADO':e.puntuacion_total>=3?'PENDIENTE':'RECHAZADO'} />}
-            meta={`${e.puntuacion_total}/5`} accentColor={e.puntuacion_total>=4?C.success:e.puntuacion_total>=3?C.warning:C.danger}>
-            <ScoreBar label="Productividad" value={e.productividad} />
-            <ScoreBar label="Calidad" value={e.calidad} />
-            <ScoreBar label="Asistencia" value={e.asistencia} />
+            meta={`${e.puntuacion_total?.toFixed(1)||'0.0'}/5`} accentColor={e.puntuacion_total>=4?C.success:e.puntuacion_total>=3?C.warning:C.danger}>
+            <ScoreBar label="Productividad" value={e.puntuacion_productividad||0} />
+            <ScoreBar label="Calidad" value={e.puntuacion_calidad||0} />
+            <ScoreBar label="Asistencia" value={e.puntuacion_asistencia||0} />
+            <ScoreBar label="Trabajo en Equipo" value={e.puntuacion_trabajo_equipo||0} />
           </DataCard>
         ))}
         <Text style={{fontSize:13,fontWeight:'700',color:C.navy,marginTop:16,marginBottom:8}}> Vacaciones y Permisos</Text>
         {VACACIONES_DATA.filter((v:any)=>JSON.stringify(v).toLowerCase().includes(q.toLowerCase())).map((v:any)=>(
-          <DataCard key={v.id} title={v.empleado} subtitle={`${v.fecha_inicio} → ${v.fecha_fin} · ${v.dias} días`}
+          <DataCard key={v.id_solicitud||v.id} title={`Empleado ID: ${v.id_empleado}`} subtitle={`${v.fecha_inicio?.substring(0,10)} → ${v.fecha_fin?.substring(0,10)} · ${v.dias_solicitados} días`}
             badge={<Badge value={v.estado} />} meta={v.motivo??'—'}
-            accentColor={v.estado==='AUTORIZADO'?C.success:v.estado==='PENDIENTE'?C.warning:C.danger}>
-            <Badge value={v.tipo} />
+            accentColor={v.estado==='APROBADO'||v.estado==='AUTORIZADO'?C.success:v.estado==='PENDIENTE'?C.warning:C.danger}>
+            <Badge value={v.tipo_solicitud} />
           </DataCard>
         ))}
       </ScrollView>

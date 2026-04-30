@@ -210,7 +210,7 @@ export default function PagoScreen() {
           <PriceRow label="TOTAL A PAGAR" value={`USD ${total}`} bold />
           {mgr.puntosGanados > 0 && (
             <View style={s.puntosWrap}>
-              <Text style={s.puntosT}>🏆 Ganarás {mgr.puntosGanados.toLocaleString('es-GT')} puntos</Text>
+              <Text style={s.puntosT}>🏆 Ganarás {mgr.puntosGanados?.toLocaleString('es-GT')} puntos</Text>
             </View>
           )}
           {pricing.badge && (
@@ -285,7 +285,7 @@ export default function PagoScreen() {
           <View style={[s.card, { backgroundColor: C.purpleBg + '40', borderColor: C.purple + '40' }]}>
             <Text style={{ fontSize: 18 }}></Text>
             <Text style={{ fontSize: 13, color: C.textSub, marginTop: 4 }}>
-              Se descontarán {(total * 100).toLocaleString('es-GT')} puntos de tu saldo de lealtad.
+              Se descontarán {((total * 100)||0).toLocaleString('es-GT')} puntos de tu saldo de lealtad.
             </Text>
           </View>
         )}

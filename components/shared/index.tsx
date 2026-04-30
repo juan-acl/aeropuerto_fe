@@ -119,7 +119,7 @@ const BADGE_MAP: Record<string, { bg: string; text: string; label: string }> = {
 };
 const FALLBACK = {bg:C.grayBg,text:C.gray};
 
-export function Badge({value}:{value:string|number|undefined}) {
+export function Badge({value, color}:{value:string|number|undefined; color?:string}) {
   if (value==null) return null;
   const k = String(value).toUpperCase().replace(/ /g,'_');
   const cfg = BADGE_MAP[k]??{...FALLBACK,label:String(value).replace(/_/g,' ')};
@@ -466,12 +466,14 @@ export function InfoRow({label,value,mono,highlight}:{label:string;value?:string
 
 // ─── PROGRESS BAR ─────────────────────────────────────────────────────────────
 export function ProgressBar({value,max,color,label}:{value:number;max:number;color?:string;label?:string}) {
-  const pct=max>0?Math.min((value/max)*100,100):0;
-  const c=color??(pct>=90?C.danger:pct>=70?C.warning:C.success);
+  const v = value ?? 0;
+  const m = max > 0 ? max : 1;
+  const pct = Math.min((v / m) * 100, 100);
+  const c = color ?? (pct >= 90 ? C.danger : pct >= 70 ? C.warning : C.success);
   return (
     <View>
       <View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:5}}>
-        <Text style={{fontSize:11,color:C.muted,fontWeight:'500'}}>{label??`${value.toLocaleString()} / ${max.toLocaleString()}`}</Text>
+        <Text style={{fontSize:11,color:C.muted,fontWeight:'500'}}>{label??`${v.toLocaleString()} / ${m.toLocaleString()}`}</Text>
         <Text style={{fontSize:11,fontWeight:'700',color:c}}>{pct.toFixed(0)}%</Text>
       </View>
       <View style={{height:8,backgroundColor:C.bg,borderRadius:4,overflow:'hidden'}}>
@@ -496,13 +498,14 @@ export function EmptyState({icon='📋',text='Sin registros',sub}:{icon?:string;
 
 // ─── SCORE BAR ───────────────────────────────────────────────────────────────
 export function ScoreBar({label,value,max=5}:{label:string;value:number;max?:number}) {
-  const pct=(value/max)*100;
-  const c=value>=4?C.success:value>=3?C.warning:C.danger;
+  const safeValue = value ?? 0;
+  const pct=(safeValue/max)*100;
+  const c=safeValue>=4?C.success:safeValue>=3?C.warning:C.danger;
   return (
     <View style={{marginBottom:10}}>
       <View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:5}}>
         <Text style={{fontSize:12,color:C.muted,fontWeight:'500'}}>{label}</Text>
-        <Text style={{fontSize:12,fontWeight:'800',color:c}}>{value.toFixed(1)}/{max}</Text>
+        <Text style={{fontSize:12,fontWeight:'800',color:c}}>{safeValue.toFixed(1)}/{max}</Text>
       </View>
       <View style={{height:6,backgroundColor:C.bg,borderRadius:3,overflow:'hidden'}}>
         <View style={{height:6,width:`${pct}%` as any,backgroundColor:c,borderRadius:3}}/>

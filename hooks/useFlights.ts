@@ -59,10 +59,10 @@ interface BE_Vuelo {
 
 function buildFromBackendVuelo(
   v: BE_Vuelo,
-  aerolineas: BE_Aerolinea[],
+  aerolineas: any[],
   factorDemanda: number = 1.0
 ): FlightResult {
-  const al  = aerolineas.find(a => a.IdAerolinea === v.IdAerolinea);
+  const al  = aerolineas.find(a => a.id_aerolinea === v.IdAerolinea);
   const sal = v.HoraSalidaProgramada?.split('T')[1]?.slice(0, 5)  ?? '00:00';
   const arr = v.HoraLlegadaProgramada?.split('T')[1]?.slice(0, 5) ?? '00:00';
   const [sh, sm] = sal.split(':').map(Number);
@@ -87,8 +87,8 @@ function buildFromBackendVuelo(
     plazas:       v.PlazasVacias ?? 30,
     precio_eco:   finalBase,
     precio_eje:   Math.round(finalBase * 2.4),
-    aerolinea:    al?.NombreAerolinea ?? 'Aerolínea',
-    cod_iata:     al?.CodigoIata      ?? '??',
+    aerolinea:    al?.nombre_aerolinea ?? 'Aerolínea',
+    cod_iata:     al?.codigo_iata      ?? '??',
     escalas:      0,
     estado:       v.EstadoVuelo ?? 'PROGRAMADO',
   };
@@ -116,10 +116,10 @@ export function useFlights() {
 
     try {
       // Cargar aerolíneas reales (siempre intentar primero)
-      let aerolineas: BE_Aerolinea[] = [];
+      let aerolineas: any[] = [];
       try {
         const rawAl = await backendApi.aerolineas.listar();
-        aerolineas = rawAl.filter(a => a.Activo === 1);
+        aerolineas = rawAl.filter((a: any) => a.activo === 1 || a.Activo === 1);
       } catch { /* sin aerolíneas, continuar */ }
 
       // Intentar endpoint de vuelos (puede no existir aún)

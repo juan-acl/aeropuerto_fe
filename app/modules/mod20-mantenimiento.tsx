@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, ScrollView, SafeAreaView, Alert, TouchableOpacity } from 'react-native';
 import { backendApi } from '@/services/backendApi';
 import {Badge, DataCard, EmptyState, FF, FSelect, FToggle, FormModal, FormSection, InfoRow, ProgressBar, ScoreBar, ScreenHeader, SearchBar, StatCard, StatsRow, TabBar} from '@/components/shared';
@@ -53,7 +53,7 @@ export default function Screen() {
         {PIEZAS_DATA.filter((p:any)=>JSON.stringify(p).toLowerCase().includes(q.toLowerCase())).map((p:any)=>(
           <DataCard key={p.id} title={p.nombre} subtitle={`${p.codigo} · ${p.modelo??'—'} · ${p.ubicacion??'—'}`}
             badge={<Badge value={p.stock_actual<p.stock_minimo?'CRITICO':'ACTIVO'} />}
-            meta={`Q ${p.precio.toLocaleString()}`} accentColor={p.stock_actual<p.stock_minimo?C.danger:C.red}>
+            meta={`Q ${p.precio?.toLocaleString()}`} accentColor={p.stock_actual<p.stock_minimo?C.danger:C.red}>
             <ProgressBar value={p.stock_actual} max={p.stock_minimo*3} />
             <Text style={{fontSize:11,color:C.muted,marginTop:4}}>Stock: {p.stock_actual} / mín {p.stock_minimo}</Text>
           </DataCard>

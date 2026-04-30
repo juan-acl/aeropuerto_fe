@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, ScrollView, SafeAreaView, Alert, TouchableOpacity } from 'react-native';
 import { backendApi } from '@/services/backendApi';
 import {Badge, DataCard, EmptyState, FF, FSelect, FToggle, FormModal, FormSection, InfoRow, ProgressBar, ScoreBar, ScreenHeader, SearchBar, StatCard, StatsRow, TabBar} from '@/components/shared';
@@ -8,8 +8,8 @@ export default function Screen() {
   const [CAMPANAS, set_CAMPANAS] = useState<any[]>([]);
   const [SEGMENTOS, set_SEGMENTOS] = useState<any[]>([]);
   useEffect(() => {
-      backendApi.vuelos.listar().then(d => set_CAMPANAS(d)).catch(() => {});
-      backendApi.vuelos.listar().then(d => set_SEGMENTOS(d)).catch(() => {});
+      backendApi.marketing.campanas.listar().then(d => set_CAMPANAS(d || [])).catch(() => {});
+      backendApi.marketing.segmentos.listar().then(d => set_SEGMENTOS(d || [])).catch(() => {});
   }, []);
 
   const [q, setQ] = useState('');

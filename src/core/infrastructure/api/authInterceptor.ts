@@ -10,6 +10,7 @@ export async function storeToken(token: string): Promise<void> {
   memoryToken = token;
   try {
     // Dynamic import so web doesn't crash (expo-secure-store is native-only)
+    // @ts-ignore
     const { setItemAsync } = await import('expo-secure-store');
     await setItemAsync('aurora_jwt', token);
   } catch {
@@ -21,6 +22,7 @@ export async function storeToken(token: string): Promise<void> {
 export async function getToken(): Promise<string | null> {
   if (memoryToken) return memoryToken;
   try {
+    // @ts-ignore
     const { getItemAsync } = await import('expo-secure-store');
     const t = await getItemAsync('aurora_jwt');
     memoryToken = t;
@@ -34,6 +36,7 @@ export async function clearToken(): Promise<void> {
   memoryToken = null;
   axiosInstance.setToken(null);
   try {
+    // @ts-ignore
     const { deleteItemAsync } = await import('expo-secure-store');
     await deleteItemAsync('aurora_jwt');
   } catch {}

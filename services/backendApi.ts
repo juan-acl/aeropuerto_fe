@@ -23,15 +23,17 @@
 
 // ─── Base URLs ────────────────────────────────────────────────────────────────
 // ✅ Todos los módulos están unificados en aeropuerto_be-develop (:5087)
-const BE_UNIFIED = process.env.EXPO_PUBLIC_BE_URL ?? 'http://localhost:5087';
+const BE_UNIFIED = process.env.EXPO_PUBLIC_BE_URL ?? "http://localhost:5087";
 const BE_DEVELOP = BE_UNIFIED;
-const BE_GERSON  = BE_UNIFIED;   // Ya no es un backend separado
-const BE_MODULOS = BE_UNIFIED;   // Ya no es un backend separado
 
 const TIMEOUT_MS = 8000;
 
 // ─── Generic fetch with timeout & auth header ─────────────────────────────────
-async function req<T>(base: string, path: string, opts?: RequestInit): Promise<T> {
+async function req<T>(
+  base: string,
+  path: string,
+  opts?: RequestInit,
+): Promise<T> {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
   try {
@@ -39,28 +41,28 @@ async function req<T>(base: string, path: string, opts?: RequestInit): Promise<T
       ...opts,
       signal: ctrl.signal,
       headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
+        "Content-Type": "application/json",
+        Accept: "application/json",
         ...opts?.headers,
       },
     });
     if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
     return res.json() as Promise<T>;
   } catch (e: any) {
-    if (e.name === 'AbortError') throw new Error(`TIMEOUT: ${base}${path}`);
+    if (e.name === "AbortError") throw new Error(`TIMEOUT: ${base}${path}`);
     throw e;
   } finally {
     clearTimeout(timer);
   }
 }
 
-const get  = <T>(base: string, path: string) => req<T>(base, path);
+const get = <T>(base: string, path: string) => req<T>(base, path);
 const post = <T>(base: string, path: string, body: unknown) =>
-  req<T>(base, path, { method: 'POST', body: JSON.stringify(body) });
-const put  = <T>(base: string, path: string, body: unknown) =>
-  req<T>(base, path, { method: 'PUT',  body: JSON.stringify(body) });
-const del  = (base: string, path: string) =>
-  req<void>(base, path, { method: 'DELETE' });
+  req<T>(base, path, { method: "POST", body: JSON.stringify(body) });
+const put = <T>(base: string, path: string, body: unknown) =>
+  req<T>(base, path, { method: "PUT", body: JSON.stringify(body) });
+const del = (base: string, path: string) =>
+  req<void>(base, path, { method: "DELETE" });
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TIPOS — Mapeados 1:1 con las columnas del DDL Oracle
@@ -70,141 +72,140 @@ const del  = (base: string, path: string) =>
 
 /** DDL: aeropuertos (codigo_aeropuerto PK natural) */
 export interface BE_Aeropuerto {
-  CodigoAeropuerto: string;
-  Nombre:           string;
-  Ciudad:           string;
-  Pais:             string;
-  Region?:          string;
-  Continente?:      string;
-  HusoHorario?:     string;
-  Latitud?:         number;
-  Longitud?:        number;
-  ElevacionMetros?: number;
-  Terminales?:      number;
-  PuertasAbordaje?: number;
-  Activo:           number;        // NUMBER(1) DEFAULT 1
-  FechaRegistro?:   string;
+  codigo_aeropuerto: string;
+  nombre: string;
+  ciudad: string;
+  pais: string;
+  region?: string;
+  continente?: string;
+  huso_horario?: string;
+  latitud?: number;
+  longitud?: number;
+  elevacion_metros?: number;
+  terminales?: number;
+  puertas_abordaje?: number;
+  activo: number;
+  fecha_registro?: string;
 }
 
-/** DDL: puertas_embarque */
 export interface BE_PuertaEmbarque {
-  IdPuerta:         number;
-  CodigoAeropuerto: string;
-  NumeroPuerta:     string;
-  Terminal:         string;
-  TipoPuerta?:      string;        // NACIONAL | INTERNACIONAL | MIXTA
-  CapacidadMaxima?: number;
-  TienePasarela?:   number;
-  Activo:           number;
+  id_puerta: number;
+  codigo_aeropuerto: string;
+  numero_puerta: string;
+  terminal: string;
+  tipo_puerta?: string;
+  capacidad_maxima?: number;
+  tiene_pasarela?: number;
+  activo: number;
 }
 
 /** DDL: pistas_aterrizaje */
 export interface BE_Pista {
-  IdPista:              number;
-  CodigoAeropuerto:     string;
-  NumeroPista:          string;
-  LongitudMetros?:      number;
-  SuperficieS?:          string;
+  IdPista: number;
+  CodigoAeropuerto: string;
+  NumeroPista: string;
+  LongitudMetros?: number;
+  SuperficieS?: string;
   IluminacionNocturna?: number;
-  SistemaIls?:          number;
-  Activo:               number;
+  SistemaIls?: number;
+  Activo: number;
 }
 
 // ── MÓDULO 2: FLOTA AÉREA ────────────────────────────────────────────────────
 
 /** DDL: modelos_aviones */
 export interface BE_ModeloAvion {
-  IdModelo:               number;
-  NombreModelo:           string;
-  Fabricante?:            string;
-  CapacidadPasajeros:     number;
-  CapacidadCargaKg?:      number;
-  AutonomiakM?:           number;
-  VelocidadCruceroKmh?:   number;
-  TripulacionMinima?:     number;
-  Activo:                 number;
+  IdModelo: number;
+  NombreModelo: string;
+  Fabricante?: string;
+  CapacidadPasajeros: number;
+  CapacidadCargaKg?: number;
+  AutonomiakM?: number;
+  VelocidadCruceroKmh?: number;
+  TripulacionMinima?: number;
+  Activo: number;
 }
 
 /** DDL: mantenimiento_aviones */
 export interface BE_MantenimientoAvion {
-  IdMantenimiento:       number;
-  MatriculaAvion?:       string;
-  IdModelo?:             number;
-  FechaMantenimiento?:   string;
-  TipoMantenimiento?:    string;   // PREVENTIVO | CORRECTIVO | PREDICTIVO | MAYOR
-  Descripcion?:          string;
-  HorasVueloActuales?:   number;
+  IdMantenimiento: number;
+  MatriculaAvion?: string;
+  IdModelo?: number;
+  FechaMantenimiento?: string;
+  TipoMantenimiento?: string; // PREVENTIVO | CORRECTIVO | PREDICTIVO | MAYOR
+  Descripcion?: string;
+  HorasVueloActuales?: number;
   ProximoMantenimiento?: string;
-  Costo?:                number;
-  TallerS?:               string;
-  TecnicoResponsable?:   string;
+  Costo?: number;
+  TallerS?: string;
+  TecnicoResponsable?: string;
 }
 
 // ── MÓDULO 3: AEROLÍNEAS ─────────────────────────────────────────────────────
 
 /** DDL: aerolineas */
 export interface BE_Aerolinea {
-  IdAerolinea:       number;
-  NombreAerolinea:   string;
-  CodigoIata?:       string;
-  CodigoOaci?:       string;
-  PaisOrigen?:       string;
-  AnioFundacion?:    number;
-  FlotaTotal?:       number;
-  DestinosTotales?:  number;
-  Alianza?:          string;       // STAR_ALLIANCE | SKYTEAM | ONEWORLD | NINGUNA
-  Website?:          string;
+  IdAerolinea: number;
+  NombreAerolinea: string;
+  CodigoIata?: string;
+  CodigoOaci?: string;
+  PaisOrigen?: string;
+  AnioFundacion?: number;
+  FlotaTotal?: number;
+  DestinosTotales?: number;
+  Alianza?: string; // STAR_ALLIANCE | SKYTEAM | ONEWORLD | NINGUNA
+  Website?: string;
   TelefonoContacto?: string;
-  EmailContacto?:    string;
-  Activo:            number;
-  FechaRegistro?:    string;
+  EmailContacto?: string;
+  Activo: number;
+  FechaRegistro?: string;
 }
 
 /** DDL: tipos_aerolinea */
 export interface BE_TipoAerolinea {
   IdTipoAerolinea: number;
-  Descripcion:     string;         // COMERCIAL | CARGA | CHARTER | EJECUTIVA | LOW_COST
-  Activo:          number;
+  Descripcion: string; // COMERCIAL | CARGA | CHARTER | EJECUTIVA | LOW_COST
+  Activo: number;
 }
 
 /** DDL: franquicias_equipaje */
 export interface BE_FranquiciaEquipaje {
-  IdFranquicia:          number;
-  IdAerolinea:           number;
-  ClaseServicio?:        string;
-  PesoMaximoKg?:         number;
-  PiezasPermitidas?:     number;
+  IdFranquicia: number;
+  IdAerolinea: number;
+  ClaseServicio?: string;
+  PesoMaximoKg?: number;
+  PiezasPermitidas?: number;
   DimensionesMaximasCm?: string;
-  ExcesoEquipajeCosto?:  number;
-  Moneda?:               string;
+  ExcesoEquipajeCosto?: number;
+  Moneda?: string;
 }
 
 // ── MÓDULO 4: PROGRAMACIÓN DE VUELOS ─────────────────────────────────────────
 
 /** DDL: programas_vuelo */
 export interface BE_ProgramaVuelo {
-  IdPrograma:                  number;
-  NumeroVuelo:                 string;
-  IdAerolinea:                 number;
-  AeropuertoOrigen:            string;
-  AeropuertoDestino:           string;
-  TipoVuelo?:                  string;   // NACIONAL | INTERNACIONAL
-  DuracionEstimadaMinutos?:    number;
-  DistanciaKm?:                number;
-  ClaseServicio?:              string;   // ECONOMICA | EJECUTIVA | PRIMERA_CLASE | MIXTA
-  Activo:                      number;
-  FechaInicio?:                string;
-  FechaFin?:                   string;
+  IdPrograma: number;
+  NumeroVuelo: string;
+  IdAerolinea: number;
+  AeropuertoOrigen: string;
+  AeropuertoDestino: string;
+  TipoVuelo?: string; // NACIONAL | INTERNACIONAL
+  DuracionEstimadaMinutos?: number;
+  DistanciaKm?: number;
+  ClaseServicio?: string; // ECONOMICA | EJECUTIVA | PRIMERA_CLASE | MIXTA
+  Activo: number;
+  FechaInicio?: string;
+  FechaFin?: string;
 }
 
 /** DDL: temporadas_vuelo */
 export interface BE_TemporadaVuelo {
-  IdTemporada:      number;
+  IdTemporada: number;
   NombreTemporada?: string;
-  FechaInicio?:     string;
-  FechaFin?:        string;
-  FactorDemanda?:   number;   // 0.5 – 2.0
-  Activa:           number;
+  FechaInicio?: string;
+  FechaFin?: string;
+  FactorDemanda?: number; // 0.5 – 2.0
+  Activa: number;
 }
 
 // ── MÓDULO 5: OPERACIONES DE VUELO ───────────────────────────────────────────
@@ -213,68 +214,67 @@ export interface BE_TemporadaVuelo {
  *  Tabla central de operaciones — referenciada por casi todos los módulos
  */
 export interface BE_Vuelo {
-  IdVuelo:                number;
-  IdPrograma:             number;
-  FechaVuelo?:            string;
-  HoraSalidaProgramada?:  string;
-  HoraLlegadaProgramada?: string;
-  HoraSalidaReal?:        string;
-  HoraLlegadaReal?:       string;
-  IdModeloAvion:          number;
-  MatriculaAvion?:        string;
-  PlazasVacias?:          number;
-  PlazasOcupadas?:        number;
-  CargaKg?:               number;
-  CombustibleLitros?:     number;
-  EstadoVuelo?:           string;  // PROGRAMADO|EN_VUELO|ATERRIZADO|CANCELADO|…
-  MotivoCancelacion?:     string;
-  IdPuertaSalida?:        number;
-  IdPuertaLlegada?:       number;
-  ObservacionesOperativas?: string;
-  // Derived from JOIN with programas_vuelo (some APIs include these)
-  NumeroVuelo?:           string;
-  AeropuertoOrigen?:      string;
-  AeropuertoDestino?:     string;
-  NombreAerolinea?:       string;
-  CodigoIata?:            string;
-  DuracionMinutos?:       number;
+  id_vuelo: number;
+  id_programa: number;
+  fecha_vuelo?: string;
+  hora_salida_programada?: string;
+  hora_llegada_programada?: string;
+  hora_salida_real?: string;
+  hora_llegada_real?: string;
+  id_modelo_avion: number;
+  matricula_avion?: string;
+  plazas_vacias?: number;
+  plazas_ocupadas?: number;
+  carga_kg?: number;
+  combustible_litros?: number;
+  estado_vuelo?: string;
+  motivo_cancelacion?: string;
+  id_puerta_salida?: number;
+  id_puerta_llegada?: number;
+  observaciones_operativas?: string;
+  numero_vuelo?: string;
+  aeropuerto_origen?: string;
+  aeropuerto_destino?: string;
+  nombre_aerolinea?: string;
+  codigo_iata?: string;
+  duracion_minutos?: number;
 }
 
 /** DDL: condiciones_meteorologicas */
 export interface BE_Meteorologia {
-  IdCondicion:           number;
-  CodigoAeropuerto:      string;
-  FechaHora?:            string;
-  Temperatura?:          number;
-  Humedad?:              number;
-  PresionAtmosferica?:   number;
-  VientoVelocidad?:      number;
-  VientosDireccion?:     string;
-  VisibilidadKm?:        number;
-  CondicionGeneral?:     string;
-  FenomenosEspeciales?:  string;
+  IdCondicion: number;
+  CodigoAeropuerto: string;
+  FechaHora?: string;
+  Temperatura?: number;
+  Humedad?: number;
+  PresionAtmosferica?: number;
+  VientoVelocidad?: number;
+  VientosDireccion?: string;
+  VisibilidadKm?: number;
+  CondicionGeneral?: string;
+  FenomenosEspeciales?: string;
 }
 
 /** DDL: incidentes_vuelo */
 export interface BE_IncidenteVuelo {
   IdIncidenteVuelo: number;
-  IdVuelo:          number;
-  FechaIncidente?:  string;
-  TipoIncidente?:   string;  // TECNICO | MEDICO | SEGURIDAD | CLIMATICO | OPERATIVO
-  Descripcion?:     string;
-  Gravedad?:        string;  // BAJA | MEDIA | ALTA | CRITICA
+  IdVuelo: number;
+  FechaIncidente?: string;
+  TipoIncidente?: string; // TECNICO | MEDICO | SEGURIDAD | CLIMATICO | OPERATIVO
+  Descripcion?: string;
+  Gravedad?: string; // BAJA | MEDIA | ALTA | CRITICA
   AccionesTomadas?: string;
-  ReportadoPor?:    string;
+  ReportadoPor?: string;
 }
 
 /** DDL: retrasos_vuelo */
 export interface BE_RetrasoVuelo {
-  IdRetraso:              number;
-  IdVuelo:                number;
-  MinutosRetraso?:        number;
-  TipoRetraso?:           string;  // CLIMATICO | TECNICO | OPERACIONAL | …
-  Causa?:                 string;
-  Responsable?:           string;
+  IdRetraso: number;
+  IdVuelo: number;
+  MinutosRetraso?: number;
+  TipoRetraso?: string; // CLIMATICO | TECNICO | OPERACIONAL | …
+  Causa?: string;
+  Responsable?: string;
   CompensacionPasajeros?: number;
 }
 
@@ -282,53 +282,53 @@ export interface BE_RetrasoVuelo {
 
 /** DDL: tripulacion */
 export interface BE_Tripulante {
-  IdTripulante:             number;
-  Nombres?:                 string;
-  Apellidos?:               string;
-  TipoDocumento?:           string;
-  NumeroDocumento?:         string;
-  FechaNacimiento?:         string;
-  Nacionalidad?:            string;
-  TipoTripulante?:          string; // PILOTO | COPILOTO | SOBRECARGO | INGENIERO | AUXILIAR
-  Licencia?:                string;
-  FechaLicencia?:           string;
+  IdTripulante: number;
+  Nombres?: string;
+  Apellidos?: string;
+  TipoDocumento?: string;
+  NumeroDocumento?: string;
+  FechaNacimiento?: string;
+  Nacionalidad?: string;
+  TipoTripulante?: string; // PILOTO | COPILOTO | SOBRECARGO | INGENIERO | AUXILIAR
+  Licencia?: string;
+  FechaLicencia?: string;
   FechaVencimientoLicencia?: string;
-  HorasVueloAcumuladas?:    number;
-  Activo:                   number;
+  HorasVueloAcumuladas?: number;
+  Activo: number;
 }
 
 // ── MÓDULO 7: PASAJEROS ──────────────────────────────────────────────────────
 
 /** DDL: pasajeros */
 export interface BE_Pasajero {
-  IdPasajero:        number;
-  Nombres:           string;
-  Apellidos:          string;
-  TipoDocumento?:    string;  // DPI | PASAPORTE | OTRO
-  NumeroDocumento:   string;
-  Nacionalidad?:     string;
-  FechaNacimiento?:  string;
-  Genero?:           string;  // M | F | O
-  Telefono?:         string;
-  Email?:            string;
-  Direccion?:        string;
+  IdPasajero: number;
+  Nombres: string;
+  Apellidos: string;
+  TipoDocumento?: string; // DPI | PASAPORTE | OTRO
+  NumeroDocumento: string;
+  Nacionalidad?: string;
+  FechaNacimiento?: string;
+  Genero?: string; // M | F | O
+  Telefono?: string;
+  Email?: string;
+  Direccion?: string;
   CiudadResidencia?: string;
-  PaisResidencia?:   string;
-  CodigoPostal?:     string;
-  Ocupacion?:        string;
-  EstadoCivil?:      string;
-  FechaRegistro?:    string;
+  PaisResidencia?: string;
+  CodigoPostal?: string;
+  Ocupacion?: string;
+  EstadoCivil?: string;
+  FechaRegistro?: string;
 }
 
 /** DDL: perfiles_viajero */
 export interface BE_PerfilViajero {
-  IdPerfil:            number;
-  IdPasajero:          number;
-  TipoPerfil?:         string;  // FRECUENTE | OCASIONAL | VIP | CORPORATIVO
-  NumeroPrograma?:     string;
-  PuntosAcumulados?:   number;
-  Categoria?:          string;
-  FechaIngreso?:       string;
+  IdPerfil: number;
+  IdPasajero: number;
+  TipoPerfil?: string; // FRECUENTE | OCASIONAL | VIP | CORPORATIVO
+  NumeroPrograma?: string;
+  PuntosAcumulados?: number;
+  Categoria?: string;
+  FechaIngreso?: string;
   FechaUltimaActividad?: string;
 }
 
@@ -336,564 +336,564 @@ export interface BE_PerfilViajero {
 
 /** DDL: reservas */
 export interface BE_Reserva {
-  IdReserva:               number;
-  IdVuelo:                 number;
-  IdPasajero:              number;
-  CodigoReserva:           string;
-  FechaReserva?:           string;
-  FechaModificacion?:      string;
-  EstadoReserva:           string;  // CONFIRMADA|PENDIENTE|CANCELADA|CHECK_IN|ABORDADO|NO_SHOW
-  TipoTarifa?:             string;
-  PrecioPagado:            number;
-  Moneda?:                 string;
-  NumeroAsiento?:          string;
-  ClaseServicio?:          string;
-  EquipajeFacturadoKg?:    number;
-  EquipajeManoKg?:         number;
-  CheckinRealizado:        number;
-  FechaCheckin?:           string;
+  IdReserva: number;
+  IdVuelo: number;
+  IdPasajero: number;
+  CodigoReserva: string;
+  FechaReserva?: string;
+  FechaModificacion?: string;
+  EstadoReserva: string; // CONFIRMADA|PENDIENTE|CANCELADA|CHECK_IN|ABORDADO|NO_SHOW
+  TipoTarifa?: string;
+  PrecioPagado: number;
+  Moneda?: string;
+  NumeroAsiento?: string;
+  ClaseServicio?: string;
+  EquipajeFacturadoKg?: number;
+  EquipajeManoKg?: number;
+  CheckinRealizado: number;
+  FechaCheckin?: string;
   PuertaEmbarqueAsignada?: string;
-  GrupoEmbarque?:          number;
-  Observaciones?:          string;
+  GrupoEmbarque?: number;
+  Observaciones?: string;
 }
 
 /** DDL: metodos_pago */
 export interface BE_MetodoPago {
   IdMetodoPago: number;
-  Descripcion:  string;
-  TipoPago?:    string;  // TARJETA_CREDITO | TARJETA_DEBITO | EFECTIVO | TRANSFERENCIA | PUNTOS
-  Procesador?:  string;
-  Activo:       number;
+  Descripcion: string;
+  TipoPago?: string; // TARJETA_CREDITO | TARJETA_DEBITO | EFECTIVO | TRANSFERENCIA | PUNTOS
+  Procesador?: string;
+  Activo: number;
 }
 
 /** DDL: reservas_pagos */
 export interface BE_ReservaPago {
-  IdPago:              number;
-  IdReserva:           number;
-  IdMetodoPago?:       number;
-  Monto:               number;
-  Moneda?:             string;
-  FechaPago?:          string;
-  CodigoTransaccion?:  string;
-  EstadoPago?:         string;
+  IdPago: number;
+  IdReserva: number;
+  IdMetodoPago?: number;
+  Monto: number;
+  Moneda?: string;
+  FechaPago?: string;
+  CodigoTransaccion?: string;
+  EstadoPago?: string;
 }
 
 /** DDL: facturas */
 export interface BE_Factura {
-  IdFactura:    number;
-  IdReserva:    number;
+  IdFactura: number;
+  IdReserva: number;
   NumeroFactura?: string;
   FechaEmision?: string;
-  Subtotal:     number;
-  Impuestos:    number;
-  Total:        number;
-  Moneda?:      string;
+  Subtotal: number;
+  Impuestos: number;
+  Total: number;
+  Moneda?: string;
   DatosFiscales?: string;
 }
 
 /** DDL: promociones */
 export interface BE_Promocion {
-  IdPromocion:       number;
-  CodigoPromocion?:  string;
-  NombrePromocion?:  string;
+  IdPromocion: number;
+  CodigoPromocion?: string;
+  NombrePromocion?: string;
   DescripcionPromocion?: string;
-  TipoDescuento?:    string;  // PORCENTAJE | MONTO_FIJO | 2X1 | OTRO
-  ValorDescuento?:   number;
-  FechaInicio?:      string;
-  FechaFin?:         string;
-  UsoMaximo?:        number;
-  UsosActuales?:     number;
-  Activa?:           number;
+  TipoDescuento?: string; // PORCENTAJE | MONTO_FIJO | 2X1 | OTRO
+  ValorDescuento?: number;
+  FechaInicio?: string;
+  FechaFin?: string;
+  UsoMaximo?: number;
+  UsosActuales?: number;
+  Activa?: number;
 }
 
 /** DDL: solicitudes_especiales */
 export interface BE_SolicitudEspecial {
-  IdSolicitud:      number;
-  IdReserva:        number;
-  TipoSolicitud?:   string;  // COMIDA_ESPECIAL | ASISTENCIA | EQUIPAJE_ESPECIAL | MASCOTA | …
-  Descripcion?:     string;
-  FechaSolicitud?:  string;
+  IdSolicitud: number;
+  IdReserva: number;
+  TipoSolicitud?: string; // COMIDA_ESPECIAL | ASISTENCIA | EQUIPAJE_ESPECIAL | MASCOTA | …
+  Descripcion?: string;
+  FechaSolicitud?: string;
   EstadoSolicitud?: string;
-  Resolucion?:      string;
+  Resolucion?: string;
 }
 
 // ── MÓDULO 9: CHECK-IN Y ABORDAJE ────────────────────────────────────────────
 
 /** DDL: checkin_digital */
 export interface BE_CheckinDigital {
-  IdCheckin:              number;
-  IdReserva:              number;
-  FechaCheckin?:          string;
-  IpOrigen?:              string;
-  Dispositivo?:           string;
-  PaseAbordajeGenerado:   number;
-  EnviadoEmail:           number;
-  EnviadoSms:             number;
+  IdCheckin: number;
+  IdReserva: number;
+  FechaCheckin?: string;
+  IpOrigen?: string;
+  Dispositivo?: string;
+  PaseAbordajeGenerado: number;
+  EnviadoEmail: number;
+  EnviadoSms: number;
 }
 
 /** DDL: pases_abordaje */
 export interface BE_PaseAbordaje {
-  IdPaseAbordaje:  number;
-  IdReserva:       number;
-  CodigoBarras?:   string;
+  IdPaseAbordaje: number;
+  IdReserva: number;
+  CodigoBarras?: string;
   FechaGeneracion?: string;
   PuertaEmbarque?: string;
-  GrupoEmbarque?:  string;
-  Asiento?:        string;
-  Utilizado:       number;
+  GrupoEmbarque?: string;
+  Asiento?: string;
+  Utilizado: number;
   // Derived/denormalized fields some APIs may include:
-  NumeroVuelo?:    string;
+  NumeroVuelo?: string;
   NombrePasajero?: string;
-  Terminal?:       string;
-  HoraEmbarque?:   string;
+  Terminal?: string;
+  HoraEmbarque?: string;
 }
 
 /** DDL: control_abordaje */
 export interface BE_ControlAbordaje {
   IdControlAbordaje: number;
-  IdVuelo:           number;
-  IdReserva:         number;
-  HoraAbordaje?:     string;
-  VerificadoPor?:    number;
-  Estado?:           string;  // ABORDADO | NO_ABORDADO
-  Observaciones?:    string;
+  IdVuelo: number;
+  IdReserva: number;
+  HoraAbordaje?: string;
+  VerificadoPor?: number;
+  Estado?: string; // ABORDADO | NO_ABORDADO
+  Observaciones?: string;
 }
 
 // ── MÓDULO 10: SEGURIDAD ─────────────────────────────────────────────────────
 
 /** DDL: incidentes (seguridad aeroportuaria) */
 export interface BE_Incidente {
-  IdIncidente:        number;
-  IdPasajero?:        number;
-  IdVuelo?:           number;
-  CodigoAeropuerto?:  string;
-  FechaIncidente?:    string;
-  HoraIncidente?:     string;
-  TipoIncidente?:     string;  // ARRESTO | INFRACCION | INCIDENTE | EMERGENCIA_MEDICA | …
-  NivelGravedad?:     string;  // BAJO | MEDIO | ALTO | CRITICO
-  Descripcion:        string;
-  LugarIncidente?:    string;
+  IdIncidente: number;
+  IdPasajero?: number;
+  IdVuelo?: number;
+  CodigoAeropuerto?: string;
+  FechaIncidente?: string;
+  HoraIncidente?: string;
+  TipoIncidente?: string; // ARRESTO | INFRACCION | INCIDENTE | EMERGENCIA_MEDICA | …
+  NivelGravedad?: string; // BAJO | MEDIO | ALTO | CRITICO
+  Descripcion: string;
+  LugarIncidente?: string;
   AutoridadInvolucrada?: string;
-  OificialACargo?:    string;
-  Resolucion?:        string;
-  Estado?:            string;
+  OificialACargo?: string;
+  Resolucion?: string;
+  Estado?: string;
   RequiereSeguimiento?: number;
 }
 
 /** DDL: alertas_seguridad */
 export interface BE_AlertaSeguridad {
-  IdAlerta:             number;
-  CodigoAeropuerto?:    string;
-  NivelAlerta?:         string;  // VERDE | AMARILLO | NARANJA | ROJO
-  FechaInicio?:         string;
-  FechaFin?:            string;
-  Motivo?:              string;
-  MedidasAdicionales?:  string;
-  Activa:               number;
-  EmitidaPor?:          string;
+  IdAlerta: number;
+  CodigoAeropuerto?: string;
+  NivelAlerta?: string; // VERDE | AMARILLO | NARANJA | ROJO
+  FechaInicio?: string;
+  FechaFin?: string;
+  Motivo?: string;
+  MedidasAdicionales?: string;
+  Activa: number;
+  EmitidaPor?: string;
 }
 
 /** DDL: prohibiciones_vuelo */
 export interface BE_ProhibicionVuelo {
-  IdProhibicion:    number;
-  IdPasajero:       number;
+  IdProhibicion: number;
+  IdPasajero: number;
   FechaProhibicion?: string;
-  FechaInicio?:     string;
-  FechaFin?:        string;
-  Motivo?:          string;
-  IdIncidente?:     number;
-  AutoridadEmite?:  string;
-  Activa:           number;
+  FechaInicio?: string;
+  FechaFin?: string;
+  Motivo?: string;
+  IdIncidente?: number;
+  AutoridadEmite?: string;
+  Activa: number;
 }
 
 // ── MÓDULO 12: OBJETOS PERDIDOS ───────────────────────────────────────────────
 
 /** DDL: objetos_perdidos */
 export interface BE_ObjetoPerdido {
-  IdObjeto:           number;
-  Descripcion:        string;
-  CategoriaObjeto?:   string;
-  FechaReporte?:      string;
-  LugarEncontrado?:   string;  // AEROPUERTO | VUELO | SALA_ESPERA | …
-  IdVuelo?:           number;
-  CodigoAeropuerto?:  string;
-  Color?:             string;
-  Marca?:             string;
-  ValorEstimado?:     number;
-  UbicacionActual?:   string;
-  Estado?:            string;  // ENCONTRADO | ENTREGADO | ELIMINADO | EN_PROCESO
-  FechaEntrega?:      string;
+  IdObjeto: number;
+  Descripcion: string;
+  CategoriaObjeto?: string;
+  FechaReporte?: string;
+  LugarEncontrado?: string; // AEROPUERTO | VUELO | SALA_ESPERA | …
+  IdVuelo?: number;
+  CodigoAeropuerto?: string;
+  Color?: string;
+  Marca?: string;
+  ValorEstimado?: number;
+  UbicacionActual?: string;
+  Estado?: string; // ENCONTRADO | ENTREGADO | ELIMINADO | EN_PROCESO
+  FechaEntrega?: string;
 }
 
 // ── MÓDULO 13: ÁREA COMERCIAL ─────────────────────────────────────────────────
 
 /** DDL: concesiones_comerciales */
 export interface BE_Concesion {
-  IdConcesion:       number;
+  IdConcesion: number;
   CodigoAeropuerto?: string;
-  NombreComercial:   string;
-  TipoNegocio?:      string;  // RESTAURANTE | TIENDA | ALQUILER | SERVICIO | DUTY_FREE
-  Empresa?:          string;
-  CanonMensual?:     number;
-  LocalNumero?:       string;
-  AreaM2?:           number;
-  Activo:            number;
+  NombreComercial: string;
+  TipoNegocio?: string; // RESTAURANTE | TIENDA | ALQUILER | SERVICIO | DUTY_FREE
+  Empresa?: string;
+  CanonMensual?: number;
+  LocalNumero?: string;
+  AreaM2?: number;
+  Activo: number;
 }
 
 /** DDL: salones_vip */
 export interface BE_SalonVip {
-  IdSalon:           number;
+  IdSalon: number;
   CodigoAeropuerto?: string;
-  NombreSalon:       string;
-  Ubicacion?:        string;
-  Capacidad?:        number;
-  HorarioApertura?:  string;
-  HorarioCierre?:    string;
+  NombreSalon: string;
+  Ubicacion?: string;
+  Capacidad?: number;
+  HorarioApertura?: string;
+  HorarioCierre?: string;
   RequisitosAcceso?: string;
-  Activo:            number;
+  Activo: number;
 }
 
 // ── MÓDULO 14: SERVICIOS AL PASAJERO ─────────────────────────────────────────
 
 /** DDL: hoteles_cercanos */
 export interface BE_HotelCercano {
-  IdHotel:             number;
-  CodigoAeropuerto?:   string;
-  NombreHotel:         string;
-  Categoria?:          string;   // 1* | 2* | 3* | 4* | 5*
-  Direccion?:          string;
-  DistanciaKm?:        number;
-  Telefono?:           string;
-  Email?:              string;
-  Website?:            string;
-  TarifaNocheDesde?:   number;
-  TieneShuttle?:       number;   // NUMBER(1)
-  Activo?:             number;
+  IdHotel: number;
+  CodigoAeropuerto?: string;
+  NombreHotel: string;
+  Categoria?: string; // 1* | 2* | 3* | 4* | 5*
+  Direccion?: string;
+  DistanciaKm?: number;
+  Telefono?: string;
+  Email?: string;
+  Website?: string;
+  TarifaNocheDesde?: number;
+  TieneShuttle?: number; // NUMBER(1)
+  Activo?: number;
 }
 
 /** DDL: transporte_terrestre */
 export interface BE_TransporteTerresre {
-  IdTransporte:        number;
-  CodigoAeropuerto?:   string;
-  TipoTransporte?:     string;  // TAXI | BUS | SHUTTLE | RENTA_AUTO | METRO
-  Empresa?:            string;
-  TelefonoContacto?:   string;
-  TarifaEstimada?:     string;
-  HorarioOperacion?:   string;
-  Activo:              number;
+  IdTransporte: number;
+  CodigoAeropuerto?: string;
+  TipoTransporte?: string; // TAXI | BUS | SHUTTLE | RENTA_AUTO | METRO
+  Empresa?: string;
+  TelefonoContacto?: string;
+  TarifaEstimada?: string;
+  HorarioOperacion?: string;
+  Activo: number;
 }
 
 /** DDL: servicios_aeropuerto */
 export interface BE_ServicioAeropuerto {
-  IdServicio:          number;
-  CodigoAeropuerto?:   string;
-  NombreServicio:      string;
-  TipoServicio?:       string;  // BANCO | CAJERO | FARMACIA | WIFI | ADUANA | …
-  Ubicacion?:          string;
-  HorarioApertura?:    string;
-  HorarioCierre?:      string;
-  Disponible24h?:      number;
-  Activo:              number;
+  IdServicio: number;
+  CodigoAeropuerto?: string;
+  NombreServicio: string;
+  TipoServicio?: string; // BANCO | CAJERO | FARMACIA | WIFI | ADUANA | …
+  Ubicacion?: string;
+  HorarioApertura?: string;
+  HorarioCierre?: string;
+  Disponible24h?: number;
+  Activo: number;
 }
 
 /** DDL: programa_lealtad */
 export interface BE_ProgramaLealtad {
-  IdLealtad:             number;
-  IdPasajero?:           number;
-  NivelMembresia:        string;  // BRONCE | PLATA | ORO | PLATINO
-  PuntosAcumulados:      number;
-  PuntosCanjeables:      number;
-  MillasAcumuladas:      number;
-  FechaIngreso?:         string;
+  IdLealtad: number;
+  IdPasajero?: number;
+  NivelMembresia: string; // BRONCE | PLATA | ORO | PLATINO
+  PuntosAcumulados: number;
+  PuntosCanjeables: number;
+  MillasAcumuladas: number;
+  FechaIngreso?: string;
   FechaUltimaActividad?: string;
-  BeneficiosActivos?:    string;
-  TarjetaNumero?:        string;
-  Activo:                number;
+  BeneficiosActivos?: string;
+  TarjetaNumero?: string;
+  Activo: number;
 }
 
 /** DDL: quejas_sugerencias */
 export interface BE_QuejaSugerencia {
-  IdQueja:          number;
-  IdPasajero?:      number;
-  IdVuelo?:         number;
-  TipoContacto?:    string;  // QUEJA | SUGERENCIA | FELICITACION | RECLAMO
-  FechaContacto?:   string;
-  MedioRecepcion?:  string;
-  Descripcion?:     string;
+  IdQueja: number;
+  IdPasajero?: number;
+  IdVuelo?: number;
+  TipoContacto?: string; // QUEJA | SUGERENCIA | FELICITACION | RECLAMO
+  FechaContacto?: string;
+  MedioRecepcion?: string;
+  Descripcion?: string;
   AreaRelacionada?: string;
-  Estado?:          string;
-  Respuesta?:       string;
+  Estado?: string;
+  Respuesta?: string;
 }
 
 /** DDL: encuestas_satisfaccion */
 export interface BE_Encuesta {
-  IdEncuesta:          number;
-  IdPasajero:          number;
-  IdVuelo:             number;
-  FechaEncuesta?:      string;
-  PuntuacionGeneral?:  number;
-  PuntuacionCheckin?:  number;
+  IdEncuesta: number;
+  IdPasajero: number;
+  IdVuelo: number;
+  FechaEncuesta?: string;
+  PuntuacionGeneral?: number;
+  PuntuacionCheckin?: number;
   PuntuacionAbordaje?: number;
   PuntuacionAtencion?: number;
-  Comentarios?:        string;
-  Recomienda?:         number;
+  Comentarios?: string;
+  Recomienda?: number;
 }
 
 /** DDL: atencion_especial */
 export interface BE_AtencionEspecial {
-  IdAtencion:           number;
-  IdPasajero:           number;
-  IdReserva:            number;
-  TipoAtencion?:        string;  // SILLA_RUEDAS | ASISTENCIA_VISUAL | ASISTENCIA_AUDITIVA
-  FechaSolicitud?:      string;
-  AsistenteAsignado?:   string;
-  Observaciones?:       string;
+  IdAtencion: number;
+  IdPasajero: number;
+  IdReserva: number;
+  TipoAtencion?: string; // SILLA_RUEDAS | ASISTENCIA_VISUAL | ASISTENCIA_AUDITIVA
+  FechaSolicitud?: string;
+  AsistenteAsignado?: string;
+  Observaciones?: string;
 }
 
 // ── MÓDULO 15: RECURSOS HUMANOS ───────────────────────────────────────────────
 
 /** DDL: empleados */
 export interface BE_Empleado {
-  IdEmpleado:         number;
-  CodigoEmpleado:     string;
-  Nombres:            string;
-  Apellidos:          string;
-  TipoDocumento?:     string;
-  NumeroDocumento?:   string;
-  FechaNacimiento?:   string;
-  Nacionalidad?:      string;
-  Genero?:            string;
-  Direccion?:         string;
-  Telefono?:          string;
-  Email?:             string;
+  IdEmpleado: number;
+  CodigoEmpleado: string;
+  Nombres: string;
+  Apellidos: string;
+  TipoDocumento?: string;
+  NumeroDocumento?: string;
+  FechaNacimiento?: string;
+  Nacionalidad?: string;
+  Genero?: string;
+  Direccion?: string;
+  Telefono?: string;
+  Email?: string;
   FechaContratacion?: string;
-  Departamento?:      string;
-  Cargo?:             string;
-  SalarioBase?:       number;
-  TipoContrato?:      string;   // PERMANENTE | TEMPORAL | PRACTICAS | CONSULTOR
-  Activo:             number;
+  Departamento?: string;
+  Cargo?: string;
+  SalarioBase?: number;
+  TipoContrato?: string; // PERMANENTE | TEMPORAL | PRACTICAS | CONSULTOR
+  Activo: number;
 }
 
 /** DDL: departamentos */
 export interface BE_Departamento {
-  IdDepartamento:      number;
-  NombreDepartamento:  string;
-  Descripcion?:        string;
-  Ubicacion?:          string;
-  PresupuestoAnual?:   number;
-  GerenteId?:          number;
-  Activo?:             number;
+  IdDepartamento: number;
+  NombreDepartamento: string;
+  Descripcion?: string;
+  Ubicacion?: string;
+  PresupuestoAnual?: number;
+  GerenteId?: number;
+  Activo?: number;
 }
 
 /** DDL: evaluaciones_desempeno */
 export interface BE_Evaluacion {
-  IdEvaluacion:               number;
-  IdEmpleado:                 number;
-  FechaEvaluacion?:           string;
-  EvaluadorId?:               number;
-  PeriodoEvaluado?:           string;
-  PuntuacionTotal?:           number;
-  PuntuacionProductividad?:   number;
-  PuntuacionAsistencia?:      number;
-  Comentarios?:               string;
+  IdEvaluacion: number;
+  IdEmpleado: number;
+  FechaEvaluacion?: string;
+  EvaluadorId?: number;
+  PeriodoEvaluado?: string;
+  PuntuacionTotal?: number;
+  PuntuacionProductividad?: number;
+  PuntuacionAsistencia?: number;
+  Comentarios?: string;
 }
 
 /** DDL: vacaciones_permisos */
 export interface BE_VacacionPermiso {
-  IdSolicitud:       number;
-  IdEmpleado:        number;
-  TipoSolicitud?:    string;  // VACACIONES | PERMISO | LICENCIA | INCAPACIDAD
-  FechaInicio?:      string;
-  FechaFin?:         string;
-  DiasSolicitados?:  number;
-  Motivo?:           string;
-  Estado?:           string;
-  AutorizadoPor?:    number;
+  IdSolicitud: number;
+  IdEmpleado: number;
+  TipoSolicitud?: string; // VACACIONES | PERMISO | LICENCIA | INCAPACIDAD
+  FechaInicio?: string;
+  FechaFin?: string;
+  DiasSolicitados?: number;
+  Motivo?: string;
+  Estado?: string;
+  AutorizadoPor?: number;
 }
 
 // ── MÓDULO 16: FINANZAS Y CONTABILIDAD ───────────────────────────────────────
 
 /** DDL: ingresos */
 export interface BE_Ingreso {
-  IdIngreso:       number;
-  Fecha:           string;
-  Concepto:        string;           // ← DDL: concepto (antes Descripcion)
-  TipoIngreso?:    string;           // TASA_EMBARQUE | CONCESIONES | ESTACIONAMIENTO | …
-  IdConcesion?:    number;
-  IdVuelo?:        number;
-  Monto:           number;
-  Moneda?:         string;
-  MetodoPago?:     string;
-  Comprobante?:    string;
-  RegistradoPor?:  number;
+  IdIngreso: number;
+  Fecha: string;
+  Concepto: string; // ← DDL: concepto (antes Descripcion)
+  TipoIngreso?: string; // TASA_EMBARQUE | CONCESIONES | ESTACIONAMIENTO | …
+  IdConcesion?: number;
+  IdVuelo?: number;
+  Monto: number;
+  Moneda?: string;
+  MetodoPago?: string;
+  Comprobante?: string;
+  RegistradoPor?: number;
 }
 
 /** DDL: gastos */
 export interface BE_Gasto {
-  IdGasto:          number;
-  Fecha:            string;
-  Concepto:         string;          // ← DDL: concepto
-  TipoGasto?:       string;          // SERVICIOS | MANTENIMIENTO | PERSONAL | …
-  IdDepartamento?:  number;
-  Proveedor?:       string;
-  Monto:            number;
-  Moneda?:          string;
-  Factura?:         string;
-  AutorizadoPor?:   number;
+  IdGasto: number;
+  Fecha: string;
+  Concepto: string; // ← DDL: concepto
+  TipoGasto?: string; // SERVICIOS | MANTENIMIENTO | PERSONAL | …
+  IdDepartamento?: number;
+  Proveedor?: string;
+  Monto: number;
+  Moneda?: string;
+  Factura?: string;
+  AutorizadoPor?: number;
 }
 
 /** DDL: proveedores */
 export interface BE_Proveedor {
-  IdProveedor:       number;
-  NombreProveedor:   string;
-  TipoProveedor?:    string;  // COMBUSTIBLE | CATERING | MANTENIMIENTO | LIMPIEZA | …
-  Nit?:              string;
-  Direccion?:        string;
-  Telefono?:         string;
-  Email?:            string;
-  ContactoNombre?:   string;
-  CondicionesPago?:  string;
-  Calificacion?:     number;
-  Activo:            number;
+  IdProveedor: number;
+  NombreProveedor: string;
+  TipoProveedor?: string; // COMBUSTIBLE | CATERING | MANTENIMIENTO | LIMPIEZA | …
+  Nit?: string;
+  Direccion?: string;
+  Telefono?: string;
+  Email?: string;
+  ContactoNombre?: string;
+  CondicionesPago?: string;
+  Calificacion?: number;
+  Activo: number;
 }
 
 /** DDL: tasas_aeroportuarias */
 export interface BE_TasaAeroportuaria {
-  IdTasa:              number;
-  NombreTasa:          string;
-  TipoTasa?:           string;  // INTERNACIONAL | NACIONAL | SEGURIDAD | …
-  Monto:               number;
-  Moneda?:             string;
-  CalculoPorcentaje?:  number;
-  AplicaA?:            string;  // PASAJERO | AEROLINEA | CARGA | AVION
-  Activa:              number;
+  IdTasa: number;
+  NombreTasa: string;
+  TipoTasa?: string; // INTERNACIONAL | NACIONAL | SEGURIDAD | …
+  Monto: number;
+  Moneda?: string;
+  CalculoPorcentaje?: number;
+  AplicaA?: string; // PASAJERO | AEROLINEA | CARGA | AVION
+  Activa: number;
 }
 
 /** DDL: cuentas_bancarias */
 export interface BE_CuentaBancaria {
-  IdCuenta:      number;
-  Banco?:        string;
-  TipoCuenta?:   string;  // MONETARIA | AHORRO | INVERSION
+  IdCuenta: number;
+  Banco?: string;
+  TipoCuenta?: string; // MONETARIA | AHORRO | INVERSION
   NumeroCuenta?: string;
-  Moneda?:       string;
-  SaldoActual?:  number;
-  Estado?:       string;
+  Moneda?: string;
+  SaldoActual?: number;
+  Estado?: string;
 }
 
 /** DDL: movimientos_bancarios */
 export interface BE_MovimientoBancario {
-  IdMovimiento:      number;
-  IdCuenta:          number;
-  Fecha?:            string;
-  TipoMovimiento?:   string;  // DEPOSITO | RETIRO | TRANSFERENCIA | PAGO | COBRO
-  Concepto?:         string;
-  Monto:             number;
-  SaldoResultante?:  number;
-  Referencia?:       string;
-  Conciliado?:       number;
+  IdMovimiento: number;
+  IdCuenta: number;
+  Fecha?: string;
+  TipoMovimiento?: string; // DEPOSITO | RETIRO | TRANSFERENCIA | PAGO | COBRO
+  Concepto?: string;
+  Monto: number;
+  SaldoResultante?: number;
+  Referencia?: string;
+  Conciliado?: number;
 }
 
 // ── MÓDULO 18: MENORES Y GRUPOS ESPECIALES ───────────────────────────────────
 
 /** DDL: menores_no_acompanados */
 export interface BE_MenorNoAcompanado {
-  IdMenor:                number;
-  IdReserva?:             number;
-  Edad?:                  number;
-  NombreEntregaOrigen?:   string;
-  RelacionOrigen?:        string;
-  TelefonoOrigen?:        string;
-  NombreRecogeDestino?:   string;
-  RelacionDestino?:       string;
-  TelefonoDestino?:       string;
-  Observaciones?:         string;
+  IdMenor: number;
+  IdReserva?: number;
+  Edad?: number;
+  NombreEntregaOrigen?: string;
+  RelacionOrigen?: string;
+  TelefonoOrigen?: string;
+  NombreRecogeDestino?: string;
+  RelacionDestino?: string;
+  TelefonoDestino?: string;
+  Observaciones?: string;
 }
 
 // ── MÓDULO 19: GESTIÓN DE CARGA ──────────────────────────────────────────────
 
 /** DDL: envios_carga */
 export interface BE_EnvioCarga {
-  IdEnvio:                  number;
-  CodigoEnvio:              string;
-  IdVuelo:                  number;
-  IdTipoCarga:              number;
-  PesoKg:                   number;
-  VolumenM3?:               number;
-  CantidadBultos?:          number;
-  Contenido:                string;
-  ValorDeclarado?:          number;
-  ConsignadorNombre?:       string;
-  ConsignatarioNombre?:     string;
+  IdEnvio: number;
+  CodigoEnvio: string;
+  IdVuelo: number;
+  IdTipoCarga: number;
+  PesoKg: number;
+  VolumenM3?: number;
+  CantidadBultos?: number;
+  Contenido: string;
+  ValorDeclarado?: number;
+  ConsignadorNombre?: string;
+  ConsignatarioNombre?: string;
   InstruccionesEspeciales?: string;
-  FechaRecepcion?:          string;
-  Estado?:                  string;  // RECIBIDO | EN_BODEGA | CARGADO | EN_VUELO | ENTREGADO | …
-  UbicacionActual?:         string;
+  FechaRecepcion?: string;
+  Estado?: string; // RECIBIDO | EN_BODEGA | CARGADO | EN_VUELO | ENTREGADO | …
+  UbicacionActual?: string;
 }
 
 /** DDL: manifiestos_carga */
 export interface BE_ManifiestoCarga {
-  IdManifiesto:      number;
-  NumeroManifiesto:  string;
-  IdVuelo:           number;
-  FechaEmision?:     string;
-  TotalBultos?:      number;
-  PesoTotalKg?:      number;
-  Estado?:           string;  // EMITIDO | VALIDADO | CERRADO
+  IdManifiesto: number;
+  NumeroManifiesto: string;
+  IdVuelo: number;
+  FechaEmision?: string;
+  TotalBultos?: number;
+  PesoTotalKg?: number;
+  Estado?: string; // EMITIDO | VALIDADO | CERRADO
 }
 
 /** DDL: seguimiento_carga */
 export interface BE_SeguimientoCarga {
-  IdSeguimiento:         number;
-  IdEnvio:               number;
-  FechaHora?:            string;
-  Ubicacion:             string;
-  Estado:                string;
-  Responsable?:          string;
-  Observaciones?:        string;
+  IdSeguimiento: number;
+  IdEnvio: number;
+  FechaHora?: string;
+  Ubicacion: string;
+  Estado: string;
+  Responsable?: string;
+  Observaciones?: string;
   TemperaturaRegistrada?: number;
-  Incidente?:            number;
+  Incidente?: number;
 }
 
 // ── MÓDULO 20: MANTENIMIENTO PREDICTIVO ──────────────────────────────────────
 
 /** DDL: ordenes_mantenimiento_predictivo */
 export interface BE_OrdenMantenimiento {
-  IdOrdenMp:            number;
-  IdAlertaTecnica?:     number;
-  IdPieza?:             number;
-  IdAvionMatricula?:    string;
-  FechaCreacion?:       string;
-  Prioridad?:           string;  // BAJA | MEDIA | ALTA | URGENTE
-  DescripcionTrabajo?:  string;
-  TecnicoAsignado?:     number;
-  Estado?:              string;  // PENDIENTE | ASIGNADO | EN_PROCESO | COMPLETADO | CANCELADO
-  CostoEstimado?:       number;
-  CostoReal?:           number;
+  IdOrdenMp: number;
+  IdAlertaTecnica?: number;
+  IdPieza?: number;
+  IdAvionMatricula?: string;
+  FechaCreacion?: string;
+  Prioridad?: string; // BAJA | MEDIA | ALTA | URGENTE
+  DescripcionTrabajo?: string;
+  TecnicoAsignado?: number;
+  Estado?: string; // PENDIENTE | ASIGNADO | EN_PROCESO | COMPLETADO | CANCELADO
+  CostoEstimado?: number;
+  CostoReal?: number;
 }
 
 /** DDL: alertas_tecnicas */
 export interface BE_AlertaTecnica {
-  IdAlertaTecnica:  number;
-  IdLectura?:       number;
-  NivelAlerta?:     string;   // INFORMATIVO | PREVENTIVO | CRITICO | EMERGENCIA
-  TipoAlerta?:      string;
-  Descripcion:      string;
-  ValorUmbral?:     number;
-  ValorActual?:     number;
-  FechaAlerta?:     string;
-  Atendida?:        number;
+  IdAlertaTecnica: number;
+  IdLectura?: number;
+  NivelAlerta?: string; // INFORMATIVO | PREVENTIVO | CRITICO | EMERGENCIA
+  TipoAlerta?: string;
+  Descripcion: string;
+  ValorUmbral?: number;
+  ValorActual?: number;
+  FechaAlerta?: string;
+  Atendida?: number;
 }
 
 /** DDL: piezas_reemplazo */
 export interface BE_PiezaReemplazo {
-  IdPieza:           number;
-  CodigoPieza:       string;
-  NombrePieza:       string;
-  Descripcion?:      string;
-  IdModeloAvion?:    number;
-  StockActual?:      number;
-  StockMinimo?:      number;
-  PrecioUnitario?:   number;
+  IdPieza: number;
+  CodigoPieza: string;
+  NombrePieza: string;
+  Descripcion?: string;
+  IdModeloAvion?: number;
+  StockActual?: number;
+  StockMinimo?: number;
+  PrecioUnitario?: number;
   TiempoReordenDias?: number;
 }
 
@@ -901,100 +901,113 @@ export interface BE_PiezaReemplazo {
 
 /** DDL: reservas_transporte_terrestre */
 export interface BE_ReservaTransporte {
-  IdReservaTransporte:   number;
+  IdReservaTransporte: number;
   CodigoReservaTransporte: string;
-  IdPasajero:            number;
-  IdRutaTransporte:      number;
-  TipoServicio?:         string;  // COMPARTIDO | PRIVADO | GRUPAL
-  FechaServicio?:        string;
-  HoraRecogida?:         string;
-  LugarRecogida:         string;
-  LugarDestino:          string;
-  NumeroPasajeros?:      number;
-  IdVueloAsociado?:      number;
-  EstadoReserva?:        string;  // CONFIRMADA | ASIGNADA | COMPLETADA | CANCELADA | NO_SHOW
-  PrecioTotal?:          number;
-  Moneda?:               string;
-  Pagado?:               number;
+  IdPasajero: number;
+  IdRutaTransporte: number;
+  TipoServicio?: string; // COMPARTIDO | PRIVADO | GRUPAL
+  FechaServicio?: string;
+  HoraRecogida?: string;
+  LugarRecogida: string;
+  LugarDestino: string;
+  NumeroPasajeros?: number;
+  IdVueloAsociado?: number;
+  EstadoReserva?: string; // CONFIRMADA | ASIGNADA | COMPLETADA | CANCELADA | NO_SHOW
+  PrecioTotal?: number;
+  Moneda?: string;
+  Pagado?: number;
 }
 
 /** DDL: empresas_transporte */
 export interface BE_EmpresaTransporte {
-  IdEmpresaTransporte:     number;
-  NombreEmpresa:           string;
-  TipoEmpresa?:            string;  // TAXI | BUS | RENTA_CAR | SHUTTLE | TRANSFER
-  TelefonoContacto?:       string;
-  CalificacionPromedio?:   number;
-  AutorizadaAeropuerto?:   number;
-  Activa:                  number;
+  IdEmpresaTransporte: number;
+  NombreEmpresa: string;
+  TipoEmpresa?: string; // TAXI | BUS | RENTA_CAR | SHUTTLE | TRANSFER
+  TelefonoContacto?: string;
+  CalificacionPromedio?: number;
+  AutorizadaAeropuerto?: number;
+  Activa: number;
 }
 
 /** DDL: convenios_hoteles_transporte */
 export interface BE_ConvenioHotelTransporte {
-  IdConvenioHotel:     number;
-  IdHotelCercano:      number;
+  IdConvenioHotel: number;
+  IdHotelCercano: number;
   IdEmpresaTransporte: number;
-  TipoConvenio?:       string;  // SHUTTLE_GRATUITO | TARIFA_PREFERENCIAL | EXCLUSIVO
-  TarifaEspecial?:     number;
-  Condiciones?:        string;
-  FechaInicio:         string;
-  FechaFin?:           string;
-  Activo:              number;
+  TipoConvenio?: string; // SHUTTLE_GRATUITO | TARIFA_PREFERENCIAL | EXCLUSIVO
+  TarifaEspecial?: number;
+  Condiciones?: string;
+  FechaInicio: string;
+  FechaFin?: string;
+  Activo: number;
 }
 
 // ── MÓDULO 22: GESTIÓN DE COMBUSTIBLE ────────────────────────────────────────
 
 /** DDL: tanques_combustible */
 export interface BE_TanqueCombustible {
-  IdTanque:                 number;
-  CodigoTanque:             string;
-  NombreTanque?:            string;
-  TipoCombustible?:         string;  // JET_A | JET_A1 | JET_B | AVGAS
-  CapacidadLitros:          number;
-  NivelActualLitros?:       number;
-  PorcentajeLlenado?:       number;
-  FechaUltimaInspeccion?:   string;
-  Activo:                   number;
+  IdTanque: number;
+  CodigoTanque: string;
+  NombreTanque?: string;
+  TipoCombustible?: string; // JET_A | JET_A1 | JET_B | AVGAS
+  CapacidadLitros: number;
+  NivelActualLitros?: number;
+  PorcentajeLlenado?: number;
+  FechaUltimaInspeccion?: string;
+  Activo: number;
 }
 
 /** DDL: cargas_combustible */
 export interface BE_CargaCombustible {
-  IdCargaCombustible:   number;
-  IdPedidoCombustible:  number;
-  IdSurtidor?:          number;
-  CantidadRealLitros:   number;
-  FechaInicioCarga?:    string;
-  FechaFinCarga?:       string;
-  DuracionMinutos?:     number;
-  OperadorCarga?:       number;
-  IncidenciaTecnica?:   number;
-  Observaciones?:       string;
+  IdCargaCombustible: number;
+  IdPedidoCombustible: number;
+  IdSurtidor?: number;
+  CantidadRealLitros: number;
+  FechaInicioCarga?: string;
+  FechaFinCarga?: string;
+  DuracionMinutos?: number;
+  OperadorCarga?: number;
+  IncidenciaTecnica?: number;
+  Observaciones?: string;
+}
+
+/** DDL: pedidos_combustible */
+export interface BE_PedidoCombustible {
+  IdPedidoCombustible: number;
+  NumeroPedido: string;
+  IdVuelo: number;
+  CantidadSolicitadaLitros?: number;
+  TipoCombustible?: string;
+  FechaPedido?: string;
+  FechaRequerida?: string;
+  EstadoPedido?: string;
+  Prioridad?: string;
 }
 
 // ── MÓDULO 24: SEGURIDAD INFORMÁTICA ─────────────────────────────────────────
 
 /** DDL: usuarios_sistema */
 export interface BE_UsuarioSistema {
-  IdUsuarioSistema:     number;
-  IdEmpleado?:          number;
-  NombreUsuario:        string;
-  EmailInstitucional?:  string;
-  FechaCreacion?:       string;
-  FechaUltimoAcceso?:   string;
-  Bloqueado?:           number;
+  IdUsuarioSistema: number;
+  IdEmpleado?: number;
+  NombreUsuario: string;
+  EmailInstitucional?: string;
+  FechaCreacion?: string;
+  FechaUltimoAcceso?: string;
+  Bloqueado?: number;
   RequiereCambioPassword?: number;
-  Activo:               number;
+  Activo: number;
 }
 
 /** DDL: logs_acceso_sistema */
 export interface BE_LogAcceso {
-  IdLogAcceso:      number;
+  IdLogAcceso: number;
   IdUsuarioSistema: number;
   TimestampAcceso?: string;
-  IpOrigen?:        string;
-  Dispositivo?:     string;
-  TipoAcceso?:      string;  // LOGIN | LOGOUT | LOGIN_FALLIDO
-  Resultado?:       string;  // EXITOSO | FALLIDO | BLOQUEADO
+  IpOrigen?: string;
+  Dispositivo?: string;
+  TipoAcceso?: string; // LOGIN | LOGOUT | LOGIN_FALLIDO
+  Resultado?: string; // EXITOSO | FALLIDO | BLOQUEADO
 }
 
 // ── MÓDULO 25: MARKETING Y FIDELIZACIÓN ──────────────────────────────────────
@@ -1002,171 +1015,399 @@ export interface BE_LogAcceso {
 /** DDL: campanas_marketing */
 export interface BE_CampanaMarketing {
   IdCampanaMarketing: number;
-  NombreCampana:      string;
-  TipoCampana?:       string;  // EMAIL | SMS | REDES_SOCIALES | WEB | APP | …
-  Objetivo?:          string;  // VENTAS | FIDELIZACION | NOTORIEDAD | LANZAMIENTO
-  FechaInicio:        string;
-  FechaFin:           string;
-  Presupuesto?:       number;
-  Activa:             number;
+  NombreCampana: string;
+  TipoCampana?: string; // EMAIL | SMS | REDES_SOCIALES | WEB | APP | …
+  Objetivo?: string; // VENTAS | FIDELIZACION | NOTORIEDAD | LANZAMIENTO
+  FechaInicio: string;
+  FechaFin: string;
+  Presupuesto?: number;
+  Activa: number;
 }
 
 /** DDL: canjes_puntos */
 export interface BE_CanjePuntos {
-  IdCanjePuntos:     number;
-  IdPasajero:        number;
-  IdLealtad:         number;
-  FechaCanje?:       string;
-  PuntosUtilizados:  number;
-  TipoCanje?:        string;  // VUELO | UPGRADE | PRODUCTO | SERVICIO | EQUIPAJE_EXTRA
-  IdVuelo?:          number;
-  ValorMonetario?:   number;
-  EstadoCanje?:      string;  // PROCESADO | ENTREGADO | CANCELADO
+  IdCanjePuntos: number;
+  IdPasajero: number;
+  IdLealtad: number;
+  FechaCanje?: string;
+  PuntosUtilizados: number;
+  TipoCanje?: string; // VUELO | UPGRADE | PRODUCTO | SERVICIO | EQUIPAJE_EXTRA
+  IdVuelo?: number;
+  ValorMonetario?: number;
+  EstadoCanje?: string; // PROCESADO | ENTREGADO | CANCELADO
 }
 
 // ── TIPOS REQUEST — Stored Procedures (lógica de negocio) ────────────────────
 
 export interface BE_CrearReservaRequest {
-  IdVuelo: number; IdPasajero: number; ClaseServicio: string;
-  NumeroAsiento: string; TipoTarifa: string; Precio: number; Moneda: string;
+  IdVuelo: number;
+  IdPasajero: number;
+  ClaseServicio: string;
+  NumeroAsiento: string;
+  TipoTarifa: string;
+  Precio: number;
+  Moneda: string;
 }
 
 export interface BE_CheckInRequest {
-  CodigoReserva: string; NumeroDocumento: string; NumeroAsiento: string;
+  CodigoReserva: string;
+  NumeroDocumento: string;
+  NumeroAsiento: string;
 }
 
 export interface BE_CheckInMostradorRequest {
-  CodigoReserva: string; NumeroDocumento: string; NumeroAsiento: string;
-  EquipajeFacturado: number; EquipajeMano: number; TipoVuelo: string; VisaValida: number;
+  CodigoReserva: string;
+  NumeroDocumento: string;
+  NumeroAsiento: string;
+  EquipajeFacturado: number;
+  EquipajeMano: number;
+  TipoVuelo: string;
+  VisaValida: number;
 }
 
 export interface BE_EmbarqueRequest {
-  CodigoReserva: string; NumeroDocumento: string; PuertaEmbarque: string;
+  CodigoReserva: string;
+  NumeroDocumento: string;
+  PuertaEmbarque: string;
 }
 
 export interface BE_PagoBoletoRequest {
-  IdReserva: number; IdMetodoPago: number; Monto: number;
-  Moneda: string; CodigoTransaccion: string; Comprobante?: string;
+  IdReserva: number;
+  IdMetodoPago: number;
+  Monto: number;
+  Moneda: string;
+  CodigoTransaccion: string;
+  Comprobante?: string;
 }
 
 export interface BE_AsignarPuertaRequest {
-  IdVuelo: number; IdPuerta: number; TipoVuelo: string;
+  IdVuelo: number;
+  IdPuerta: number;
+  TipoVuelo: string;
 }
 
 export interface BE_CancelarVueloRequest {
-  IdVuelo: number; MotivoCancelacion: string;
+  IdVuelo: number;
+  MotivoCancelacion: string;
 }
 
 export interface BE_CrearVueloRequest {
-  IdPrograma: number; FechaVuelo: string; HoraSalida: string;
-  HoraLlegada: string; IdModeloAvion: number; MatriculaAvion: string;
+  IdPrograma: number;
+  FechaVuelo: string;
+  HoraSalida: string;
+  HoraLlegada: string;
+  IdModeloAvion: number;
+  MatriculaAvion: string;
 }
 
 export interface BE_ReprogramarVueloRequest {
-  IdVuelo: number; NuevaFecha: string; NuevaHoraSalida: string; NuevaHoraLlegada: string;
+  IdVuelo: number;
+  NuevaFecha: string;
+  NuevaHoraSalida: string;
+  NuevaHoraLlegada: string;
 }
 
 export interface BE_RegistrarAerolineaRequest {
-  Nombre: string; CodigoIata: string; CodigoOaci: string; PaisOrigen: string; Contacto: string;
+  Nombre: string;
+  CodigoIata: string;
+  CodigoOaci: string;
+  PaisOrigen: string;
+  Contacto: string;
 }
 
 export interface BE_RegistrarAeronaveRequest {
-  Matricula: string; CodigoIcaoTipo: string; IdAerolinea: number;
-  NombreAeronave?: string; Configuracion: string; NumeroMotores: number; AnioFabricacion: number;
+  Matricula: string;
+  CodigoIcaoTipo: string;
+  IdAerolinea: number;
+  NombreAeronave?: string;
+  Configuracion: string;
+  NumeroMotores: number;
+  AnioFabricacion: number;
 }
 
 export interface BE_RegistrarPasajeroRequest {
-  Nombre: string; Apellidos: string; NumeroDocumento: string;
-  Nacionalidad: string; FechaNacimiento: string; Email?: string;
+  Nombre: string;
+  Apellidos: string;
+  NumeroDocumento: string;
+  Nacionalidad: string;
+  FechaNacimiento: string;
+  Email?: string;
 }
 
 // ── HEALTH CHECK ──────────────────────────────────────────────────────────────
-export interface BE_HealthCheck { status: string; database: string; }
+export interface BE_HealthCheck {
+  status: string;
+  database: string;
+}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // NORMALIZERS — PascalCase → snake_case para consistencia interna del frontend
 // ═══════════════════════════════════════════════════════════════════════════════
-export const norm = {
-  aeropuerto: (a: BE_Aeropuerto) => ({
-    codigo_aeropuerto: a.CodigoAeropuerto, nombre: a.Nombre,
-    ciudad: a.Ciudad, pais: a.Pais, region: a.Region,
-    latitud: a.Latitud, longitud: a.Longitud,
-    terminales: a.Terminales, puertas_abordaje: a.PuertasAbordaje,
-    activo: a.Activo,
+export const NORM = {
+  aeropuerto: (a: any) => ({
+    codigo_aeropuerto: a.codigo_aeropuerto ?? a.CodigoAeropuerto,
+    nombre: a.nombre ?? a.Nombre,
+    ciudad: a.ciudad ?? a.Ciudad,
+    pais: a.pais ?? a.Pais,
+    region: a.region ?? a.Region,
+    latitud: a.latitud ?? a.Latitud,
+    longitud: a.longitud ?? a.Longitud,
+    terminales: a.terminales ?? a.Terminales,
+    puertas_abordaje: a.puertas_abordaje ?? a.PuertasAbordaje,
+    activo: a.activo ?? a.Activo,
   }),
-  aerolinea: (a: BE_Aerolinea) => ({
-    id_aerolinea: a.IdAerolinea, nombre_aerolinea: a.NombreAerolinea,
-    codigo_iata: a.CodigoIata, codigo_oaci: a.CodigoOaci,
-    pais_origen: a.PaisOrigen, flota_total: a.FlotaTotal,
-    alianza: a.Alianza, activo: a.Activo,
+  aerolinea: (a: any) => ({
+    id_aerolinea: a.id_aerolinea ?? a.IdAerolinea,
+    nombre_aerolinea: a.nombre_aerolinea ?? a.NombreAerolinea,
+    codigo_iata: a.codigo_iata ?? a.CodigoIata,
+    codigo_oaci: a.codigo_oaci ?? a.CodigoOaci,
+    pais_origen: a.pais_origen ?? a.PaisOrigen,
+    flota_total: a.flota_total ?? a.FlotaTotal,
+    alianza: a.alianza ?? a.Alianza,
+    activo: a.activo ?? a.Activo,
   }),
-  vuelo: (v: BE_Vuelo) => ({
-    id_vuelo: v.IdVuelo, id_programa: v.IdPrograma,
-    numero_vuelo: v.NumeroVuelo,
-    aeropuerto_origen: v.AeropuertoOrigen,
-    aeropuerto_destino: v.AeropuertoDestino,
-    hora_salida_programada: v.HoraSalidaProgramada,
-    hora_llegada_programada: v.HoraLlegadaProgramada,
-    hora_salida_real: v.HoraSalidaReal,
-    hora_llegada_real: v.HoraLlegadaReal,
-    plazas_vacias: v.PlazasVacias, plazas_ocupadas: v.PlazasOcupadas,
-    estado_vuelo: v.EstadoVuelo, matricula_avion: v.MatriculaAvion,
-    nombre_aerolinea: v.NombreAerolinea, codigo_iata: v.CodigoIata,
-    duracion_minutos: v.DuracionMinutos,
+  vuelo: (v: any) => ({
+    id_vuelo: v.id_vuelo ?? v.IdVuelo,
+    id_programa: v.id_programa ?? v.IdPrograma,
+    numero_vuelo: v.numero_vuelo ?? v.NumeroVuelo,
+    aeropuerto_origen: v.aeropuerto_origen ?? v.AeropuertoOrigen,
+    aeropuerto_destino: v.aeropuerto_destino ?? v.AeropuertoDestino,
+    hora_salida_programada: v.hora_salida_programada ?? v.HoraSalidaProgramada,
+    hora_llegada_programada:
+      v.hora_llegada_programada ?? v.HoraLlegadaProgramada,
+    hora_salida_real: v.hora_salida_real ?? v.HoraSalidaReal,
+    hora_llegada_real: v.hora_llegada_real ?? v.HoraLlegadaReal,
+    plazas_vacias: v.plazas_vacias ?? v.PlazasVacias,
+    plazas_ocupadas: v.plazas_ocupadas ?? v.PlazasOcupadas,
+    estado_vuelo: v.estado_vuelo ?? v.EstadoVuelo,
+    matricula_avion: v.matricula_avion ?? v.MatriculaAvion,
+    nombre_aerolinea: v.nombre_aerolinea ?? v.NombreAerolinea,
+    codigo_iata: v.codigo_iata ?? v.CodigoIata,
+    duracion_minutos: v.duracion_minutos ?? v.DuracionMinutos,
   }),
-  pasajero: (p: BE_Pasajero) => ({
-    id_pasajero: p.IdPasajero, nombres: p.Nombres, apellidos: p.Apellidos,
-    tipo_documento: p.TipoDocumento, numero_documento: p.NumeroDocumento,
-    email: p.Email, telefono: p.Telefono, nacionalidad: p.Nacionalidad,
-    fecha_nacimiento: p.FechaNacimiento, genero: p.Genero,
+  retraso: (r: any) => ({
+    id_retraso: r.id_retraso ?? r.IdRetraso,
+    id_vuelo: r.id_vuelo ?? r.IdVuelo,
+    tipo_retraso: r.tipo_retraso ?? r.TipoRetraso,
+    causa: r.causa ?? r.Causa,
+    minutos_retraso: r.minutos_retraso ?? r.MinutosRetraso,
+    responsable: r.responsable ?? r.Responsable,
+    compensacion_pasajeros: r.compensacion_pasajeros ?? r.CompensacionPasajeros,
   }),
-  reserva: (r: BE_Reserva) => ({
-    id_reserva: r.IdReserva, id_vuelo: r.IdVuelo, id_pasajero: r.IdPasajero,
-    codigo_reserva: r.CodigoReserva, estado_reserva: r.EstadoReserva,
-    precio_pagado: r.PrecioPagado, moneda: r.Moneda,
-    numero_asiento: r.NumeroAsiento, clase_servicio: r.ClaseServicio,
-    equipaje_facturado_kg: r.EquipajeFacturadoKg,
-    equipaje_mano_kg: r.EquipajeManoKg,
-    checkin_realizado: r.CheckinRealizado, fecha_checkin: r.FechaCheckin,
-    puerta_embarque_asignada: r.PuertaEmbarqueAsignada,
-    grupo_embarque: r.GrupoEmbarque,
+  incidenteVuelo: (i: any) => ({
+    id_incidente_vuelo: i.id_incidente_vuelo ?? i.IdIncidenteVuelo,
+    id_vuelo: i.id_vuelo ?? i.IdVuelo,
+    tipo_incidente: i.tipo_incidente ?? i.TipoIncidente,
+    descripcion: i.descripcion ?? i.Descripcion,
+    gravedad: i.gravedad ?? i.Gravedad,
+    acciones_tomadas: i.acciones_tomadas ?? i.AccionesTomadas,
+    reportado_por: i.reportado_por ?? i.ReportadoPor,
+    fecha_incidente: i.fecha_incidente ?? i.FechaIncidente,
   }),
-  lealtad: (l: BE_ProgramaLealtad) => ({
-    id_lealtad: l.IdLealtad, id_pasajero: l.IdPasajero,
-    nivel_membresia: l.NivelMembresia, puntos_acumulados: l.PuntosAcumulados,
-    puntos_canjeables: l.PuntosCanjeables, millas_acumuladas: l.MillasAcumuladas,
-    tarjeta_numero: l.TarjetaNumero, activo: l.Activo,
+  pedidoCombustible: (p: any) => ({
+    id_pedido_combustible: p.id_pedido_combustible ?? p.IdPedidoCombustible,
+    id_vuelo: p.id_vuelo ?? p.IdVuelo,
+    id_tanque: p.id_tanque ?? p.IdTanque,
+    cantidad_solicitada_litros:
+      p.cantidad_solicitada_litros ?? p.CantidadSolicitadaLitros,
+    tipo_combustible: p.tipo_combustible ?? p.TipoCombustible,
+    fecha_pedido: p.fecha_pedido ?? p.FechaPedido,
+    estado_pedido: p.estado_pedido ?? p.EstadoPedido,
+    prioridad: p.prioridad ?? p.Prioridad,
   }),
-  hotel: (h: BE_HotelCercano) => ({
-    id_hotel: h.IdHotel, codigo_aeropuerto: h.CodigoAeropuerto,
-    nombre_hotel: h.NombreHotel, categoria: h.Categoria,
-    direccion: h.Direccion, distancia_km: h.DistanciaKm,
-    tarifa_noche_desde: h.TarifaNocheDesde,
-    tiene_shuttle: h.TieneShuttle, activo: h.Activo,
+  tanque: (t: any) => ({
+    id_tanque: t.id_tanque ?? t.IdTanque,
+    codigo_tanque: t.codigo_tanque ?? t.CodigoTanque,
+    nombre_tanque: t.nombre_tanque ?? t.NombreTanque,
+    tipo_combustible: t.tipo_combustible ?? t.TipoCombustible,
+    capacidad_litros: t.capacidad_litros ?? t.CapacidadLitros,
+    nivel_actual_litros: t.nivel_actual_litros ?? t.NivelActualLitros,
+    porcentaje_llenado: t.porcentaje_llenado ?? t.PorcentajeLlenado,
+    ubicacion: t.ubicacion ?? t.Ubicacion,
+    activo: t.activo ?? t.Activo,
   }),
-  empleado: (e: BE_Empleado) => ({
-    id_empleado: e.IdEmpleado, codigo: e.CodigoEmpleado,
-    nombres: e.Nombres, apellidos: e.Apellidos,
-    email: e.Email, telefono: e.Telefono,
-    departamento: e.Departamento, cargo: e.Cargo,
-    salario_base: e.SalarioBase, activo: e.Activo,
+  pasajero: (p: any) => ({
+    id_pasajero: p.id_pasajero ?? p.IdPasajero,
+    nombres: p.nombres ?? p.Nombres,
+    apellidos: p.apellidos ?? p.Apellidos,
+    tipo_documento: p.tipo_documento ?? p.TipoDocumento,
+    numero_documento: p.numero_documento ?? p.NumeroDocumento,
+    email: p.email ?? p.Email,
+    telefono: p.telefono ?? p.Telefono,
+    nacionalidad: p.nacionalidad ?? p.Nacionalidad,
+    fecha_nacimiento: p.fecha_nacimiento ?? p.FechaNacimiento,
+    genero: p.genero ?? p.Genero,
   }),
-  ingreso: (i: BE_Ingreso) => ({
-    id_ingreso: i.IdIngreso, fecha: i.Fecha,
-    concepto: i.Concepto, tipo_ingreso: i.TipoIngreso,
-    monto: i.Monto, moneda: i.Moneda, metodo_pago: i.MetodoPago,
+  reserva: (r: any) => ({
+    id_reserva: r.id_reserva ?? r.IdReserva,
+    id_vuelo: r.id_vuelo ?? r.IdVuelo,
+    id_pasajero: r.id_pasajero ?? r.IdPasajero,
+    codigo_reserva: r.codigo_reserva ?? r.CodigoReserva,
+    estado_reserva: r.estado_reserva ?? r.EstadoReserva,
+    precio_pagado: r.precio_pagado ?? r.PrecioPagado,
+    moneda: r.moneda ?? r.Moneda,
+    numero_asiento: r.numero_asiento ?? r.NumeroAsiento,
+    clase_servicio: r.clase_servicio ?? r.ClaseServicio,
+    equipaje_facturado_kg: r.equipaje_facturado_kg ?? r.EquipajeFacturadoKg,
+    equipaje_mano_kg: r.equipaje_mano_kg ?? r.EquipajeManoKg,
+    checkin_realizado: r.checkin_realizado ?? r.CheckinRealizado,
+    fecha_checkin: r.fecha_checkin ?? r.FechaCheckin,
+    puerta_embarque_asignada:
+      r.puerta_embarque_asignada ?? r.PuertaEmbarqueAsignada,
+    grupo_embarque: r.grupo_embarque ?? r.GrupoEmbarque,
   }),
-  gasto: (g: BE_Gasto) => ({
-    id_gasto: g.IdGasto, fecha: g.Fecha,
-    concepto: g.Concepto, tipo_gasto: g.TipoGasto,
-    monto: g.Monto, proveedor: g.Proveedor,
+  lealtad: (l: any) => ({
+    id_lealtad: l.id_lealtad ?? l.IdLealtad,
+    id_pasajero: l.id_pasajero ?? l.IdPasajero,
+    nivel_membresia: l.nivel_membresia ?? l.NivelMembresia,
+    puntos_acumulados: l.puntos_acumulados ?? l.PuntosAcumulados,
+    puntos_canjeables: l.puntos_canjeables ?? l.PuntosCanjeables,
+    millas_acumuladas: l.millas_acumuladas ?? l.MillasAcumuladas,
+    tarjeta_numero: l.tarjeta_numero ?? l.TarjetaNumero,
+    activo: l.activo ?? l.Activo,
   }),
-  promocion: (p: BE_Promocion) => ({
-    id_promocion: p.IdPromocion, codigo: p.CodigoPromocion,
-    nombre: p.NombrePromocion, descripcion: p.DescripcionPromocion,
-    tipo_descuento: p.TipoDescuento, valor_descuento: p.ValorDescuento,
-    fecha_inicio: p.FechaInicio, fecha_fin: p.FechaFin,
-    usos_actuales: p.UsosActuales, uso_maximo: p.UsoMaximo, activa: p.Activa,
+  hotel: (h: any) => ({
+    id_hotel: h.id_hotel ?? h.IdHotel,
+    codigo_aeropuerto: h.codigo_aeropuerto ?? h.CodigoAeropuerto,
+    nombre_hotel: h.nombre_hotel ?? h.NombreHotel,
+    categoria: h.categoria ?? h.Categoria,
+    direccion: h.direccion ?? h.Direccion,
+    distancia_km: h.distancia_km ?? h.DistanciaKm,
+    tarifa_noche_desde: h.tarifa_noche_desde ?? h.TarifaNocheDesde,
+    tiene_shuttle: h.tiene_shuttle ?? h.TieneShuttle,
+    activo: h.activo ?? h.Activo,
+  }),
+  empleado: (e: any) => ({
+    id_empleado: e.id_empleado ?? e.IdEmpleado,
+    codigo: e.codigo_empleado ?? e.CodigoEmpleado,
+    nombres: e.nombres ?? e.Nombres,
+    apellidos: e.apellidos ?? e.Apellidos,
+    email: e.email ?? e.Email,
+    telefono: e.telefono ?? e.Telefono,
+    departamento: e.departamento ?? e.Departamento,
+    cargo: e.cargo ?? e.Cargo,
+    salario_base: e.salario_base ?? e.SalarioBase,
+    activo: e.activo ?? e.Activo,
+  }),
+  ingreso: (i: any) => ({
+    id_ingreso: i.id_ingreso ?? i.IdIngreso,
+    fecha: i.fecha ?? i.Fecha,
+    concepto: i.concepto ?? i.Concepto,
+    tipo_ingreso: i.tipo_ingreso ?? i.TipoIngreso,
+    monto: i.monto ?? i.Monto,
+    moneda: i.moneda ?? i.Moneda,
+    metodo_pago: i.metodo_pago ?? i.MetodoPago,
+  }),
+  gasto: (g: any) => ({
+    id_gasto: g.id_gasto ?? g.IdGasto,
+    fecha: g.fecha ?? g.Fecha,
+    concepto: g.concepto ?? g.Concepto,
+    tipo_gasto: g.tipo_gasto ?? g.TipoGasto,
+    monto: g.monto ?? g.Monto,
+    proveedor: g.proveedor ?? g.Proveedor,
+  }),
+  proveedor: (p: any) => ({
+    id_proveedor: p.id_proveedor ?? p.IdProveedor,
+    nombre: p.nombre ?? p.Nombre,
+    nit: p.nit ?? p.Nit,
+    contacto: p.contacto ?? p.Contacto,
+    telefono: p.telefono ?? p.Telefono,
+    email: p.email ?? p.Email,
+    direccion: p.direccion ?? p.Direccion,
+    tipo_proveedor: p.tipo_proveedor ?? p.TipoProveedor,
+    activo: p.activo ?? p.Activo,
+  }),
+  presupuesto: (p: any) => ({
+    id_presupuesto: p.id_presupuesto ?? p.IdPresupuesto,
+    departamento: p.departamento ?? p.Departamento,
+    anio: p.anio ?? p.Anio,
+    mes: p.mes ?? p.Mes,
+    monto_asignado: p.monto_asignado ?? p.MontoAsignado,
+    monto_ejecutado: p.monto_ejecutado ?? p.MontoEjecutado,
+    concepto: p.concepto ?? p.Concepto,
+    activo: p.activo ?? p.Activo,
+  }),
+  cuentaBancaria: (c: any) => ({
+    id_cuenta: c.id_cuenta ?? c.IdCuenta,
+    nombre_banco: c.nombre_banco ?? c.NombreBanco,
+    numero_cuenta: c.numero_cuenta ?? c.NumeroCuenta,
+    tipo_cuenta: c.tipo_cuenta ?? c.TipoCuenta,
+    saldo_actual: c.saldo_actual ?? c.SaldoActual,
+    moneda: c.moneda ?? c.Moneda,
+    activa: c.activa ?? c.Activa,
+  }),
+  promocion: (p: any) => ({
+    id_promocion: p.id_promocion ?? p.IdPromocion,
+    codigo: p.codigo_promocion ?? p.CodigoPromocion,
+    nombre: p.nombre_promocion ?? p.NombrePromocion,
+    descripcion: p.descripcion_promocion ?? p.DescripcionPromocion,
+    tipo_descuento: p.tipo_descuento ?? p.TipoDescuento,
+    valor_descuento: p.valor_descuento ?? p.ValorDescuento,
+    fecha_inicio: p.fecha_inicio ?? p.FechaInicio,
+    fecha_fin: p.fecha_fin ?? p.FechaFin,
+    usos_actuales: p.usos_actuales ?? p.UsosActuales,
+    uso_maximo: p.uso_maximo ?? p.UsoMaximo,
+    activa: p.activa ?? p.Activa,
+  }),
+  usuarioSistema: (u: any) => ({
+    id_usuario_sistema: u.id_usuario_sistema ?? u.IdUsuarioSistema,
+    nombre_usuario: u.nombre_usuario ?? u.NombreUsuario,
+    email_institucional: u.email_institucional ?? u.EmailInstitucional,
+    activo: u.activo ?? u.Activo,
+    bloqueado: u.bloqueado ?? u.Bloqueado,
+    fecha_ultimo_acceso: u.fecha_ultimo_acceso ?? u.FechaUltimoAcceso,
+    intentos_fallidos: u.intentos_fallidos ?? u.IntentosFallidos,
+  }),
+  rolSistema: (r: any) => ({
+    id_rol_sistema: r.id_rol_sistema ?? r.IdRolSistema,
+    nombre_rol: r.nombre_rol ?? r.NombreRol,
+    descripcion: r.descripcion ?? r.Descripcion,
+    nivel_jerarquico: r.nivel_jerarquico ?? r.NivelJerarquico,
+    activo: r.activo ?? r.Activo,
+  }),
+  incidenteSegInfo: (i: any) => ({
+    id_incidente_seguridad_info:
+      i.id_incidente_seguridad_info ?? i.IdIncidenteSeguridadInfo,
+    tipo_incidente: i.tipo_incidente ?? i.TipoIncidente,
+    nivel_gravedad: i.nivel_gravedad ?? i.NivelGravedad,
+    fecha_deteccion: i.fecha_deteccion ?? i.FechaDeteccion,
+    estado: i.estado ?? i.Estado,
+  }),
+  planEmergencia: (p: any) => ({
+    id_plan_emergencia: p.id_plan_emergencia ?? p.IdPlanEmergencia,
+    codigo_plan: p.codigo_plan ?? p.CodigoPlan,
+    nombre_plan: p.nombre_plan ?? p.NombrePlan,
+    tipo_emergencia: p.tipo_emergencia ?? p.TipoEmergencia,
+    nivel_activacion: p.nivel_activacion ?? p.NivelActivacion,
+    responsable_activacion: p.responsable_activacion ?? p.ResponsableActivacion,
+    activo: p.activo ?? p.Activo,
+  }),
+  equipoEmergencia: (e: any) => ({
+    id_equipo_emergencia: e.id_equipo_emergencia ?? e.IdEquipoEmergencia,
+    codigo_equipo: e.codigo_equipo ?? e.CodigoEquipo,
+    nombre_equipo: e.nombre_equipo ?? e.NombreEquipo,
+    tipo_equipo: e.tipo_equipo ?? e.TipoEquipo,
+    ubicacion_habitual: e.ubicacion_habitual ?? e.UbicacionHabitual,
+    estado: e.estado ?? e.Estado,
+    activo: e.activo ?? e.Activo,
+  }),
+  activacionEmergencia: (a: any) => ({
+    id_activacion: a.id_activacion ?? a.IdActivacion,
+    tipo_emergencia: a.tipo_emergencia ?? a.TipoEmergencia,
+    id_plan_emergencia: a.id_plan_emergencia ?? a.IdPlanEmergencia,
+    nivel_activacion: a.nivel_activacion ?? a.NivelActivacion,
+    personas_afectadas: a.personas_afectadas ?? a.PersonasAfectadas,
+    estado: a.estado ?? a.Estado,
+  }),
+  queja: (q: any) => ({
+    id_queja: q.id_queja ?? q.IdQueja,
+    id_pasajero: q.id_pasajero ?? q.IdPasajero,
+    tipo_contacto: q.tipo_contacto ?? q.TipoContacto,
+    fecha_contacto: q.fecha_contacto ?? q.FechaContacto,
+    asunto: q.asunto ?? q.Asunto,
+    descripcion: q.descripcion ?? q.Descripcion,
+    estado: q.estado ?? q.Estado,
+    prioridad: q.prioridad ?? q.Prioridad,
   }),
 };
 
@@ -1174,205 +1415,286 @@ export const norm = {
 // API SURFACE — Organizado por backend + módulo DDL
 // ═══════════════════════════════════════════════════════════════════════════════
 export const backendApi = {
-
   // ── DEVELOP BACKEND (:5087) — Módulos 1-6, 21-29 ─────────────────────────
 
   // Módulo 1
-  health:       () => get<BE_HealthCheck>(BE_DEVELOP, '/api/test'),
+  health: () => get<BE_HealthCheck>(BE_DEVELOP, "/api/test"),
   aeropuertos: {
-    listar:     () => get<BE_Aeropuerto[]>(BE_DEVELOP, '/api/aeropuertos'),
-    obtener:    (cod: string) => get<BE_Aeropuerto>(BE_DEVELOP, `/api/aeropuertos/${cod}`),
-    crear:      (m: Omit<BE_Aeropuerto, 'FechaRegistro'>) => post(BE_DEVELOP, '/api/aeropuertos', m),
-    actualizar: (cod: string, m: Partial<BE_Aeropuerto>) => put(BE_DEVELOP, `/api/aeropuertos/${cod}`, m),
-    eliminar:   (cod: string) => del(BE_DEVELOP, `/api/aeropuertos/${cod}`),
+    listar: () =>
+      get<any[]>(BE_DEVELOP, "/api/aeropuertos").then((d) =>
+        d.map(NORM.aeropuerto),
+      ),
+    obtener: (cod: string) =>
+      get<BE_Aeropuerto>(BE_DEVELOP, `/api/aeropuertos/${cod}`),
+    crear: (m: Omit<BE_Aeropuerto, "FechaRegistro">) =>
+      post(BE_DEVELOP, "/api/aeropuertos", m),
+    actualizar: (cod: string, m: Partial<BE_Aeropuerto>) =>
+      put(BE_DEVELOP, `/api/aeropuertos/${cod}`, m),
+    eliminar: (cod: string) => del(BE_DEVELOP, `/api/aeropuertos/${cod}`),
   },
   puertas: {
-    listar:       () => get<BE_PuertaEmbarque[]>(BE_DEVELOP, '/api/puertasembarque'),
-    porAeropuerto:(cod: string) => get<BE_PuertaEmbarque[]>(BE_DEVELOP, `/api/puertasembarque/aeropuerto/${cod}`),
+    listar: () => get<BE_PuertaEmbarque[]>(BE_DEVELOP, "/api/puertasembarque"),
+    porAeropuerto: (cod: string) =>
+      get<BE_PuertaEmbarque[]>(
+        BE_DEVELOP,
+        `/api/puertasembarque/aeropuerto/${cod}`,
+      ),
   },
 
   // Módulo 2
   aviones: {
-    listar:     () => get<any[]>(BE_DEVELOP, '/api/aviones'),
-    obtener:    (matricula: string) => get<any>(BE_DEVELOP, `/api/aviones/${matricula}`),
-    crear:      (m: any) => post(BE_DEVELOP, '/api/aviones', m),
-    actualizar: (matricula: string, m: any) => put(BE_DEVELOP, `/api/aviones/${matricula}`, m),
+    listar: () => get<any[]>(BE_DEVELOP, "/api/aviones"),
+    obtener: (matricula: string) =>
+      get<any>(BE_DEVELOP, `/api/aviones/${matricula}`),
+    crear: (m: any) => post(BE_DEVELOP, "/api/aviones", m),
+    actualizar: (matricula: string, m: any) =>
+      put(BE_DEVELOP, `/api/aviones/${matricula}`, m),
   },
   modelosAvion: {
-    listar:     () => get<BE_ModeloAvion[]>(BE_DEVELOP, '/api/modelosaviones'),
-    obtener:    (id: number) => get<BE_ModeloAvion>(BE_DEVELOP, `/api/modelosaviones/${id}`),
+    listar: () => get<BE_ModeloAvion[]>(BE_DEVELOP, "/api/modelosaviones"),
+    obtener: (id: number) =>
+      get<BE_ModeloAvion>(BE_DEVELOP, `/api/modelosaviones/${id}`),
   },
   mantenimientoAviones: {
-    listar:     () => get<BE_MantenimientoAvion[]>(BE_DEVELOP, '/api/mantenimientoaviones'),
-    crear:      (m: Omit<BE_MantenimientoAvion, 'IdMantenimiento'>) =>
-      post(BE_DEVELOP, '/api/mantenimientoaviones', m),
+    listar: () =>
+      get<BE_MantenimientoAvion[]>(BE_DEVELOP, "/api/mantenimientoaviones"),
+    crear: (m: Omit<BE_MantenimientoAvion, "IdMantenimiento">) =>
+      post(BE_DEVELOP, "/api/mantenimientoaviones", m),
   },
 
   // Módulo 1 extra (pistas, terminales, hangares)
   pistas: {
-    listar:       () => get<BE_Pista[]>(BE_DEVELOP, '/api/pistasaterrizaje'),
-    porAeropuerto:(cod: string) => get<BE_Pista[]>(BE_DEVELOP, `/api/pistasaterrizaje/aeropuerto/${cod}`),
-    crear:        (m: any) => post(BE_DEVELOP, '/api/pistasaterrizaje', m),
+    listar: () => get<BE_Pista[]>(BE_DEVELOP, "/api/pistasaterrizaje"),
+    porAeropuerto: (cod: string) =>
+      get<BE_Pista[]>(BE_DEVELOP, `/api/pistasaterrizaje/aeropuerto/${cod}`),
+    crear: (m: any) => post(BE_DEVELOP, "/api/pistasaterrizaje", m),
   },
   terminales: {
-    listar:       () => get<any[]>(BE_DEVELOP, '/api/terminalesaeropuerto'),
-    porAeropuerto:(cod: string) => get<any[]>(BE_DEVELOP, `/api/terminalesaeropuerto/aeropuerto/${cod}`),
-    crear:        (m: any) => post(BE_DEVELOP, '/api/terminalesaeropuerto', m),
+    listar: () => get<any[]>(BE_DEVELOP, "/api/terminalesaeropuerto"),
+    porAeropuerto: (cod: string) =>
+      get<any[]>(BE_DEVELOP, `/api/terminalesaeropuerto/aeropuerto/${cod}`),
+    crear: (m: any) => post(BE_DEVELOP, "/api/terminalesaeropuerto", m),
   },
   hangares: {
-    listar:       () => get<any[]>(BE_DEVELOP, '/api/hangares'),
-    crear:        (m: any) => post(BE_DEVELOP, '/api/hangares', m),
+    listar: () => get<any[]>(BE_DEVELOP, "/api/hangares"),
+    crear: (m: any) => post(BE_DEVELOP, "/api/hangares", m),
   },
 
   // Módulo 3
   aerolineas: {
-    listar:           () => get<BE_Aerolinea[]>(BE_DEVELOP, '/api/aerolineas'),
-    obtener:          (id: number) => get<BE_Aerolinea>(BE_DEVELOP, `/api/aerolineas/${id}`),
-    crear:            (m: Omit<BE_Aerolinea, 'IdAerolinea'>) => post(BE_DEVELOP, '/api/aerolineas', m),
-    actualizar:       (id: number, m: Partial<BE_Aerolinea>) => put(BE_DEVELOP, `/api/aerolineas/${id}`, m),
-    eliminar:         (id: number) => del(BE_DEVELOP, `/api/aerolineas/${id}`),
-    registrar:        (m: BE_RegistrarAerolineaRequest) =>
-      post<{ mensaje: string }>(BE_DEVELOP, '/api/aerolineas/registrar', m),
-    registrarAeronave:(m: BE_RegistrarAeronaveRequest) =>
-      post<{ mensaje: string }>(BE_DEVELOP, '/api/aerolineas/registrar_aeronave', m),
+    listar: () => get<BE_Aerolinea[]>(BE_DEVELOP, "/api/aerolineas"),
+    obtener: (id: number) =>
+      get<BE_Aerolinea>(BE_DEVELOP, `/api/aerolineas/${id}`),
+    crear: (m: Omit<BE_Aerolinea, "IdAerolinea">) =>
+      post(BE_DEVELOP, "/api/aerolineas", m),
+    actualizar: (id: number, m: Partial<BE_Aerolinea>) =>
+      put(BE_DEVELOP, `/api/aerolineas/${id}`, m),
+    eliminar: (id: number) => del(BE_DEVELOP, `/api/aerolineas/${id}`),
+    registrar: (m: BE_RegistrarAerolineaRequest) =>
+      post<{ mensaje: string }>(BE_DEVELOP, "/api/aerolineas/registrar", m),
+    registrarAeronave: (m: BE_RegistrarAeronaveRequest) =>
+      post<{ mensaje: string }>(
+        BE_DEVELOP,
+        "/api/aerolineas/registrar_aeronave",
+        m,
+      ),
   },
   tiposAerolinea: {
-    listar:     () => get<BE_TipoAerolinea[]>(BE_DEVELOP, '/api/tiposaerolinea'),
-    crear:      (m: Omit<BE_TipoAerolinea, 'IdTipoAerolinea'>) => post(BE_DEVELOP, '/api/tiposaerolinea', m),
+    listar: () => get<BE_TipoAerolinea[]>(BE_DEVELOP, "/api/tiposaerolinea"),
+    crear: (m: Omit<BE_TipoAerolinea, "IdTipoAerolinea">) =>
+      post(BE_DEVELOP, "/api/tiposaerolinea", m),
   },
   franquiciasEquipaje: {
-    listar:         () => get<BE_FranquiciaEquipaje[]>(BE_DEVELOP, '/api/franquiciasequipaje'),
-    porAerolinea:   (id: number) => get<BE_FranquiciaEquipaje[]>(BE_DEVELOP, `/api/franquiciasequipaje/aerolinea/${id}`),
+    listar: () =>
+      get<BE_FranquiciaEquipaje[]>(BE_DEVELOP, "/api/franquiciasequipaje"),
+    porAerolinea: (id: number) =>
+      get<BE_FranquiciaEquipaje[]>(
+        BE_DEVELOP,
+        `/api/franquiciasequipaje/aerolinea/${id}`,
+      ),
   },
 
   // Módulo 4
   programasVuelo: {
-    listar:     () => get<BE_ProgramaVuelo[]>(BE_DEVELOP, '/api/programasvuelo'),
-    obtener:    (id: number) => get<BE_ProgramaVuelo>(BE_DEVELOP, `/api/programasvuelo/${id}`),
-    buscar:     (origen: string, destino: string) =>
-      get<BE_ProgramaVuelo[]>(BE_DEVELOP, `/api/programasvuelo?origen=${origen}&destino=${destino}`),
-    crear:      (m: Omit<BE_ProgramaVuelo, 'IdPrograma'>) => post(BE_DEVELOP, '/api/programasvuelo', m),
-    actualizar: (id: number, m: Partial<BE_ProgramaVuelo>) => put(BE_DEVELOP, `/api/programasvuelo/${id}`, m),
+    listar: () => get<BE_ProgramaVuelo[]>(BE_DEVELOP, "/api/programasvuelo"),
+    obtener: (id: number) =>
+      get<BE_ProgramaVuelo>(BE_DEVELOP, `/api/programasvuelo/${id}`),
+    buscar: (origen: string, destino: string) =>
+      get<BE_ProgramaVuelo[]>(
+        BE_DEVELOP,
+        `/api/programasvuelo?origen=${origen}&destino=${destino}`,
+      ),
+    crear: (m: Omit<BE_ProgramaVuelo, "IdPrograma">) =>
+      post(BE_DEVELOP, "/api/programasvuelo", m),
+    actualizar: (id: number, m: Partial<BE_ProgramaVuelo>) =>
+      put(BE_DEVELOP, `/api/programasvuelo/${id}`, m),
   },
   temporadas: {
-    listar:     () => get<BE_TemporadaVuelo[]>(BE_DEVELOP, '/api/temporadavuelo'),
-    obtener:    (id: number) => get<BE_TemporadaVuelo>(BE_DEVELOP, `/api/temporadavuelo/${id}`),
-    crear:      (m: Omit<BE_TemporadaVuelo, 'IdTemporada'>) => post(BE_DEVELOP, '/api/temporadavuelo', m),
-    actualizar: (id: number, m: Partial<BE_TemporadaVuelo>) => put(BE_DEVELOP, `/api/temporadavuelo/${id}`, m),
+    listar: () => get<BE_TemporadaVuelo[]>(BE_DEVELOP, "/api/temporadavuelo"),
+    obtener: (id: number) =>
+      get<BE_TemporadaVuelo>(BE_DEVELOP, `/api/temporadavuelo/${id}`),
+    crear: (m: Omit<BE_TemporadaVuelo, "IdTemporada">) =>
+      post(BE_DEVELOP, "/api/temporadavuelo", m),
+    actualizar: (id: number, m: Partial<BE_TemporadaVuelo>) =>
+      put(BE_DEVELOP, `/api/temporadavuelo/${id}`, m),
   },
   tarifasVuelo: {
-    listar:     () => get<any[]>(BE_DEVELOP, '/api/tarifasvuelo'),
-    porPrograma:(id: number) => get<any[]>(BE_DEVELOP, `/api/tarifasvuelo/programa/${id}`),
-    crear:      (m: any) => post(BE_DEVELOP, '/api/tarifasvuelo', m),
-    actualizar: (id: number, m: any) => put(BE_DEVELOP, `/api/tarifasvuelo/${id}`, m),
+    listar: () => get<any[]>(BE_DEVELOP, "/api/tarifasvuelo"),
+    porPrograma: (id: number) =>
+      get<any[]>(BE_DEVELOP, `/api/tarifasvuelo/programa/${id}`),
+    crear: (m: any) => post(BE_DEVELOP, "/api/tarifasvuelo", m),
+    actualizar: (id: number, m: any) =>
+      put(BE_DEVELOP, `/api/tarifasvuelo/${id}`, m),
   },
   frecuenciasVuelo: {
-    listar:     () => get<any[]>(BE_DEVELOP, '/api/frecuenciasvuelo'),
-    porPrograma:(id: number) => get<any[]>(BE_DEVELOP, `/api/frecuenciasvuelo/programa/${id}`),
-    crear:      (m: any) => post(BE_DEVELOP, '/api/frecuenciasvuelo', m),
+    listar: () => get<any[]>(BE_DEVELOP, "/api/frecuenciasvuelo"),
+    porPrograma: (id: number) =>
+      get<any[]>(BE_DEVELOP, `/api/frecuenciasvuelo/programa/${id}`),
+    crear: (m: any) => post(BE_DEVELOP, "/api/frecuenciasvuelo", m),
   },
 
   // Módulo 5
   vuelos: {
-    listar:          () => get<BE_Vuelo[]>(BE_DEVELOP, '/api/vuelos'),
-    obtener:         (id: number) => get<BE_Vuelo>(BE_DEVELOP, `/api/vuelos/${id}`),
-    buscar:          (origen: string, destino: string, fecha: string) =>
-      get<BE_Vuelo[]>(BE_DEVELOP, `/api/vuelos?origen=${origen}&destino=${destino}&fecha=${fecha}`),
-    crear:           (m: Omit<BE_Vuelo, 'IdVuelo'>) => post<{ IdGenerado: number }>(BE_DEVELOP, '/api/vuelos', m),
-    actualizar:      (id: number, m: Partial<BE_Vuelo>) => put(BE_DEVELOP, `/api/vuelos/${id}`, m),
-    actualizarEstado:(id: number, estado: string) =>
+    listar: () => get<BE_Vuelo[]>(BE_DEVELOP, "/api/vuelos"),
+    obtener: (id: number) => get<BE_Vuelo>(BE_DEVELOP, `/api/vuelos/${id}`),
+    buscar: (origen: string, destino: string, fecha: string) =>
+      get<BE_Vuelo[]>(
+        BE_DEVELOP,
+        `/api/vuelos?origen=${origen}&destino=${destino}&fecha=${fecha}`,
+      ),
+    crear: (m: Omit<BE_Vuelo, "IdVuelo">) =>
+      post<{ IdGenerado: number }>(BE_DEVELOP, "/api/vuelos", m),
+    actualizar: (id: number, m: Partial<BE_Vuelo>) =>
+      put(BE_DEVELOP, `/api/vuelos/${id}`, m),
+    actualizarEstado: (id: number, estado: string) =>
       put(BE_DEVELOP, `/api/vuelos/${id}/estado`, { EstadoVuelo: estado }),
-    crearVuelo:      (m: BE_CrearVueloRequest) =>
-      post<{ mensaje: string }>(BE_DEVELOP, '/api/vuelos/crear-vuelo', m),
-    reprogramar:     (m: BE_ReprogramarVueloRequest) =>
-      put<{ mensaje: string }>(BE_DEVELOP, '/api/vuelos/reprogramar', m),
-    asignarPuerta:   (m: BE_AsignarPuertaRequest) =>
-      post<{ mensaje: string }>(BE_DEVELOP, '/api/vuelos/asignar-puerta', m),
-    cancelar:        (m: BE_CancelarVueloRequest) =>
-      post<{ mensaje: string }>(BE_DEVELOP, '/api/vuelos/cancelar', m),
-    cerrarEmbarque:  (idVuelo: number) =>
-      post<{ mensaje: string }>(BE_DEVELOP, `/api/vuelos/${idVuelo}/cerrar-embarque`, {}),
+    crearVuelo: (m: BE_CrearVueloRequest) =>
+      post<{ mensaje: string }>(BE_DEVELOP, "/api/vuelos/crear-vuelo", m),
+    reprogramar: (m: BE_ReprogramarVueloRequest) =>
+      put<{ mensaje: string }>(BE_DEVELOP, "/api/vuelos/reprogramar", m),
+    asignarPuerta: (m: BE_AsignarPuertaRequest) =>
+      post<{ mensaje: string }>(BE_DEVELOP, "/api/vuelos/asignar-puerta", m),
+    cancelar: (m: BE_CancelarVueloRequest) =>
+      post<{ mensaje: string }>(BE_DEVELOP, "/api/vuelos/cancelar", m),
+    cerrarEmbarque: (idVuelo: number) =>
+      post<{ mensaje: string }>(
+        BE_DEVELOP,
+        `/api/vuelos/${idVuelo}/cerrar-embarque`,
+        {},
+      ),
   },
   incidentesVuelo: {
-    listar:     () => get<BE_IncidenteVuelo[]>(BE_DEVELOP, '/api/incidentesvuelo'),
-    porVuelo:   (id: number) => get<BE_IncidenteVuelo[]>(BE_DEVELOP, `/api/incidentesvuelo/vuelo/${id}`),
-    crear:      (m: Omit<BE_IncidenteVuelo, 'IdIncidenteVuelo'>) => post(BE_DEVELOP, '/api/incidentesvuelo', m),
+    listar: () =>
+      get<any[]>(BE_DEVELOP, "/api/incidentesvuelo").then((d) =>
+        d.map(NORM.incidenteVuelo),
+      ),
+    porVuelo: (id: number) =>
+      get<any[]>(BE_DEVELOP, `/api/incidentesvuelo/vuelo/${id}`).then((d) =>
+        d.map(NORM.incidenteVuelo),
+      ),
+    crear: (m: any) => post(BE_DEVELOP, "/api/incidentesvuelo", m),
   },
   retrasos: {
-    listar:     () => get<BE_RetrasoVuelo[]>(BE_DEVELOP, '/api/retrasosvuelo'),
-    porVuelo:   (id: number) => get<BE_RetrasoVuelo[]>(BE_DEVELOP, `/api/retrasosvuelo/vuelo/${id}`),
-    crear:      (m: Omit<BE_RetrasoVuelo, 'IdRetraso'>) => post(BE_DEVELOP, '/api/retrasosvuelo', m),
+    listar: () =>
+      get<any[]>(BE_DEVELOP, "/api/retrasosvuelo").then((d) =>
+        d.map(NORM.retraso),
+      ),
+    porVuelo: (id: number) =>
+      get<any[]>(BE_DEVELOP, `/api/retrasosvuelo/vuelo/${id}`).then((d) =>
+        d.map(NORM.retraso),
+      ),
+    crear: (m: any) => post(BE_DEVELOP, "/api/retrasosvuelo", m),
   },
   meteorologia: {
-    listar:        () => get<BE_Meteorologia[]>(BE_DEVELOP, '/api/condicionesmeteorologicas'),
+    listar: () =>
+      get<BE_Meteorologia[]>(BE_DEVELOP, "/api/condicionesmeteorologicas"),
     porAeropuerto: (cod: string) =>
-      get<BE_Meteorologia[]>(BE_DEVELOP, `/api/condicionesmeteorologicas/aeropuerto/${cod}`),
-    crear:         (m: Omit<BE_Meteorologia, 'IdCondicion'>) => post(BE_DEVELOP, '/api/condicionesmeteorologicas', m),
+      get<BE_Meteorologia[]>(
+        BE_DEVELOP,
+        `/api/condicionesmeteorologicas/aeropuerto/${cod}`,
+      ),
+    crear: (m: Omit<BE_Meteorologia, "IdCondicion">) =>
+      post(BE_DEVELOP, "/api/condicionesmeteorologicas", m),
   },
 
   // Módulo 6
   tripulacion: {
-    listar:     () => get<BE_Tripulante[]>(BE_DEVELOP, '/api/tripulacion'),
-    obtener:    (id: number) => get<BE_Tripulante>(BE_DEVELOP, `/api/tripulacion/${id}`),
-    crear:      (m: Omit<BE_Tripulante, 'IdTripulante'>) => post(BE_DEVELOP, '/api/tripulacion', m),
-    actualizar: (id: number, m: Partial<BE_Tripulante>) => put(BE_DEVELOP, `/api/tripulacion/${id}`, m),
-    eliminar:   (id: number) => del(BE_DEVELOP, `/api/tripulacion/${id}`),
+    listar: () => get<BE_Tripulante[]>(BE_DEVELOP, "/api/tripulacion"),
+    obtener: (id: number) =>
+      get<BE_Tripulante>(BE_DEVELOP, `/api/tripulacion/${id}`),
+    crear: (m: Omit<BE_Tripulante, "IdTripulante">) =>
+      post(BE_DEVELOP, "/api/tripulacion", m),
+    actualizar: (id: number, m: Partial<BE_Tripulante>) =>
+      put(BE_DEVELOP, `/api/tripulacion/${id}`, m),
+    eliminar: (id: number) => del(BE_DEVELOP, `/api/tripulacion/${id}`),
   },
 
   tripulacionVuelo: {
-    porVuelo:   (id: number) => get<any[]>(BE_DEVELOP, `/api/tripulacionvuelo/vuelo/${id}`),
-    listar:     () => get<any[]>(BE_DEVELOP, '/api/tripulacionvuelo'),
-    asignar:    (m: any) => post(BE_DEVELOP, '/api/tripulacionvuelo', m),
-    eliminar:   (id: number) => del(BE_DEVELOP, `/api/tripulacionvuelo/${id}`),
+    porVuelo: (id: number) =>
+      get<any[]>(BE_DEVELOP, `/api/tripulacionvuelo/vuelo/${id}`),
+    listar: () => get<any[]>(BE_DEVELOP, "/api/tripulacionvuelo"),
+    asignar: (m: any) => post(BE_DEVELOP, "/api/tripulacionvuelo", m),
+    eliminar: (id: number) => del(BE_DEVELOP, `/api/tripulacionvuelo/${id}`),
   },
 
   // Módulo 21 — Tiempo Real
   tiempoReal: {
     slots: {
-      listar:     () => get<any[]>(BE_DEVELOP, '/api/slotaeropuerto'),
-      porFecha:   (fecha: string) => get<any[]>(BE_DEVELOP, `/api/slotaeropuerto/fecha/${fecha}`),
-      crear:      (m: any) => post(BE_DEVELOP, '/api/slotaeropuerto', m),
-      actualizar: (id: number, m: any) => put(BE_DEVELOP, `/api/slotaeropuerto/${id}`, m),
+      listar: () => get<any[]>(BE_DEVELOP, "/api/slotaeropuerto"),
+      porFecha: (fecha: string) =>
+        get<any[]>(BE_DEVELOP, `/api/slotaeropuerto/fecha/${fecha}`),
+      crear: (m: any) => post(BE_DEVELOP, "/api/slotaeropuerto", m),
+      actualizar: (id: number, m: any) =>
+        put(BE_DEVELOP, `/api/slotaeropuerto/${id}`, m),
     },
     retrasos: {
-      listar:     () => get<any[]>(BE_DEVELOP, '/api/retrasostiemporeal'),
-      activos:    () => get<any[]>(BE_DEVELOP, '/api/retrasostiemporeal/activos'),
-      crear:      (m: any) => post(BE_DEVELOP, '/api/retrasostiemporeal', m),
+      listar: () => get<any[]>(BE_DEVELOP, "/api/retrasostiemporeal"),
+      activos: () => get<any[]>(BE_DEVELOP, "/api/retrasostiemporeal/activos"),
+      crear: (m: any) => post(BE_DEVELOP, "/api/retrasostiemporeal", m),
     },
     asignacionPistas: {
-      listar:     () => get<any[]>(BE_DEVELOP, '/api/asignacionpistastiemporeal'),
-      activas:    () => get<any[]>(BE_DEVELOP, '/api/asignacionpistastiemporeal/activas'),
-      crear:      (m: any) => post(BE_DEVELOP, '/api/asignacionpistastiemporeal', m),
+      listar: () => get<any[]>(BE_DEVELOP, "/api/asignacionpistastiemporeal"),
+      activas: () =>
+        get<any[]>(BE_DEVELOP, "/api/asignacionpistastiemporeal/activas"),
+      crear: (m: any) => post(BE_DEVELOP, "/api/asignacionpistastiemporeal", m),
     },
     capacidadTerminal: {
-      listar:     () => get<any[]>(BE_DEVELOP, '/api/capacidadterminal'),
-      actual:     (terminal: string) => get<any>(BE_DEVELOP, `/api/capacidadterminal/${terminal}`),
+      listar: () => get<any[]>(BE_DEVELOP, "/api/capacidadterminal"),
+      actual: (terminal: string) =>
+        get<any>(BE_DEVELOP, `/api/capacidadterminal/${terminal}`),
     },
     condicionesPista: {
-      listar:     () => get<any[]>(BE_DEVELOP, '/api/condicionespista'),
-      porPista:   (id: number) => get<any>(BE_DEVELOP, `/api/condicionespista/${id}`),
+      listar: () => get<any[]>(BE_DEVELOP, "/api/condicionespista"),
+      porPista: (id: number) =>
+        get<any>(BE_DEVELOP, `/api/condicionespista/${id}`),
     },
     posicionesRadar: {
-      listar:     () => get<any[]>(BE_DEVELOP, '/api/posicionesradar'),
-      activas:    () => get<any[]>(BE_DEVELOP, '/api/posicionesradar/activas'),
+      listar: () => get<any[]>(BE_DEVELOP, "/api/posicionesradar"),
+      activas: () => get<any[]>(BE_DEVELOP, "/api/posicionesradar/activas"),
     },
     torreControl: {
-      listar:     () => get<any[]>(BE_DEVELOP, '/api/torrecontrol'),
-      crear:      (m: any) => post(BE_DEVELOP, '/api/torrecontrol', m),
+      listar: () => get<any[]>(BE_DEVELOP, "/api/torrecontrol"),
+      crear: (m: any) => post(BE_DEVELOP, "/api/torrecontrol", m),
     },
     historialFlujo: {
-      listar:     () => get<any[]>(BE_DEVELOP, '/api/historialflujotrafico'),
-      porFecha:   (fecha: string) => get<any[]>(BE_DEVELOP, `/api/historialflujotrafico/fecha/${fecha}`),
+      listar: () => get<any[]>(BE_DEVELOP, "/api/historialflujotrafico"),
+      porFecha: (fecha: string) =>
+        get<any[]>(BE_DEVELOP, `/api/historialflujotrafico/fecha/${fecha}`),
     },
     prediccionDemanda: {
-      listar:     () => get<any[]>(BE_DEVELOP, '/api/predicciondemanda'),
-      porFecha:   (fecha: string) => get<any[]>(BE_DEVELOP, `/api/predicciondemanda/fecha/${fecha}`),
+      listar: () => get<any[]>(BE_DEVELOP, "/api/predicciondemanda"),
+      porFecha: (fecha: string) =>
+        get<any[]>(BE_DEVELOP, `/api/predicciondemanda/fecha/${fecha}`),
     },
     meteorologia: {
-      listar:        () => get<BE_Meteorologia[]>(BE_DEVELOP, '/api/condicionesmeteorologicas'),
+      listar: () =>
+        get<BE_Meteorologia[]>(BE_DEVELOP, "/api/condicionesmeteorologicas"),
       porAeropuerto: (cod: string) =>
-        get<BE_Meteorologia[]>(BE_DEVELOP, `/api/condicionesmeteorologicas/aeropuerto/${cod}`),
-      crear:         (m: any) => post(BE_DEVELOP, '/api/condicionesmeteorologicas', m),
+        get<BE_Meteorologia[]>(
+          BE_DEVELOP,
+          `/api/condicionesmeteorologicas/aeropuerto/${cod}`,
+        ),
+      crear: (m: any) => post(BE_DEVELOP, "/api/condicionesmeteorologicas", m),
     },
   },
 
@@ -1380,280 +1702,479 @@ export const backendApi = {
 
   // Módulo 7
   pasajeros: {
-    listar:     () => get<BE_Pasajero[]>(BE_GERSON, '/api/pasajeros'),
-    obtener:    (id: number) => get<BE_Pasajero>(BE_GERSON, `/api/pasajeros/${id}`),
-    buscar:     (q: string) => get<BE_Pasajero[]>(BE_GERSON, `/api/pasajeros/buscar?q=${encodeURIComponent(q)}`),
-    crear:      (m: Omit<BE_Pasajero, 'IdPasajero'>) => post<{ IdGenerado: number }>(BE_GERSON, '/api/pasajeros', m),
-    actualizar: (id: number, m: Partial<BE_Pasajero>) => put(BE_GERSON, `/api/pasajeros/${id}`, m),
-    registrar:  (m: BE_RegistrarPasajeroRequest) =>
-      post<{ mensaje: string }>(BE_GERSON, '/api/pasajeros/registrar', m),
+    listar: () => get<BE_Pasajero[]>(BE_GERSON, "/api/pasajeros"),
+    obtener: (id: number) =>
+      get<BE_Pasajero>(BE_GERSON, `/api/pasajeros/${id}`),
+    buscar: (q: string) =>
+      get<BE_Pasajero[]>(
+        BE_GERSON,
+        `/api/pasajeros/buscar?q=${encodeURIComponent(q)}`,
+      ),
+    crear: (m: Omit<BE_Pasajero, "IdPasajero">) =>
+      post<{ IdGenerado: number }>(BE_GERSON, "/api/pasajeros", m),
+    actualizar: (id: number, m: Partial<BE_Pasajero>) =>
+      put(BE_GERSON, `/api/pasajeros/${id}`, m),
+    registrar: (m: BE_RegistrarPasajeroRequest) =>
+      post<{ mensaje: string }>(BE_GERSON, "/api/pasajeros/registrar", m),
   },
   perfilesViajero: {
-    porPasajero:(id: number) => get<BE_PerfilViajero>(BE_GERSON, `/api/perfilesviajero/pasajero/${id}`),
-    actualizar: (id: number, m: Partial<BE_PerfilViajero>) => put(BE_GERSON, `/api/perfilesviajero/${id}`, m),
+    porPasajero: (id: number) =>
+      get<BE_PerfilViajero>(BE_DEVELOP, `/api/perfilesviajero/pasajero/${id}`),
+    actualizar: (id: number, m: Partial<BE_PerfilViajero>) =>
+      put(BE_DEVELOP, `/api/perfilesviajero/${id}`, m),
   },
 
   // Módulo 8
   reservas: {
-    crear:                (m: Omit<BE_Reserva, 'IdReserva'>) =>
-      post<{ IdGenerado: number; CodigoReserva: string }>(BE_GERSON, '/api/reservas', m),
-    porPasajero:          (id: number) => get<BE_Reserva[]>(BE_GERSON, `/api/reservas/pasajero/${id}`),
-    porCodigo:            (cod: string) => get<BE_Reserva>(BE_GERSON, `/api/reservas/${cod}`),
-    cancelar:             (id: number) => put(BE_GERSON, `/api/reservas/${id}/cancelar`, {}),
-    actualizar:           (id: number, m: Partial<BE_Reserva>) => put(BE_GERSON, `/api/reservas/${id}`, m),
-    crearReserva:         (m: BE_CrearReservaRequest) =>
-      post<{ mensaje: string }>(BE_GERSON, '/api/reservas/crear-reserva', m),
-    checkIn:              (m: BE_CheckInRequest) =>
-      post<{ mensaje: string; qr_provisional: string }>(BE_GERSON, '/api/reservas/check-in', m),
-    checkInMostrador:     (m: BE_CheckInMostradorRequest) =>
-      post<{ mensaje: string; detalle: string }>(BE_GERSON, '/api/reservas/check-in-mostrador', m),
-    registrarAbordaje:    (m: BE_EmbarqueRequest) =>
-      post<{ mensaje: string }>(BE_GERSON, '/api/reservas/registrar-abordaje', m),
-    pagar:                (m: BE_PagoBoletoRequest) =>
-      post<{ mensaje: string }>(BE_GERSON, '/api/reservas/pagar', m),
+    crear: (m: Omit<BE_Reserva, "IdReserva">) =>
+      post<{ IdGenerado: number; CodigoReserva: string }>(
+        BE_GERSON,
+        "/api/reservas",
+        m,
+      ),
+    porPasajero: (id: number) =>
+      get<BE_Reserva[]>(BE_GERSON, `/api/reservas/pasajero/${id}`),
+    porCodigo: (cod: string) =>
+      get<BE_Reserva>(BE_GERSON, `/api/reservas/${cod}`),
+    cancelar: (id: number) =>
+      put(BE_GERSON, `/api/reservas/${id}/cancelar`, {}),
+    actualizar: (id: number, m: Partial<BE_Reserva>) =>
+      put(BE_GERSON, `/api/reservas/${id}`, m),
+    crearReserva: (m: BE_CrearReservaRequest) =>
+      post<{ mensaje: string }>(BE_GERSON, "/api/reservas/crear-reserva", m),
+    checkIn: (m: BE_CheckInRequest) =>
+      post<{ mensaje: string; qr_provisional: string }>(
+        BE_GERSON,
+        "/api/reservas/check-in",
+        m,
+      ),
+    checkInMostrador: (m: BE_CheckInMostradorRequest) =>
+      post<{ mensaje: string; detalle: string }>(
+        BE_GERSON,
+        "/api/reservas/check-in-mostrador",
+        m,
+      ),
+    registrarAbordaje: (m: BE_EmbarqueRequest) =>
+      post<{ mensaje: string }>(
+        BE_GERSON,
+        "/api/reservas/registrar-abordaje",
+        m,
+      ),
+    pagar: (m: BE_PagoBoletoRequest) =>
+      post<{ mensaje: string }>(BE_GERSON, "/api/reservas/pagar", m),
   },
   pagosReserva: {
-    registrar:  (m: Omit<BE_ReservaPago, 'IdPago'>) =>
-      post<{ IdGenerado: number }>(BE_GERSON, '/api/reservaspagos', m),
-    porReserva: (id: number) => get<BE_ReservaPago[]>(BE_GERSON, `/api/reservaspagos/reserva/${id}`),
+    registrar: (m: Omit<BE_ReservaPago, "IdPago">) =>
+      post<{ IdGenerado: number }>(BE_DEVELOP, "/api/reservaspagos", m),
+    porReserva: (id: number) =>
+      get<BE_ReservaPago[]>(BE_DEVELOP, `/api/reservaspagos/reserva/${id}`),
   },
   facturas: {
     porReserva: (idReserva: number) =>
-      get<BE_Factura>(BE_GERSON, `/api/facturas/reserva/${idReserva}`),
+      get<BE_Factura>(BE_DEVELOP, `/api/facturas/reserva/${idReserva}`),
   },
   metodosPago: {
-    listar:     () => get<BE_MetodoPago[]>(BE_GERSON, '/api/metodospago'),
+    listar: () => get<BE_MetodoPago[]>(BE_DEVELOP, "/api/metodospago"),
   },
   promociones: {
-    listar:     () => get<BE_Promocion[]>(BE_GERSON, '/api/promociones'),
-    obtener:    (id: number) => get<BE_Promocion>(BE_GERSON, `/api/promociones/${id}`),
-    crear:      (m: Omit<BE_Promocion, 'IdPromocion'>) => post(BE_GERSON, '/api/promociones', m),
-    aplicar:    (idReserva: number, codigo: string) =>
-      post(BE_GERSON, '/api/promociones/aplicar', { IdReserva: idReserva, CodigoPromocion: codigo }),
+    listar: () => get<BE_Promocion[]>(BE_DEVELOP, "/api/promociones"),
+    obtener: (id: number) =>
+      get<BE_Promocion>(BE_DEVELOP, `/api/promociones/${id}`),
+    crear: (m: Omit<BE_Promocion, "IdPromocion">) =>
+      post(BE_DEVELOP, "/api/promociones", m),
+    aplicar: (idReserva: number, codigo: string) =>
+      post(BE_DEVELOP, "/api/promociones/aplicar", {
+        IdReserva: idReserva,
+        CodigoPromocion: codigo,
+      }),
   },
   solicitudesEspeciales: {
-    crear:       (m: Omit<BE_SolicitudEspecial, 'IdSolicitud'>) => post(BE_GERSON, '/api/solicitudesespeciales', m),
-    porReserva:  (id: number) => get<BE_SolicitudEspecial[]>(BE_GERSON, `/api/solicitudesespeciales/reserva/${id}`),
+    crear: (m: Omit<BE_SolicitudEspecial, "IdSolicitud">) =>
+      post(BE_DEVELOP, "/api/solicitudesespeciales", m),
+    porReserva: (id: number) =>
+      get<BE_SolicitudEspecial[]>(
+        BE_DEVELOP,
+        `/api/solicitudesespeciales/reserva/${id}`,
+      ),
   },
 
   // Módulo 9
   checkin: {
-    registrar:  (m: Omit<BE_CheckinDigital, 'IdCheckin'>) => post(BE_GERSON, '/api/checkindigital', m),
-    obtener:    (idReserva: number) => get<BE_CheckinDigital>(BE_GERSON, `/api/checkindigital/${idReserva}`),
+    registrar: (m: Omit<BE_CheckinDigital, "IdCheckin">) =>
+      post(BE_DEVELOP, "/api/checkindigital", m),
+    obtener: (idReserva: number) =>
+      get<BE_CheckinDigital>(BE_DEVELOP, `/api/checkindigital/${idReserva}`),
   },
   pasesAbordaje: {
-    generar:    (m: Omit<BE_PaseAbordaje, 'IdPaseAbordaje'>) =>
-      post<{ IdPase: number; CodigoBarras: string }>(BE_GERSON, '/api/pasesabordaje', m),
-    obtener:    (idReserva: number) => get<BE_PaseAbordaje>(BE_GERSON, `/api/pasesabordaje/${idReserva}`),
+    generar: (m: Omit<BE_PaseAbordaje, "IdPaseAbordaje">) =>
+      post<{ IdPase: number; CodigoBarras: string }>(
+        BE_DEVELOP,
+        "/api/pasesabordaje",
+        m,
+      ),
+    obtener: (idReserva: number) =>
+      get<BE_PaseAbordaje>(BE_DEVELOP, `/api/pasesabordaje/${idReserva}`),
   },
   controlAbordaje: {
-    registrar:  (m: Omit<BE_ControlAbordaje, 'IdControlAbordaje'>) => post(BE_GERSON, '/api/controlabordaje', m),
-    porVuelo:   (id: number) => get<BE_ControlAbordaje[]>(BE_GERSON, `/api/controlabordaje/vuelo/${id}`),
+    registrar: (m: Omit<BE_ControlAbordaje, "IdControlAbordaje">) =>
+      post(BE_DEVELOP, "/api/controlabordaje", m),
+    porVuelo: (id: number) =>
+      get<BE_ControlAbordaje[]>(BE_DEVELOP, `/api/controlabordaje/vuelo/${id}`),
   },
 
   // Módulo 10
   incidentes: {
-    listar:     () => get<BE_Incidente[]>(BE_GERSON, '/api/incidentes'),
-    obtener:    (id: number) => get<BE_Incidente>(BE_GERSON, `/api/incidentes/${id}`),
-    crear:      (m: Omit<BE_Incidente, 'IdIncidente'>) => post(BE_GERSON, '/api/incidentes', m),
-    porPasajero:(id: number) => get<BE_Incidente[]>(BE_GERSON, `/api/incidentes/pasajero/${id}`),
+    listar: () => get<BE_Incidente[]>(BE_DEVELOP, "/api/incidentes"),
+    obtener: (id: number) =>
+      get<BE_Incidente>(BE_DEVELOP, `/api/incidentes/${id}`),
+    crear: (m: Omit<BE_Incidente, "IdIncidente">) =>
+      post(BE_DEVELOP, "/api/incidentes", m),
+    porPasajero: (id: number) =>
+      get<BE_Incidente[]>(BE_DEVELOP, `/api/incidentes/pasajero/${id}`),
   },
   alertasSeguridad: {
-    listar:     () => get<BE_AlertaSeguridad[]>(BE_GERSON, '/api/alertasseguridad'),
-    activas:    () => get<BE_AlertaSeguridad[]>(BE_GERSON, '/api/alertasseguridad/activas'),
-    crear:      (m: Omit<BE_AlertaSeguridad, 'IdAlerta'>) => post(BE_GERSON, '/api/alertasseguridad', m),
+    listar: () =>
+      get<BE_AlertaSeguridad[]>(BE_DEVELOP, "/api/alertasseguridad"),
+    activas: () =>
+      get<BE_AlertaSeguridad[]>(BE_DEVELOP, "/api/alertasseguridad/activas"),
+    crear: (m: Omit<BE_AlertaSeguridad, "IdAlerta">) =>
+      post(BE_DEVELOP, "/api/alertasseguridad", m),
   },
   prohibicionesVuelo: {
-    porPasajero:(id: number) => get<BE_ProhibicionVuelo[]>(BE_GERSON, `/api/prohibicionesvuelo/pasajero/${id}`),
-    crear:      (m: Omit<BE_ProhibicionVuelo, 'IdProhibicion'>) => post(BE_GERSON, '/api/prohibicionesvuelo', m),
+    porPasajero: (id: number) =>
+      get<BE_ProhibicionVuelo[]>(
+        BE_DEVELOP,
+        `/api/prohibicionesvuelo/pasajero/${id}`,
+      ),
+    crear: (m: Omit<BE_ProhibicionVuelo, "IdProhibicion">) =>
+      post(BE_DEVELOP, "/api/prohibicionesvuelo", m),
   },
 
   // Módulo 12
   objetosPerdidos: {
-    listar:     () => get<BE_ObjetoPerdido[]>(BE_GERSON, '/api/objetosperdidos'),
-    crear:      (m: Omit<BE_ObjetoPerdido, 'IdObjeto'>) => post(BE_GERSON, '/api/objetosperdidos', m),
-    entregar:   (id: number, idPasajero: number) =>
-      put(BE_GERSON, `/api/objetosperdidos/${id}/entregar`, { IdPasajero: idPasajero }),
+    listar: () => get<BE_ObjetoPerdido[]>(BE_DEVELOP, "/api/objetosperdidos"),
+    crear: (m: Omit<BE_ObjetoPerdido, "IdObjeto">) =>
+      post(BE_DEVELOP, "/api/objetosperdidos", m),
+    entregar: (id: number, idPasajero: number) =>
+      put(BE_DEVELOP, `/api/objetosperdidos/${id}/entregar`, {
+        IdPasajero: idPasajero,
+      }),
   },
 
   // Módulo 13
   concesiones: {
-    listar:     () => get<BE_Concesion[]>(BE_GERSON, '/api/concesionescomerciales'),
+    listar: () =>
+      get<BE_Concesion[]>(BE_DEVELOP, "/api/concesionescomerciales"),
   },
   salonesVip: {
-    listar:     () => get<BE_SalonVip[]>(BE_GERSON, '/api/salonesvip'),
-    acceder:    (idSalon: number, idPasajero: number, idVuelo: number) =>
-      post(BE_GERSON, '/api/salonesvip/acceso', { IdSalon: idSalon, IdPasajero: idPasajero, IdVuelo: idVuelo }),
+    listar: () => get<BE_SalonVip[]>(BE_DEVELOP, "/api/salonesvip"),
+    acceder: (idSalon: number, idPasajero: number, idVuelo: number) =>
+      post(BE_DEVELOP, "/api/salonesvip/acceso", {
+        IdSalon: idSalon,
+        IdPasajero: idPasajero,
+        IdVuelo: idVuelo,
+      }),
   },
 
   // Módulo 14
   hoteles: {
-    listar:       () => get<BE_HotelCercano[]>(BE_GERSON, '/api/hotelescercanos'),
-    porAeropuerto:(cod: string) =>
-      get<BE_HotelCercano[]>(BE_GERSON, `/api/hotelescercanos/aeropuerto/${cod}`),
-    registrar:    (m: Omit<BE_HotelCercano, 'IdHotel'>) => post(BE_GERSON, '/api/hotelescercanos', m),
+    listar: () =>
+      get<any[]>(BE_DEVELOP, "/api/hotelescercanos").then((d) =>
+        d.map(NORM.hotel),
+      ),
+    porAeropuerto: (cod: string) =>
+      get<any[]>(BE_DEVELOP, `/api/hotelescercanos/aeropuerto/${cod}`).then(
+        (d) => d.map(NORM.hotel),
+      ),
+    registrar: (m: any) => post(BE_DEVELOP, "/api/hotelescercanos", m),
   },
   transporte: {
-    listar:       () => get<BE_TransporteTerresre[]>(BE_GERSON, '/api/transporteterrestre'),
-    reservar:     (m: Omit<BE_ReservaTransporte, 'IdReservaTransporte'>) =>
-      post<{ IdGenerado: number }>(BE_GERSON, '/api/reservastransporte', m),
-    misReservas:  (idPasajero: number) =>
-      get<BE_ReservaTransporte[]>(BE_GERSON, `/api/reservastransporte/pasajero/${idPasajero}`),
-    empresas:     () => get<BE_EmpresaTransporte[]>(BE_GERSON, '/api/empresastransporte'),
-    conveniosHotel:(idHotel: number) =>
-      get<BE_ConvenioHotelTransporte[]>(BE_GERSON, `/api/conveniostransporte/hotel/${idHotel}`),
+    listar: () =>
+      get<BE_TransporteTerresre[]>(BE_DEVELOP, "/api/transporteterrestre"),
+    reservar: (m: Omit<BE_ReservaTransporte, "IdReservaTransporte">) =>
+      post<{ IdGenerado: number }>(BE_DEVELOP, "/api/reservastransporte", m),
+    misReservas: (idPasajero: number) =>
+      get<BE_ReservaTransporte[]>(
+        BE_DEVELOP,
+        `/api/reservastransporte/pasajero/${idPasajero}`,
+      ),
+    empresas: () =>
+      get<BE_EmpresaTransporte[]>(BE_DEVELOP, "/api/empresastransporte"),
+    conveniosHotel: (idHotel: number) =>
+      get<BE_ConvenioHotelTransporte[]>(
+        BE_DEVELOP,
+        `/api/conveniostransporte/hotel/${idHotel}`,
+      ),
   },
   serviciosAeropuerto: {
-    listar:       () => get<BE_ServicioAeropuerto[]>(BE_GERSON, '/api/serviciosaeropuerto'),
-    porAeropuerto:(cod: string) =>
-      get<BE_ServicioAeropuerto[]>(BE_GERSON, `/api/serviciosaeropuerto/aeropuerto/${cod}`),
+    listar: () =>
+      get<BE_ServicioAeropuerto[]>(BE_DEVELOP, "/api/serviciosaeropuerto"),
+    porAeropuerto: (cod: string) =>
+      get<BE_ServicioAeropuerto[]>(
+        BE_DEVELOP,
+        `/api/serviciosaeropuerto/aeropuerto/${cod}`,
+      ),
   },
   lealtad: {
-    listar:     ()                             => get<BE_ProgramaLealtad[]>(BE_GERSON, '/api/programalealtad'),
-    registrar:  (m: Omit<BE_ProgramaLealtad, 'IdLealtad'>) =>
-      post<{ IdGenerado: number }>(BE_GERSON, '/api/programalealtad', m),
-    porPasajero:(id: number) => get<BE_ProgramaLealtad>(BE_GERSON, `/api/programalealtad/pasajero/${id}`),
-    actualizar: (id: number, m: Partial<BE_ProgramaLealtad>) => put(BE_GERSON, `/api/programalealtad/${id}`, m),
+    listar: () =>
+      get<any[]>(BE_DEVELOP, "/api/programalealtad").then((d) =>
+        d.map(NORM.lealtad),
+      ),
+    registrar: (m: any) => post(BE_DEVELOP, "/api/programalealtad", m),
+    porPasajero: (id: number) =>
+      get<any>(BE_DEVELOP, `/api/programalealtad/pasajero/${id}`).then(
+        NORM.lealtad,
+      ),
+    actualizar: (id: number, m: any) =>
+      put(BE_DEVELOP, `/api/programalealtad/${id}`, m),
   },
   quejas: {
-    crear:      (m: Omit<BE_QuejaSugerencia, 'IdQueja'>) => post(BE_GERSON, '/api/quejassugerencias', m),
-    porPasajero:(id: number) => get<BE_QuejaSugerencia[]>(BE_GERSON, `/api/quejassugerencias/pasajero/${id}`),
+    listar: () =>
+      get<any[]>(BE_DEVELOP, "/api/quejassugerencias").then((d) =>
+        d.map(NORM.queja),
+      ),
+    crear: (m: any) => post(BE_DEVELOP, "/api/quejassugerencias", m),
+    porPasajero: (id: number) =>
+      get<any[]>(BE_DEVELOP, `/api/quejassugerencias/pasajero/${id}`).then(
+        (d) => d.map(NORM.queja),
+      ),
   },
   encuestas: {
-    crear:      (m: Omit<BE_Encuesta, 'IdEncuesta'>) => post(BE_GERSON, '/api/encuestassatisfaccion', m),
-    porVuelo:   (id: number) => get<BE_Encuesta[]>(BE_GERSON, `/api/encuestassatisfaccion/vuelo/${id}`),
+    crear: (m: Omit<BE_Encuesta, "IdEncuesta">) =>
+      post(BE_DEVELOP, "/api/encuestassatisfaccion", m),
+    porVuelo: (id: number) =>
+      get<BE_Encuesta[]>(BE_DEVELOP, `/api/encuestassatisfaccion/vuelo/${id}`),
   },
   atencionEspecial: {
-    crear:      (m: Omit<BE_AtencionEspecial, 'IdAtencion'>) => post(BE_GERSON, '/api/atencionespecial', m),
-    porPasajero:(id: number) => get<BE_AtencionEspecial[]>(BE_GERSON, `/api/atencionespecial/pasajero/${id}`),
+    crear: (m: Omit<BE_AtencionEspecial, "IdAtencion">) =>
+      post(BE_DEVELOP, "/api/atencionespecial", m),
+    porPasajero: (id: number) =>
+      get<BE_AtencionEspecial[]>(
+        BE_DEVELOP,
+        `/api/atencionespecial/pasajero/${id}`,
+      ),
   },
   historialReservas: {
-    registrar:  (m: { IdReserva: number; CampoModificado: string; ValorAnterior: string; ValorNuevo: string; MotivoCambio?: string }) =>
-      post(BE_GERSON, '/api/historialreservas', m),
+    registrar: (m: {
+      IdReserva: number;
+      CampoModificado: string;
+      ValorAnterior: string;
+      ValorNuevo: string;
+      MotivoCambio?: string;
+    }) => post(BE_DEVELOP, "/api/historialreservas", m),
   },
 
   // ── MODULOS BACKEND (:5089) — Módulos 15-20 ──────────────────────────────
 
   // Módulo 15
   empleados: {
-    listar:     () => get<BE_Empleado[]>(BE_MODULOS, '/api/empleado'),
-    obtener:    (id: number) => get<BE_Empleado>(BE_MODULOS, `/api/empleado/${id}`),
-    crear:      (m: Omit<BE_Empleado, 'IdEmpleado'>) => post(BE_MODULOS, '/api/empleado', m),
-    actualizar: (id: number, m: Partial<BE_Empleado>) => put(BE_MODULOS, `/api/empleado/${id}`, m),
+    listar: () =>
+      get<any[]>(BE_DEVELOP, "/api/empleado").then((d) => d.map(NORM.empleado)),
+    obtener: (id: number) =>
+      get<BE_Empleado>(BE_DEVELOP, `/api/empleado/${id}`),
+    crear: (m: Omit<BE_Empleado, "IdEmpleado">) =>
+      post(BE_DEVELOP, "/api/empleado", m),
+    actualizar: (id: number, m: Partial<BE_Empleado>) =>
+      put(BE_DEVELOP, `/api/empleado/${id}`, m),
   },
   departamentos: {
-    listar:     () => get<BE_Departamento[]>(BE_MODULOS, '/api/departamento'),
-    crear:      (m: Omit<BE_Departamento, 'IdDepartamento'>) => post(BE_MODULOS, '/api/departamento', m),
+    listar: () => get<BE_Departamento[]>(BE_DEVELOP, "/api/departamento"),
+    crear: (m: Omit<BE_Departamento, "IdDepartamento">) =>
+      post(BE_DEVELOP, "/api/departamento", m),
   },
   evaluaciones: {
-    listar:     () => get<BE_Evaluacion[]>(BE_MODULOS, '/api/evaluaciondesempeno'),
-    porEmpleado:(id: number) => get<BE_Evaluacion[]>(BE_MODULOS, `/api/evaluaciondesempeno/empleado/${id}`),
-    crear:      (m: Omit<BE_Evaluacion, 'IdEvaluacion'>) => post(BE_MODULOS, '/api/evaluaciondesempeno', m),
+    listar: () => get<BE_Evaluacion[]>(BE_DEVELOP, "/api/evaluacion"),
+    porEmpleado: (id: number) =>
+      get<BE_Evaluacion[]>(BE_DEVELOP, `/api/evaluacion/empleado/${id}`),
+    crear: (m: Omit<BE_Evaluacion, "IdEvaluacion">) =>
+      post(BE_DEVELOP, "/api/evaluacion", m),
   },
   vacaciones: {
-    listar:     () => get<BE_VacacionPermiso[]>(BE_MODULOS, '/api/vacacionespermiso'),
-    porEmpleado:(id: number) => get<BE_VacacionPermiso[]>(BE_MODULOS, `/api/vacacionespermiso/empleado/${id}`),
-    crear:      (m: Omit<BE_VacacionPermiso, 'IdSolicitud'>) => post(BE_MODULOS, '/api/vacacionespermiso', m),
-    aprobar:    (id: number, por: number) =>
-      put(BE_MODULOS, `/api/vacacionespermiso/${id}/aprobar`, { AutorizadoPor: por }),
+    listar: () => get<BE_VacacionPermiso[]>(BE_DEVELOP, "/api/vacaciones"),
+    porEmpleado: (id: number) =>
+      get<BE_VacacionPermiso[]>(BE_DEVELOP, `/api/vacaciones/empleado/${id}`),
+    crear: (m: Omit<BE_VacacionPermiso, "IdSolicitud">) =>
+      post(BE_DEVELOP, "/api/vacaciones", m),
+    aprobar: (id: number, por: number) =>
+      put(BE_DEVELOP, `/api/vacaciones/${id}/aprobar`, { AutorizadoPor: por }),
   },
 
   // Módulo 16
   ingresos: {
-    listar:     () => get<BE_Ingreso[]>(BE_MODULOS, '/api/ingreso'),
-    crear:      (m: Omit<BE_Ingreso, 'IdIngreso'>) => post(BE_MODULOS, '/api/ingreso', m),
+    listar: () =>
+      get<any[]>(BE_DEVELOP, "/api/ingreso").then((d) => d.map(NORM.ingreso)),
+    crear: (m: any) => post(BE_DEVELOP, "/api/ingreso", m),
   },
   gastos: {
-    listar:     () => get<BE_Gasto[]>(BE_MODULOS, '/api/gasto'),
-    crear:      (m: Omit<BE_Gasto, 'IdGasto'>) => post(BE_MODULOS, '/api/gasto', m),
+    listar: () =>
+      get<any[]>(BE_DEVELOP, "/api/gasto").then((d) => d.map(NORM.gasto)),
+    crear: (m: any) => post(BE_DEVELOP, "/api/gasto", m),
   },
   proveedores: {
-    listar:     () => get<BE_Proveedor[]>(BE_MODULOS, '/api/proveedor'),
-    crear:      (m: Omit<BE_Proveedor, 'IdProveedor'>) => post(BE_MODULOS, '/api/proveedor', m),
+    listar: () =>
+      get<any[]>(BE_DEVELOP, "/api/proveedor").then((d) =>
+        d.map(NORM.proveedor),
+      ),
+    crear: (m: any) => post(BE_DEVELOP, "/api/proveedor", m),
   },
   tasas: {
-    listar:     () => get<BE_TasaAeroportuaria[]>(BE_MODULOS, '/api/tasaaeropuertaria'),
-    crear:      (m: Omit<BE_TasaAeroportuaria, 'IdTasa'>) => post(BE_MODULOS, '/api/tasaaeropuertaria', m),
+    listar: () => get<any[]>(BE_DEVELOP, "/api/tasaaeropuertaria"),
+    crear: (m: any) => post(BE_DEVELOP, "/api/tasaaeropuertaria", m),
   },
   cuentasBancarias: {
-    listar:     () => get<BE_CuentaBancaria[]>(BE_MODULOS, '/api/cuentabancaria'),
-    crear:      (m: Omit<BE_CuentaBancaria, 'IdCuenta'>) => post(BE_MODULOS, '/api/cuentabancaria', m),
+    listar: () =>
+      get<any[]>(BE_DEVELOP, "/api/cuentabancaria").then((d) =>
+        d.map(NORM.cuentaBancaria),
+      ),
+    crear: (m: any) => post(BE_DEVELOP, "/api/cuentabancaria", m),
   },
   movimientosBancarios: {
-    listar:     () => get<BE_MovimientoBancario[]>(BE_MODULOS, '/api/movimientobancario'),
-    crear:      (m: Omit<BE_MovimientoBancario, 'IdMovimiento'>) => post(BE_MODULOS, '/api/movimientobancario', m),
+    listar: () => get<any[]>(BE_DEVELOP, "/api/movimientobancario"),
+    crear: (m: any) => post(BE_DEVELOP, "/api/movimientobancario", m),
   },
   finanzas: {
-    presupuestos:{ listar: () => get(BE_MODULOS, '/api/presupuesto'),
-                   crear:  (m: any) => post(BE_MODULOS, '/api/presupuesto', m) },
+    presupuestos: {
+      listar: () =>
+        get<any[]>(BE_DEVELOP, "/api/presupuesto").then((d) =>
+          d.map(NORM.presupuesto),
+        ),
+      crear: (m: any) => post(BE_DEVELOP, "/api/presupuesto", m),
+    },
   },
 
   // Módulo 18
   menores: {
-    listar:     () => get<BE_MenorNoAcompanado[]>(BE_MODULOS, '/api/menoresnoacompanados'),
-    obtener:    (id: number) => get<BE_MenorNoAcompanado>(BE_MODULOS, `/api/menoresnoacompanados/${id}`),
-    crear:      (m: Omit<BE_MenorNoAcompanado, 'IdMenor'>) => post(BE_MODULOS, '/api/menoresnoacompanados', m),
-    autorizaciones:{
-      listar: () => get(BE_MODULOS, '/api/autorizacionmenor'),
-      crear:  (m: any) => post(BE_MODULOS, '/api/autorizacionmenor', m),
+    listar: () =>
+      get<BE_MenorNoAcompanado[]>(BE_DEVELOP, "/api/menoresnoacompanados"),
+    obtener: (id: number) =>
+      get<BE_MenorNoAcompanado>(BE_DEVELOP, `/api/menoresnoacompanados/${id}`),
+    crear: (m: Omit<BE_MenorNoAcompanado, "IdMenor">) =>
+      post(BE_DEVELOP, "/api/menoresnoacompanados", m),
+    autorizaciones: {
+      listar: () => get(BE_DEVELOP, "/api/autorizacionmenor"),
+      crear: (m: any) => post(BE_DEVELOP, "/api/autorizacionmenor", m),
     },
   },
 
   // Módulo 19
   carga: {
     envios: {
-      listar:     () => get<BE_EnvioCarga[]>(BE_MODULOS, '/api/enviocarga'),
-      obtener:    (id: number) => get<BE_EnvioCarga>(BE_MODULOS, `/api/enviocarga/${id}`),
-      buscar:     (codigo: string) =>
-        get<BE_EnvioCarga>(BE_MODULOS, `/api/enviocarga/codigo/${codigo}`),
-      crear:      (m: Omit<BE_EnvioCarga, 'IdEnvio'>) => post(BE_MODULOS, '/api/enviocarga', m),
+      listar: () => get<BE_EnvioCarga[]>(BE_DEVELOP, "/api/enviocarga"),
+      obtener: (id: number) =>
+        get<BE_EnvioCarga>(BE_DEVELOP, `/api/enviocarga/${id}`),
+      buscar: (codigo: string) =>
+        get<BE_EnvioCarga>(BE_DEVELOP, `/api/enviocarga/codigo/${codigo}`),
+      crear: (m: Omit<BE_EnvioCarga, "IdEnvio">) =>
+        post(BE_DEVELOP, "/api/enviocarga", m),
     },
     manifiestos: {
-      listar:     () => get<BE_ManifiestoCarga[]>(BE_MODULOS, '/api/manifiestocarga'),
-      porVuelo:   (id: number) => get<BE_ManifiestoCarga[]>(BE_MODULOS, `/api/manifiestocarga/vuelo/${id}`),
-      crear:      (m: Omit<BE_ManifiestoCarga, 'IdManifiesto'>) => post(BE_MODULOS, '/api/manifiestocarga', m),
+      listar: () =>
+        get<BE_ManifiestoCarga[]>(BE_DEVELOP, "/api/manifiestocarga"),
+      porVuelo: (id: number) =>
+        get<BE_ManifiestoCarga[]>(
+          BE_DEVELOP,
+          `/api/manifiestocarga/vuelo/${id}`,
+        ),
+      crear: (m: Omit<BE_ManifiestoCarga, "IdManifiesto">) =>
+        post(BE_DEVELOP, "/api/manifiestocarga", m),
     },
     seguimiento: {
-      porEnvio:   (id: number) => get<BE_SeguimientoCarga[]>(BE_MODULOS, `/api/seguimientocarga/envio/${id}`),
-      crear:      (m: Omit<BE_SeguimientoCarga, 'IdSeguimiento'>) => post(BE_MODULOS, '/api/seguimientocarga', m),
+      porEnvio: (id: number) =>
+        get<BE_SeguimientoCarga[]>(
+          BE_DEVELOP,
+          `/api/seguimientocarga/envio/${id}`,
+        ),
+      crear: (m: Omit<BE_SeguimientoCarga, "IdSeguimiento">) =>
+        post(BE_DEVELOP, "/api/seguimientocarga", m),
     },
   },
 
   // Módulo 20
   mantenimiento: {
     ordenes: {
-      listar:     () => get<BE_OrdenMantenimiento[]>(BE_MODULOS, '/api/ordenmantenimientopredictivo'),
-      crear:      (m: Omit<BE_OrdenMantenimiento, 'IdOrdenMp'>) =>
-        post(BE_MODULOS, '/api/ordenmantenimientopredictivo', m),
+      listar: () =>
+        get<BE_OrdenMantenimiento[]>(
+          BE_DEVELOP,
+          "/api/ordenmantenimientopredictivo",
+        ),
+      crear: (m: Omit<BE_OrdenMantenimiento, "IdOrdenMp">) =>
+        post(BE_DEVELOP, "/api/ordenmantenimientopredictivo", m),
       actualizar: (id: number, m: Partial<BE_OrdenMantenimiento>) =>
-        put(BE_MODULOS, `/api/ordenmantenimientopredictivo/${id}`, m),
+        put(BE_DEVELOP, `/api/ordenmantenimientopredictivo/${id}`, m),
     },
     alertasTecnicas: {
-      listar:     () => get<BE_AlertaTecnica[]>(BE_MODULOS, '/api/alertastecnicas'),
-      sinAtender: () => get<BE_AlertaTecnica[]>(BE_MODULOS, '/api/alertastecnicas/pendientes'),
-      crear:      (m: Omit<BE_AlertaTecnica, 'IdAlertaTecnica'>) => post(BE_MODULOS, '/api/alertastecnicas', m),
+      listar: () => get<BE_AlertaTecnica[]>(BE_DEVELOP, "/api/alertastecnicas"),
+      sinAtender: () =>
+        get<BE_AlertaTecnica[]>(BE_DEVELOP, "/api/alertastecnicas/pendientes"),
+      crear: (m: Omit<BE_AlertaTecnica, "IdAlertaTecnica">) =>
+        post(BE_DEVELOP, "/api/alertastecnicas", m),
     },
     checklists: {
-      listar:     () => get(BE_MODULOS, '/api/checklistmantenimiento'),
-      crear:      (m: any) => post(BE_MODULOS, '/api/checklistmantenimiento', m),
+      listar: () => get(BE_DEVELOP, "/api/checklistmantenimiento"),
+      crear: (m: any) => post(BE_DEVELOP, "/api/checklistmantenimiento", m),
     },
     piezas: {
-      listar:     () => get<BE_PiezaReemplazo[]>(BE_MODULOS, '/api/piezareemplazo'),
-      stockBajo:  () => get<BE_PiezaReemplazo[]>(BE_MODULOS, '/api/piezareemplazo/stockbajo'),
-      crear:      (m: Omit<BE_PiezaReemplazo, 'IdPieza'>) => post(BE_MODULOS, '/api/piezareemplazo', m),
+      listar: () => get<BE_PiezaReemplazo[]>(BE_DEVELOP, "/api/piezareemplazo"),
+      stockBajo: () =>
+        get<BE_PiezaReemplazo[]>(BE_DEVELOP, "/api/piezareemplazo/stockbajo"),
+      crear: (m: Omit<BE_PiezaReemplazo, "IdPieza">) =>
+        post(BE_DEVELOP, "/api/piezareemplazo", m),
     },
   },
 
   // Módulo 22
   combustible: {
     tanques: {
-      listar:     () => get<BE_TanqueCombustible[]>(BE_MODULOS, '/api/tanquecombustible'),
-      crear:      (m: Omit<BE_TanqueCombustible, 'IdTanque'>) => post(BE_MODULOS, '/api/tanquecombustible', m),
+      listar: () =>
+        get<any[]>(BE_DEVELOP, "/api/tanquecombustible").then((d) =>
+          d.map(NORM.tanque),
+        ),
+      crear: (m: any) => post(BE_DEVELOP, "/api/tanquecombustible", m),
     },
     cargas: {
-      listar:     () => get<BE_CargaCombustible[]>(BE_MODULOS, '/api/cargacombustible'),
-      crear:      (m: Omit<BE_CargaCombustible, 'IdCargaCombustible'>) =>
-        post(BE_MODULOS, '/api/cargacombustible', m),
+      listar: () =>
+        get<BE_CargaCombustible[]>(BE_DEVELOP, "/api/cargacombustible"),
+      crear: (m: Omit<BE_CargaCombustible, "IdCargaCombustible">) =>
+        post(BE_DEVELOP, "/api/cargacombustible", m),
+    },
+    pedidos: {
+      listar: () =>
+        get<any[]>(BE_DEVELOP, "/api/pedidoscombustible").then((d) =>
+          d.map(NORM.pedidoCombustible),
+        ),
+      crear: (m: any) => post(BE_DEVELOP, "/api/pedidoscombustible", m),
+    },
+  },
+
+  // Módulo 24
+  usuariosSistema: {
+    listar: () => get<any[]>(BE_DEVELOP, "/api/usuariosistema"),
+  },
+  rolesSistema: {
+    listar: () => get<any[]>(BE_DEVELOP, "/api/rolsistema"),
+  },
+  incidentesSeguridadInfo: {
+    listar: () => get<any[]>(BE_DEVELOP, "/api/incidenteseguridadinformatica"),
+  },
+  marketing: {
+    campanas: {
+      listar: () => get<any[]>(BE_DEVELOP, "/api/campanamarketing"),
+    },
+    segmentos: {
+      listar: () => get<any[]>(BE_DEVELOP, "/api/segmentocliente"),
+    },
+  },
+  emergencias: {
+    planes: {
+      listar: () => get<BE_PlanEmergencia[]>(BE_DEVELOP, "/api/planemergencia"),
+    },
+    equipos: {
+      listar: () =>
+        get<BE_EquipoEmergencia[]>(BE_DEVELOP, "/api/equipoemergencia"),
+    },
+    activaciones: {
+      listar: () =>
+        get<BE_ActivacionEmergencia[]>(BE_DEVELOP, "/api/activacionemergencia"),
     },
   },
 };

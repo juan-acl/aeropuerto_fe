@@ -1,9 +1,11 @@
 /**
  * useVuelos.ts — Conectado a backendApi.vuelos (Oracle real vía /api/vuelos)
- * Fallback graceful a mockData cuando el backend no está disponible.
+ * 
+ * NOTA: backendApi.vuelos.listar() ya normaliza a snake_case internamente,
+ *       así que mapVuelo espera propiedades snake_case.
  */
 import { useState, useEffect, useCallback } from 'react';
-import { backendApi, BE_Vuelo, norm } from '@/services/backendApi';
+import { backendApi } from '@/services/backendApi';
 
 export interface VueloDisponible {
   id_vuelo:              number;
@@ -24,32 +26,37 @@ export interface VueloDisponible {
   fuente:                'oracle' | 'mock';
 }
 
-function mapVuelo(v: BE_Vuelo): VueloDisponible {
-  const horaSalida  = v.HoraSalidaProgramada
-    ? new Date(v.HoraSalidaProgramada).toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit', hour12: false })
+function mapVuelo(v: any): VueloDisponible {
+  // Support both snake_case (normalized) and PascalCase (raw) properties
+  const horaSalidaRaw = v.hora_salida_programada ?? v.HoraSalidaProgramada;
+  const horaLlegadaRaw = v.hora_llegada_programada ?? v.HoraLlegadaProgramada;
+  const fechaVueloRaw = v.fecha_vuelo ?? v.FechaVuelo;
+
+  const horaSalida  = horaSalidaRaw
+    ? new Date(horaSalidaRaw).toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit', hour12: false })
     : '--:--';
-  const horaLlegada = v.HoraLlegadaProgramada
-    ? new Date(v.HoraLlegadaProgramada).toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit', hour12: false })
+  const horaLlegada = horaLlegadaRaw
+    ? new Date(horaLlegadaRaw).toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit', hour12: false })
     : '--:--';
-  const fechaVuelo  = v.FechaVuelo
-    ? new Date(v.FechaVuelo).toISOString().split('T')[0]
+  const fechaVuelo  = fechaVueloRaw
+    ? new Date(fechaVueloRaw).toISOString().split('T')[0]
     : '';
 
   return {
-    id_vuelo:           v.IdVuelo,
-    numero_vuelo:       v.NumeroVuelo ?? `FL-${v.IdVuelo}`,
-    aeropuerto_origen:  v.AeropuertoOrigen ?? '',
-    aeropuerto_destino: v.AeropuertoDestino ?? '',
+    id_vuelo:           v.id_vuelo ?? v.IdVuelo,
+    numero_vuelo:       v.numero_vuelo ?? v.NumeroVuelo ?? `FL-${v.id_vuelo ?? v.IdVuelo}`,
+    aeropuerto_origen:  v.aeropuerto_origen ?? v.AeropuertoOrigen ?? '',
+    aeropuerto_destino: v.aeropuerto_destino ?? v.AeropuertoDestino ?? '',
     fecha_vuelo:        fechaVuelo,
     hora_salida:        horaSalida,
     hora_llegada:       horaLlegada,
-    duracion_min:       v.DuracionMinutos ?? 120,
-    plazas_disponibles: v.PlazasVacias ?? 0,
+    duracion_min:       v.duracion_minutos ?? v.DuracionMinutos ?? 120,
+    plazas_disponibles: v.plazas_vacias ?? v.PlazasVacias ?? 0,
     precio_economica:   0,   // Se carga desde tarifas cuando estén disponibles
     precio_ejecutiva:   0,
-    aerolinea:          v.NombreAerolinea ?? 'Aerolínea',
-    codigo_iata:        v.CodigoIata ?? '',
-    estado:             v.EstadoVuelo ?? 'PROGRAMADO',
+    aerolinea:          v.nombre_aerolinea ?? v.NombreAerolinea ?? 'Aerolínea',
+    codigo_iata:        v.codigo_iata ?? v.CodigoIata ?? '',
+    estado:             v.estado_vuelo ?? v.EstadoVuelo ?? 'PROGRAMADO',
     fuente:             'oracle',
   };
 }
@@ -66,18 +73,20 @@ export function useVuelos() {
     setError(null);
     try {
       const raw = await backendApi.vuelos.buscar(origen, destino, fecha);
-      const mapped = raw.map(mapVuelo);
+      const mapped = (raw || []).map(mapVuelo);
       setVuelos(mapped);
       setFuente('oracle');
     } catch (e: any) {
       // Fallback: listar todos y filtrar en cliente
       try {
         const all = await backendApi.vuelos.listar();
-        const filtrados = all.filter(v =>
-          (!origen  || v.AeropuertoOrigen?.toUpperCase()  === origen.toUpperCase()) &&
-          (!destino || v.AeropuertoDestino?.toUpperCase() === destino.toUpperCase())
-        );
-        setVuelos((filtrados.length ? filtrados : all).map(mapVuelo));
+        const filtrados = (all || []).filter((v: any) => {
+          const aorig = (v.aeropuerto_origen ?? v.AeropuertoOrigen ?? '').toUpperCase();
+          const adest = (v.aeropuerto_destino ?? v.AeropuertoDestino ?? '').toUpperCase();
+          return (!origen  || aorig === origen.toUpperCase()) &&
+                 (!destino || adest === destino.toUpperCase());
+        });
+        setVuelos((filtrados.length ? filtrados : all || []).map(mapVuelo));
         setFuente('oracle');
       } catch {
         // Backend completamente no disponible → mock vacío con mensaje
@@ -94,7 +103,7 @@ export function useVuelos() {
     setLoading(true);
     try {
       const raw = await backendApi.vuelos.listar();
-      setVuelos(raw.map(mapVuelo));
+      setVuelos((raw || []).map(mapVuelo));
       setFuente('oracle');
     } catch {
       setVuelos([]);
@@ -109,7 +118,7 @@ export function useVuelos() {
 
 // ─── Hook de detalle de vuelo ─────────────────────────────────────────────────
 export function useVueloDetalle(id: number) {
-  const [vuelo, setVuelo]       = useState<BE_Vuelo | null>(null);
+  const [vuelo, setVuelo]       = useState<any | null>(null);
   const [tarifas, setTarifas]   = useState<any[]>([]);
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState<string | null>(null);
@@ -124,8 +133,11 @@ export function useVueloDetalle(id: number) {
         if (!cancelled) setVuelo(v);
         // También intentar cargar tarifas del programa
         try {
-          const t = await backendApi.tarifasVuelo.porPrograma(v.IdPrograma);
-          if (!cancelled) setTarifas(t);
+          const programId = v.id_programa;
+          if (programId) {
+            const t = await backendApi.tarifasVuelo.porPrograma(programId);
+            if (!cancelled) setTarifas(t || []);
+          }
         } catch { /* tarifas opcionales */ }
       } catch (e: any) {
         if (!cancelled) setError(e.message);
